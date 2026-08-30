@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Unearthed Artisan Co. — Handmade Soap, Lotion &amp; Lip Balm, Simi Valley CA</title>
+<meta name="description" content="Small-batch soap, tallow lotion, and lip balm handmade in Simi Valley, California with organic oils, grass-fed tallow, and natural clay and earth pigments. Local pickup, local delivery, and nationwide shipping." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="nav-mark" href="#top">
+      <img src="assets/logo.png" alt="" />
+      Unearthed Artisan Co.
+    </a>
+    <ul class="nav-links">
+      <li><a href="#shop">Shop</a></li>
+      <li><a href="#shipping">Shipping &amp; Delivery</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="cart-toggle" id="cart-toggle" aria-haspopup="true" aria-controls="cart-drawer" aria-label="Open your bag">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 8h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-copy">
+      <p class="eyebrow">Simi Valley, California</p>
+      <h1>Small&#8209;batch skincare,<br />made slow and by hand.</h1>
+      <p class="hero-lede">
+        Cold-process soap, grass-fed tallow lotion, and lip balm — built from
+        organic plant oils, real tallow and shea butter, colored only with
+        clay, root powders, and other earth pigments. Gentle enough for every
+        day, honest about what's in it.
+      </p>
+      <div class="hero-cta-row">
+        <a class="btn btn--primary" href="#shop">Shop the Collection</a>
+        <a class="btn btn--ghost" href="#shipping">Shipping &amp; Local Pickup</a>
+      </div>
+    </div>
+    <div class="hero-medallion">
+      <img src="assets/logo.png" alt="Unearthed Artisan Co. — Handmade with care. Gentle, natural ingredients." />
+    </div>
+  </div>
+</header>
+
+<section class="band" id="shop">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">The Collection</p>
+      <h2>All natural, down to the last ingredient.</h2>
+      <p>Every recipe starts from organic plant oils and grass-fed tallow, never stretched with cheap
+        filler oils. Colored only with clay, root powders, and activated charcoal — no synthetic dye,
+        no synthetic fragrance fillers. Soap, tallow lotion, and lip balm, each made the same honest way.</p>
+    </div>
+
+    <h3 class="shelf-heading">Soap</h3>
+    <div class="shelf">
+
+      <article class="card">
+        <div class="card-art">
+          <span class="card-tag">Fragrance-Free</span>
+          <img src="assets/soap-placeholder.png" alt="Quiet Clay soap" />
+        </div>
+        <div class="card-body">
+          <h3>Quiet Clay</h3>
+          <p class="card-ingredients">Kaolin clay only · no essential or fragrance oil</p>
+          <p class="card-desc">The quiet one in the collection — nothing added but kaolin clay for a silky
+            lather. Built for sensitive skin and anyone who'd rather skip fragrance altogether.</p>
+          <div class="card-foot">
+            <p class="card-price"><span>Per bar</span>$8.95</p>
+            <button class="buy-btn add-to-cart" type="button" data-id="quiet-clay" data-name="Quiet Clay Soap" data-price="8.95">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-art">
+          <span class="card-tag">Tea Tree</span>
+          <img src="assets/soap-placeholder.png" alt="Jade Hollow soap" />
+        </div>
+        <div class="card-body">
+          <h3>Jade Hollow</h3>
+          <p class="card-ingredients">Organic tea tree oil · French green clay · Dead Sea mud</p>
+          <p class="card-desc">Clarifying tea tree essential oil against soft, pastel-green French clay and
+            mineral-rich Dead Sea mud — a purifying, grounded bar.</p>
+          <div class="card-foot">
+            <p class="card-price"><span>Per bar</span>$8.95</p>
+            <button class="buy-btn add-to-cart" type="button" data-id="jade-hollow" data-name="Jade Hollow Soap" data-price="8.95">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-art">
+          <span class="card-tag">Lavender</span>
+          <img src="assets/soap-placeholder.png" alt="Violet Dusk soap" />
+        </div>
+        <div class="card-body">
+          <h3>Violet Dusk</h3>
+          <p class="card-ingredients">Organic lavender oil · purple clay · Dead Sea mud</p>
+          <p class="card-desc">Calming lavender essential oil deepened with purple clay and Dead Sea mud
+            for a soft violet, dusk-toned bar.</p>
+          <div class="card-foot">
+            <p class="card-price"><span>Per bar</span>$8.95</p>
+            <button class="buy-btn add-to-cart" type="button" data-id="violet-dusk" data-name="Violet Dusk Soap" data-price="8.95">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-art">
+          <span class="card-tag">Lavender Swirl</span>
+          <img src="assets/soap-placeholder.png" alt="Violet Storm soap" />
+        </div>
+        <div class="card-body">
+          <h3>Violet Storm</h3>
+          <p class="card-ingredients">Organic lavender oil · purple clay &amp; indigo swirl · kaolin clay</p>
+          <p class="card-desc">The marbled sibling to Violet Dusk — the same calming lavender, hand-swirled
+            with purple clay and a thread of indigo for a stormy, marbled finish.</p>
+          <div class="card-foot">
+            <p class="card-price"><span>Per bar</span>$8.95</p>
+            <button class="buy-btn add-to-cart" type="button" data-id="violet-storm" data-name="Violet Storm Soap" data-price="8.95">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-art">
+          <span class="card-tag">Grapefruit · Lemongrass</span>
+          <img src="assets/soap-placeholder.png" alt="Garnet Dawn soap" />
+        </div>
+        <div class="card-body">
+          <h3>Garnet Dawn</h3>
+          <p class="card-ingredients">Organic grapefruit &amp; lemongrass oils · madder root powder</p>
+          <p class="card-desc">Bright grapefruit and lemongrass essential oils over a madder-root base —
+            a warm, reddish-orange bar with a fresh citrus lift.</p>
+          <div class="card-foot">
+            <p class="card-price"><span>Per bar</span>$9.95</p>
+            <button class="buy-btn add-to-cart" type="button" data-id="garnet-dawn" data-name="Garnet Dawn Soap" data-price="9.95">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-art">
+          <span class="card-tag">Eucalyptus · Patchouli</span>
+          <img src="assets/soap-placeholder.png" alt="Indigo Grove soap" />
+        </div>
+        <div class="card-body">
+          <h3>Indigo Grove</h3>
+          <p class="card-ingredients">Organic eucalyptus &amp; patchouli oils · indigo powder</p>
+          <p class="card-desc">Cooling eucalyptus and earthy patchouli over deep indigo powder — a
+            grove-toned bar with a grounded, herbal scent.</p>
+          <div class="card-foot">
+            <p class="card-price"><span>Per bar</span>$9.95</p>
+            <button class="buy-btn add-to-cart" type="button" data-id="indigo-grove" data-name="Indigo Grove Soap" data-price="9.95">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-art">
+          <span class="card-tag">Face Bar</span>
+          <img src="assets/soap-placeholder.png" alt="Onyx Ember soap" />
+        </div>
+        <div class="card-body">
+          <h3>Onyx Ember</h3>
+          <p class="card-ingredients">Organic frankincense &amp; orange oils · activated charcoal</p>
+          <p class="card-desc">Warm frankincense and orange over activated charcoal — a deep black bar
+            formulated as a gentle facial cleansing bar.</p>
+          <div class="card-foot">
+            <p class="card-price"><span>Per bar</span>$9.95</p>
+            <button class="buy-btn add-to-cart" type="button" data-id="onyx-ember" data-name="Onyx Ember Soap" data-price="9.95">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <p class="shelf-note">Mix and match scents freely — everything you add goes into one bag,
+      with one shipping or delivery choice at checkout. Photos above are placeholders until
+      each bar's product photography is ready.</p>
+
+    <h3 class="shelf-heading">Tallow Lotion</h3>
+    <div class="shelf shelf--two">
+
+      <article class="card">
+        <div class="card-art card-art--label">
+          <img src="assets/lavender-lotion.png" alt="Lavender Tallow Body Lotion" />
+        </div>
+        <div class="card-body">
+          <h3>Lavender Tallow Body Lotion</h3>
+          <p class="card-ingredients">Grass-fed tallow · organic jojoba oil · shea butter · lavender essential oil</p>
+          <p class="card-desc">A rich, whipped-texture lotion built on grass-fed tallow and organic shea
+            and jojoba oils, scented with calming lavender essential oil. 4oz jar.</p>
+          <div class="card-foot">
+            <p class="card-price"><span>4oz jar</span>$24.99</p>
+            <button class="buy-btn add-to-cart" type="button" data-id="lavender-tallow-lotion" data-name="Lavender Tallow Body Lotion (4oz)" data-price="24.99">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-art card-art--label">
+          <img src="assets/facial-lotion.png" alt="Frankincense Tallow Facial Lotion" />
+        </div>
+        <div class="card-body">
+          <h3>Frankincense Tallow Facial Lotion</h3>
+          <p class="card-ingredients">Grass-fed tallow · organic rosehip seed oil · organic jojoba oil · shea butter · frankincense oil</p>
+          <p class="card-desc">A lighter facial formula built around organic rosehip seed oil for its
+            antioxidant, anti-aging properties, warmed with frankincense. 2oz jar.</p>
+          <div class="card-foot">
+            <p class="card-price"><span>2oz jar</span>$26.99</p>
+            <button class="buy-btn add-to-cart" type="button" data-id="frankincense-facial-lotion" data-name="Frankincense Tallow Facial Lotion (2oz)" data-price="26.99">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <h3 class="shelf-heading">Lip Balm</h3>
+    <div class="shelf shelf--coming-soon">
+      <article class="card card--soon">
+        <div class="card-body card-body--soon">
+          <span class="card-tag card-tag--static">Coming Soon</span>
+          <h3>Tallow Lip Balm — Vanilla, Peppermint &amp; Guava</h3>
+          <p class="card-desc">Grass-fed tallow and beeswax lip balm in three flavors, made with organic
+            lip-safe flavor oils. In final ingredient review before it joins the shop — check back soon.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="band band--pale" id="shipping">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Getting It To You</p>
+      <h2>Shipping &amp; delivery</h2>
+      <p>Every order ships from Simi Valley, CA. Choose your method at checkout —
+        estimate it below first.</p>
+    </div>
+
+    <div class="ledger">
+      <div>
+        <dl class="ledger-table">
+          <div class="ledger-row">
+            <div>
+              <dt>Local Pickup</dt>
+              <dd>Simi Valley, 93065 — arrange a pickup time after ordering.</dd>
+            </div>
+            <div class="amt">Free</div>
+          </div>
+          <div class="ledger-row">
+            <div>
+              <dt>Local Delivery</dt>
+              <dd>Within about 10 miles of 93065. Free on orders of $35 or more.</dd>
+            </div>
+            <div class="amt">$5.00</div>
+          </div>
+          <div class="ledger-row">
+            <div>
+              <dt>Standard Shipping — 1&ndash;3 bars</dt>
+              <dd>USPS Ground Advantage, nationwide. Packages under 1 lb now ship at one flat rate
+                regardless of exact weight.</dd>
+            </div>
+            <div class="amt">$8.95</div>
+          </div>
+          <div class="ledger-row">
+            <div>
+              <dt>Standard Shipping — 4&ndash;9 bars</dt>
+              <dd>USPS Priority Mail Flat Rate Small Box — one fixed price up to 70 lb, so it's the
+                simpler and usually cheaper option once an order crosses 1 lb.</dd>
+            </div>
+            <div class="amt">$13.65</div>
+          </div>
+          <div class="ledger-row">
+            <div>
+              <dt>Standard Shipping — 10+ bars</dt>
+              <dd>USPS Priority Mail Flat Rate Medium Box.</dd>
+            </div>
+            <div class="amt">$24.80</div>
+          </div>
+        </dl>
+        <p class="ledger-foot">Standard shipping is free on orders of $75 or more (about 8 bars).
+          These are USPS retail counter prices as of the July 2026 rate update — shipping from a
+          free tool like Pirate Ship instead of the post office counter typically gets Commercial
+          Plus pricing, a few dollars cheaper on Ground Advantage, without needing a business
+          account. Worth rechecking at usps.com if it's been a while.</p>
+      </div>
+
+      <div class="estimator">
+        <h3>Estimate your order</h3>
+        <p class="estimator-sub">Based on standard soap bars at $8.95 each (specialty bars run $9.95 — this
+          estimate is close either way). Pick a quantity and a method to see the total; lotion and lip balm
+          weigh differently, so orders mixing products get a confirmed shipping cost when we follow up.</p>
+
+        <div class="field">
+          <label for="est-qty">Number of bars</label>
+          <div class="stepper">
+            <button type="button" id="est-dec" aria-label="Decrease quantity">&minus;</button>
+            <output id="est-qty">4</output>
+            <button type="button" id="est-inc" aria-label="Increase quantity">+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Method</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <span class="rlabel"><input type="radio" name="est-method" value="pickup" /> Local Pickup</span>
+              <span class="ramt">Free</span>
+            </label>
+            <label class="radio-option">
+              <span class="rlabel"><input type="radio" name="est-method" value="delivery" /> Local Delivery</span>
+              <span class="ramt">$5.00</span>
+            </label>
+            <label class="radio-option">
+              <span class="rlabel"><input type="radio" name="est-method" value="shipping" checked /> Standard Shipping</span>
+              <span class="ramt">$8.95</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="estimate-total">
+          <span class="lbl">Subtotal <span id="est-subtotal">$35.80</span> + shipping <span id="est-shipping">$13.65</span></span>
+          <span class="val" id="est-total">$49.45</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="about">
+  <div class="wrap about-grid">
+    <div class="about-medallion">
+      <img src="assets/logo.png" alt="" />
+    </div>
+    <div class="about-copy">
+      <p class="eyebrow">About the Studio</p>
+      <h2>Scented by nature. Colored by the earth.</h2>
+      <p class="about-lede">Unearthed Artisan Co. began with a simple, stubborn belief: what you put
+        on your skin should be as honest as what you put in your body. No synthetic dye pretending
+        to be color. No fragrance blend hiding behind a chemical list. Just plant oils, grass-fed
+        tallow, and clay, root, and mineral pigments pulled straight from the earth — the kind of
+        ingredients your skin has always known what to do with.</p>
+      <p>Every bar of soap is mixed by hand in small batches, poured, and cured for six weeks before
+        it's ready. Every jar of lotion is blended slowly from grass-fed tallow and organic oils —
+        the same lipids your skin already makes on its own, not something manufactured to imitate
+        them. It takes longer this way. It's also the only way we'd do it.</p>
+      <p class="about-signoff">Simi Valley, California. Small batches. Nothing to hide.</p>
+      <ul class="about-list">
+        <li>Real oils and butters, never synthetic substitutes</li>
+        <li>Colored with clay, root powders, and activated charcoal — never synthetic dye</li>
+        <li>Small-batch, hand-poured, and cured slow</li>
+        <li>Every ingredient sourced and documented</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="footer" id="contact">
+  <div class="wrap">
+    <div>
+      <p class="footer-mark">Unearthed Artisan Co.</p>
+      <p>Handmade with care.<br />Gentle, natural ingredients.</p>
+    </div>
+    <div>
+      <h4>Visit &amp; Contact</h4>
+      <address>
+        Simi Valley, CA 93065<br />
+        <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a><br />
+        <a href="https://www.instagram.com/unearthedartisanco" target="_blank" rel="noopener">@unearthedartisanco</a>
+      </address>
+    </div>
+    <div>
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="#shop">The Collection</a></li>
+        <li><a href="#shipping">Shipping &amp; Delivery</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>&copy; 2026 Unearthed Artisan Co. Made in Simi Valley, CA.</span>
+    <span>Prices shown are per item and do not include shipping.</span>
+  </div>
+</footer>
+
+<div class="cart-overlay" id="cart-overlay"></div>
+<aside class="cart-drawer" id="cart-drawer" aria-hidden="true" aria-label="Your bag">
+  <div class="cart-drawer-head">
+    <h3>Your Bag</h3>
+    <button class="cart-close" id="cart-close" aria-label="Close bag">&times;</button>
+  </div>
+
+  <div class="cart-items" id="cart-items">
+    <p class="cart-empty" id="cart-empty">Your bag is empty — add something from the collection.</p>
+  </div>
+
+  <div class="cart-shipping">
+    <label>Delivery method</label>
+    <div class="radio-group">
+      <label class="radio-option">
+        <span class="rlabel"><input type="radio" name="cart-method" value="pickup" /> Local Pickup</span>
+        <span class="ramt">Free</span>
+      </label>
+      <label class="radio-option">
+        <span class="rlabel"><input type="radio" name="cart-method" value="delivery" /> Local Delivery</span>
+        <span class="ramt">$5.00</span>
+      </label>
+      <label class="radio-option">
+        <span class="rlabel"><input type="radio" name="cart-method" value="shipping" checked /> Standard Shipping</span>
+        <span class="ramt">$8.95</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="cart-totals">
+    <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
+    <div class="cart-total-row"><span>Shipping</span><span id="cart-shipping">&mdash;</span></div>
+    <div class="cart-total-row cart-total-row--grand"><span>Total</span><span id="cart-total">$0.00</span></div>
+  </div>
+
+  <a class="btn btn--primary cart-checkout is-disabled" id="cart-checkout" href="#">Email This Order</a>
+  <p class="cart-note">Online payment isn't connected yet. For now, this sends your order details
+    to us by email and we'll follow up to arrange payment and delivery. Shipping shown here is
+    estimated on soap-bar weight — bags mixing in lotion or lip balm get a confirmed shipping
+    cost in that follow-up.</p>
+</aside>
+
+<script src="script.js"></script>
+</body>
+</html>
