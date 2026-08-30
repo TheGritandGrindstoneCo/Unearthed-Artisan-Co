@@ -74,6 +74,62 @@
     opacity: 0.75;
     line-height: 1.7;
   }
+  .notify-form {
+    margin-top: 40px;
+  }
+  .notify-hp {
+    position: absolute;
+    left: -9999px;
+  }
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .notify-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .notify-input {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    padding: 14px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--ivory-card);
+    color: var(--charcoal);
+    min-width: 260px;
+  }
+  .notify-input:focus-visible {
+    outline: 2px solid var(--sage-deep);
+    outline-offset: 2px;
+  }
+  .notify-success {
+    margin-top: 40px;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--forest);
+  }
+  .notify-error {
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: var(--charcoal);
+  }
+  .soon-instagram {
+    margin-top: 20px;
+  }
+  @media (max-width: 480px) {
+    .notify-input { min-width: 0; width: 100%; }
+  }
   @media (max-width: 560px) {
     .soon-wrap { padding: 48px 20px; }
   }
@@ -102,8 +158,19 @@
 
   <span class="soon-badge">Preorders Opening Soon</span>
 
-  <div class="soon-cta">
-    <a class="btn btn--primary" href="mailto:unearthedartisanco@gmail.com?subject=Notify%20me%20when%20preorders%20open">Get Notified by Email</a>
+  <form name="preorder-notify" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="notify-form" id="notify-form">
+    <input type="hidden" name="form-name" value="preorder-notify" />
+    <p class="notify-hp"><label>Don't fill this out if you're human: <input name="bot-field" /></label></p>
+    <div class="notify-row">
+      <label for="notify-email" class="visually-hidden">Email address</label>
+      <input type="email" name="email" id="notify-email" class="notify-input" placeholder="you@email.com" required />
+      <button type="submit" class="btn btn--primary">Get Notified</button>
+    </div>
+    <p class="notify-error" id="notify-error" hidden>Something went wrong — try again, or email us directly at unearthedartisanco@gmail.com.</p>
+  </form>
+  <p class="notify-success" id="notify-success" hidden>You're on the list — we'll email you the moment preorders open.</p>
+
+  <div class="soon-cta soon-instagram">
     <a class="btn btn--ghost" href="https://www.instagram.com/unearthedartisanco" target="_blank" rel="noopener">Follow on Instagram</a>
   </div>
 
@@ -112,6 +179,38 @@
     <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a> &middot; Simi Valley, CA 93065
   </p>
 </div>
+
+<script>
+  var notifyForm = document.getElementById("notify-form");
+  var notifyError = document.getElementById("notify-error");
+  var notifySuccess = document.getElementById("notify-success");
+
+  function encodeFormData(form) {
+    var params = new URLSearchParams();
+    new FormData(form).forEach(function (value, key) {
+      params.append(key, value);
+    });
+    return params.toString();
+  }
+
+  notifyForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    notifyError.hidden = true;
+    fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: encodeFormData(notifyForm),
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error("Submission failed");
+        notifyForm.hidden = true;
+        notifySuccess.hidden = false;
+      })
+      .catch(function () {
+        notifyError.hidden = false;
+      });
+  });
+</script>
 
 </body>
 </html>

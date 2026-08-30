@@ -2,6 +2,11 @@
 // Standalone front-end estimate for browsing. The cart module below (bottom
 // of this file) uses the same rate table for the actual bag total.
 
+// CA sales tax rate for Simi Valley (93065) — verify against CDTFA's official
+// "Find a Sales and Use Tax Rate by Address" tool before relying on this for
+// filing; third-party rate aggregators disagreed when this was set.
+const CA_TAX_RATE = 0.0725;
+
 (function () {
   const BAR_PRICE = 8.95; // standard bar price; specialty bars ($9.95) run close enough for this estimate
 
@@ -36,6 +41,7 @@
   const radios = document.querySelectorAll('input[name="est-method"]');
   const subtotalEl = document.getElementById("est-subtotal");
   const shippingEl = document.getElementById("est-shipping");
+  const taxEl = document.getElementById("est-tax");
   const totalEl = document.getElementById("est-total");
 
   if (!qtyOutput) return; // estimator not on this page
@@ -56,10 +62,14 @@
     const subtotal = qty * BAR_PRICE;
     const method = selectedMethod();
     const shippingCost = RATES[method].cost(subtotal, qty);
-    const total = subtotal + shippingCost;
+    // CA tax only applies to Local Pickup/Delivery here — Standard Shipping's
+    // destination is unknown until checkout, so it's confirmed at follow-up.
+    const taxCost = method === "shipping" ? 0 : subtotal * CA_TAX_RATE;
+    const total = subtotal + shippingCost + taxCost;
 
     subtotalEl.textContent = "$" + subtotal.toFixed(2);
     shippingEl.textContent = money(shippingCost);
+    taxEl.textContent = method === "shipping" ? "TBD" : "$" + taxCost.toFixed(2);
     totalEl.textContent = "$" + total.toFixed(2);
 
     radios.forEach((r) => {
@@ -115,6 +125,7 @@
   const countEl = document.getElementById("cart-count");
   const subtotalEl = document.getElementById("cart-subtotal");
   const shippingEl = document.getElementById("cart-shipping");
+  const taxEl = document.getElementById("cart-tax");
   const totalEl = document.getElementById("cart-total");
   const checkoutBtn = document.getElementById("cart-checkout");
   const methodRadios = document.querySelectorAll('input[name="cart-method"]');
@@ -194,12 +205,18 @@
     const sub = subtotal();
     const method = selectedMethod();
     const shipCost = qty === 0 ? 0 : RATES[method].cost(sub, qty);
-    const total = sub + shipCost;
+    // CA tax applies to Local Pickup/Delivery (always CA transactions). For
+    // Standard Shipping, destination is unknown here, so tax is confirmed
+    // at follow-up rather than guessed in the live total.
+    const taxApplies = qty > 0 && method !== "shipping";
+    const taxCost = taxApplies ? sub * CA_TAX_RATE : 0;
+    const total = sub + shipCost + taxCost;
 
     countEl.textContent = qty;
     countEl.style.display = qty > 0 ? "flex" : "none";
     subtotalEl.textContent = money(sub);
     shippingEl.textContent = qty === 0 ? "—" : money(shipCost);
+    taxEl.textContent = qty === 0 ? "—" : method === "shipping" ? "TBD" : money(taxCost);
     totalEl.textContent = money(total);
 
     methodRadios.forEach((r) => {
@@ -211,6 +228,10 @@
       const lines = cart.map((item) => item.qty + " x " + item.name + " - " + money(item.qty * item.price));
       const methodOption = document.querySelector('input[name="cart-method"]:checked').closest(".radio-option");
       const methodLabel = methodOption.querySelector(".rlabel").textContent.trim();
+      const taxLine =
+        method === "shipping"
+          ? "CA sales tax: TBD — only applies if shipping within California, confirmed when we follow up"
+          : "CA sales tax (7.25%): " + money(taxCost);
       const body = [
         "Hi! I'd like to order:",
         "",
@@ -218,6 +239,7 @@
         "",
         "Subtotal: " + money(sub),
         "Delivery method: " + methodLabel + " (" + money(shipCost) + ")",
+        taxLine,
         "Estimated total: " + money(total),
         "",
         "Name:",
