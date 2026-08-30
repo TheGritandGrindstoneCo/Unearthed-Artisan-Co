@@ -77,6 +77,12 @@
   .notify-form {
     margin-top: 40px;
   }
+  .notify-prompt {
+    margin: 0 0 16px;
+    font-size: 0.92rem;
+    color: var(--charcoal);
+    opacity: 0.85;
+  }
   .notify-hp {
     position: absolute;
     left: -9999px;
@@ -161,10 +167,11 @@
   <form name="preorder-notify" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="notify-form" id="notify-form">
     <input type="hidden" name="form-name" value="preorder-notify" />
     <p class="notify-hp"><label>Don't fill this out if you're human: <input name="bot-field" /></label></p>
+    <p class="notify-prompt">Leave your email and we'll send you a one-time note the moment preorders open — no spam, no other emails.</p>
     <div class="notify-row">
       <label for="notify-email" class="visually-hidden">Email address</label>
       <input type="email" name="email" id="notify-email" class="notify-input" placeholder="you@email.com" required />
-      <button type="submit" class="btn btn--primary">Get Notified</button>
+      <button type="submit" class="btn btn--primary">Notify Me at Launch</button>
     </div>
     <p class="notify-error" id="notify-error" hidden>Something went wrong — try again, or email us directly at unearthedartisanco@gmail.com.</p>
   </form>
