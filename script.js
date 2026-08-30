@@ -12,7 +12,7 @@ const CA_TAX_RATE = 0.0725;
 
   const RATES = {
     pickup: {
-      label: "Local Pickup — Simi Valley",
+      label: "Local Pickup",
       cost: () => 0,
     },
     delivery: {
