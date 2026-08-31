@@ -570,6 +570,10 @@ p { margin: 0; }
   border-color: var(--sage-deep);
   background: var(--sage-pale);
 }
+.radio-option:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .radio-option input { accent-color: var(--sage-deep); }
 .radio-option .rlabel { display: flex; align-items: center; gap: 10px; }
 .radio-option .ramt { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--sage-deep); }
@@ -814,6 +818,34 @@ p { margin: 0; }
 }
 .cart-shipping .radio-group { gap: 8px; }
 .cart-shipping .radio-option { padding: 10px 12px; font-size: 0.86rem; }
+
+.zip-check { margin-bottom: 14px; }
+.zip-check label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+  margin-bottom: 8px;
+}
+.zip-input {
+  width: 140px;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--ivory-card);
+  color: var(--charcoal);
+}
+.zip-input:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 2px;
+}
+.zip-check-msg { margin-top: 8px; font-size: 0.82rem; }
+.zip-check-msg.is-eligible { color: var(--sage-deep); font-weight: 600; }
+.zip-check-msg.is-ineligible { color: var(--accent); font-weight: 600; }
 
 .cart-totals {
   margin-top: 16px;

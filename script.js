@@ -31,7 +31,7 @@ const CA_TAX_RATE = 0.0725;
 // ============================================================
 (function () {
   const RATES = {
-    delivery: { cost: (subtotal) => (subtotal >= 35 ? 0 : 5) },
+    delivery: { cost: (subtotal) => (subtotal >= 45 ? 0 : 5) },
     shipping: {
       cost: (subtotal, qty) => {
         if (subtotal >= 75) return 0;
@@ -217,6 +217,40 @@ const CA_TAX_RATE = 0.0725;
     });
 
     methodRadios.forEach((r) => r.addEventListener("change", render));
+
+    // Local Delivery only covers specific ZIP codes — gate the radio behind a
+    // ZIP check rather than letting anyone select it regardless of location.
+    const zipInput = document.getElementById("delivery-zip");
+    const zipMsg = document.getElementById("zip-check-msg");
+    const deliveryRadio = document.getElementById("delivery-radio");
+    const DELIVERY_ZIPS = ["93065", "93062", "93063", "93021"];
+
+    if (zipInput && zipMsg && deliveryRadio) {
+      zipInput.addEventListener("input", () => {
+        const zip = zipInput.value.trim();
+
+        if (zip.length < 5) {
+          deliveryRadio.disabled = true;
+          zipMsg.textContent = "";
+          zipMsg.className = "zip-check-msg";
+        } else if (DELIVERY_ZIPS.includes(zip)) {
+          deliveryRadio.disabled = false;
+          zipMsg.textContent = "Local delivery is available in your area.";
+          zipMsg.className = "zip-check-msg is-eligible";
+        } else {
+          deliveryRadio.disabled = true;
+          zipMsg.textContent = "Local delivery isn't available for that ZIP — Standard Shipping ships nationwide.";
+          zipMsg.className = "zip-check-msg is-ineligible";
+        }
+
+        if (deliveryRadio.disabled && deliveryRadio.checked) {
+          deliveryRadio.checked = false;
+          const shippingRadio = document.querySelector('input[name="cart-method"][value="shipping"]');
+          if (shippingRadio) shippingRadio.checked = true;
+          render();
+        }
+      });
+    }
 
     checkoutBtn.addEventListener("click", async (e) => {
       e.preventDefault();

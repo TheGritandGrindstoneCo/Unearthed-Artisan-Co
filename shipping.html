@@ -61,9 +61,10 @@
           <div class="ledger-row">
             <div>
               <dt>Local Delivery</dt>
-              <dd>Within about 10 miles of 93065. Delivered Wednesdays and Saturdays — order by
-                Monday 5pm PT for Wednesday, or Thursday 5pm PT for Saturday. Porch or mailbox
-                depending on package size. Free on orders of $35 or more.</dd>
+              <dd>ZIP codes 93065, 93062, 93063, and 93021 only. Delivered Wednesdays and
+                Saturdays — order by Monday 5pm PT for Wednesday, or Thursday 5pm PT for
+                Saturday. Porch or mailbox depending on package size. Free on orders of $45 or
+                more.</dd>
             </div>
             <div class="amt">$5.00</div>
           </div>
@@ -106,9 +107,16 @@
 
         <div class="cart-shipping">
           <label>Delivery method</label>
+
+          <div class="zip-check">
+            <label for="delivery-zip">Check local delivery eligibility (ZIP code)</label>
+            <input type="text" id="delivery-zip" class="zip-input" inputmode="numeric" maxlength="5" placeholder="ZIP code" />
+            <p class="zip-check-msg" id="zip-check-msg"></p>
+          </div>
+
           <div class="radio-group">
             <label class="radio-option">
-              <span class="rlabel"><input type="radio" name="cart-method" value="delivery" /> Local Delivery</span>
+              <span class="rlabel"><input type="radio" name="cart-method" value="delivery" id="delivery-radio" disabled /> Local Delivery</span>
               <span class="ramt">$5.00</span>
             </label>
             <label class="radio-option">
