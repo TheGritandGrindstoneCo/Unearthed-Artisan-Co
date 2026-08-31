@@ -851,11 +851,16 @@ p { margin: 0; }
   padding-bottom: 16px;
   border-bottom: 1px solid var(--line);
 }
+.cart-item-info {
+  flex: 1;
+  min-width: 0;
+}
 .cart-item-name {
   font-family: var(--font-display);
   font-size: 1.08rem;
   font-weight: 600;
   color: var(--forest);
+  overflow-wrap: break-word;
 }
 .cart-item-price {
   margin-top: 2px;
