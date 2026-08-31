@@ -809,6 +809,7 @@ p { margin: 0; }
   display: flex;
   flex-direction: column;
   padding: 26px;
+  overflow-y: auto;
 }
 .cart-drawer.is-open { transform: translateX(0); }
 
@@ -817,6 +818,7 @@ p { margin: 0; }
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
+  flex: none;
 }
 .cart-drawer-head h3 { font-size: 1.4rem; }
 .cart-close {
@@ -831,8 +833,7 @@ p { margin: 0; }
 .cart-close:hover { color: var(--sage-deep); }
 
 .cart-items {
-  flex: 1;
-  overflow-y: auto;
+  flex: none;
   display: flex;
   flex-direction: column;
   gap: 16px;
