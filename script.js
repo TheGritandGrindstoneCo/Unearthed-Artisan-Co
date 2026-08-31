@@ -241,6 +241,7 @@ const CA_TAX_RATE = 0.0725;
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             items: cart.map((item) => ({ name: item.name, price: item.price, qty: item.qty })),
+            method: method,
             shippingLabel: shippingLabel,
             shippingCost: shipCost,
             taxCost: taxCost,

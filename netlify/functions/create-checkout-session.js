@@ -27,6 +27,7 @@ exports.handler = async (event) => {
   const shippingLabel = (payload.shippingLabel || "Shipping").toString().slice(0, 250);
   const taxCost = parseFloat(payload.taxCost) || 0;
   const siteUrl = (payload.siteUrl || "").replace(/\/$/, "");
+  const method = (payload.method || "shipping").toString();
 
   if (items.length === 0 || !siteUrl) {
     return { statusCode: 400, body: JSON.stringify({ error: "Your bag is empty." }) };
@@ -36,6 +37,12 @@ exports.handler = async (event) => {
   params.append("mode", "payment");
   params.append("success_url", siteUrl + "/checkout-success.html");
   params.append("cancel_url", siteUrl + "/shipping.html");
+  params.append("phone_number_collection[enabled]", "true");
+  // Local Pickup doesn't need a mailing address; Local Delivery and Standard
+  // Shipping both do, so collect it for anything other than pickup.
+  if (method !== "pickup") {
+    params.append("shipping_address_collection[allowed_countries][0]", "US");
+  }
 
   let i = 0;
   items.forEach((item) => {
