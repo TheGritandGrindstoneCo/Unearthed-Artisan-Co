@@ -25,7 +25,7 @@ const CA_TAX_RATE = 0.0725;
 })();
 
 // ============================================================
-// Cart — add to bag on any page, review and check out on cart.html.
+// Cart — add to bag on any page, review and check out on shipping.html.
 // Persists to localStorage so the bag survives a page reload.
 // Checkout hands off to Stripe via a Netlify serverless function.
 // ============================================================
@@ -48,7 +48,7 @@ const CA_TAX_RATE = 0.0725;
   const countEl = document.getElementById("cart-count");
   if (!countEl) return; // no cart icon on this page (e.g. the preorder teaser)
 
-  // These only exist on cart.html — everywhere else, only the badge count updates.
+  // These only exist on shipping.html — everywhere else, only the badge count updates.
   const itemsEl = document.getElementById("cart-items");
   const emptyEl = document.getElementById("cart-empty");
   const subtotalEl = document.getElementById("cart-subtotal");
