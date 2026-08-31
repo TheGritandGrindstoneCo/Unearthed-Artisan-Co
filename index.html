@@ -15,21 +15,8 @@
     min-height: 100vh;
     align-items: center;
   }
-  .soon-wrap {
-    margin: 0 auto;
-    max-width: 800px;
-    padding: 64px 32px;
+  .soon-copy {
     text-align: center;
-  }
-  .soon-logo {
-    width: min(300px, 75vw);
-    margin: 0 auto 32px;
-    border-radius: 50%;
-    box-shadow: var(--shadow);
-  }
-  .soon-wrap h1 {
-    font-size: clamp(2.3rem, 5vw, 3.1rem);
-    margin-top: 18px;
   }
   .soon-list {
     margin-top: 40px;
@@ -140,55 +127,57 @@
   @media (max-width: 480px) {
     .notify-input { min-width: 0; width: 100%; }
   }
-  @media (max-width: 560px) {
-    .soon-wrap { padding: 48px 20px; }
-  }
 </style>
 </head>
 <body>
 
-<div class="soon-wrap">
-  <img class="soon-logo" src="assets/logo.png" alt="Unearthed Artisan Co." />
-
-  <p class="eyebrow">Handcrafted in the USA</p>
-  <h1>Preorders launching soon.</h1>
-
-  <div class="soon-list">
-    <span>Cold-Process Soap</span>
-    <span class="dot">&#9679;</span>
-    <span>Grass-fed Tallow Lotion</span>
-    <span class="dot">&#9679;</span>
-    <span>Tallow &amp; Beeswax Lip Balm</span>
-  </div>
-
-  <p class="brand-line">The ritual your skin has been waiting for — organic oils, grass-fed
-    tallow, colored only by the earth. No filler oils, no synthetic dye, no synthetic fragrance,
-    never synthetic.</p>
-
-  <span class="soon-badge">Preorders Opening Soon</span>
-
-  <form name="preorder-notify" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="notify-form" id="notify-form">
-    <input type="hidden" name="form-name" value="preorder-notify" />
-    <p class="notify-hp"><label>Don't fill this out if you're human: <input name="bot-field" /></label></p>
-    <p class="notify-prompt">Leave your email and we'll send you a one-time note the moment preorders open — no spam, no other emails.</p>
-    <div class="notify-row">
-      <label for="notify-email" class="visually-hidden">Email address</label>
-      <input type="email" name="email" id="notify-email" class="notify-input" placeholder="you@email.com" required />
-      <button type="submit" class="btn btn--primary">Notify Me at Launch</button>
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-medallion">
+      <img src="assets/logo.png" alt="Unearthed Artisan Co." />
     </div>
-    <p class="notify-error" id="notify-error" hidden>Something went wrong — try again, or email us directly at unearthedartisanco@gmail.com.</p>
-  </form>
-  <p class="notify-success" id="notify-success" hidden>You're on the list — we'll email you the moment preorders open.</p>
+    <div class="hero-copy soon-copy">
+      <p class="eyebrow">Handcrafted in the USA</p>
+      <h1>Preorders launching soon.</h1>
 
-  <div class="soon-cta soon-instagram">
-    <a class="btn btn--ghost" href="https://www.instagram.com/unearthedartisanco" target="_blank" rel="noopener">Follow on Instagram</a>
+      <div class="soon-list">
+        <span>Cold-Process Soap</span>
+        <span class="dot">&#9679;</span>
+        <span>Grass-fed Tallow Lotion</span>
+        <span class="dot">&#9679;</span>
+        <span>Tallow &amp; Beeswax Lip Balm</span>
+      </div>
+
+      <p class="brand-line">The ritual your skin has been waiting for — organic oils, grass-fed
+        tallow, colored only by the earth. No filler oils, no synthetic dye, no synthetic fragrance,
+        never synthetic.</p>
+
+      <span class="soon-badge">Preorders Opening Soon</span>
+
+      <form name="preorder-notify" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="notify-form" id="notify-form">
+        <input type="hidden" name="form-name" value="preorder-notify" />
+        <p class="notify-hp"><label>Don't fill this out if you're human: <input name="bot-field" /></label></p>
+        <p class="notify-prompt">Leave your email and we'll send you a one-time note the moment preorders open — no spam, no other emails.</p>
+        <div class="notify-row">
+          <label for="notify-email" class="visually-hidden">Email address</label>
+          <input type="email" name="email" id="notify-email" class="notify-input" placeholder="you@email.com" required />
+          <button type="submit" class="btn btn--primary">Notify Me at Launch</button>
+        </div>
+        <p class="notify-error" id="notify-error" hidden>Something went wrong — try again, or email us directly at unearthedartisanco@gmail.com.</p>
+      </form>
+      <p class="notify-success" id="notify-success" hidden>You're on the list — we'll email you the moment preorders open.</p>
+
+      <div class="soon-cta soon-instagram">
+        <a class="btn btn--ghost" href="https://www.instagram.com/unearthedartisanco" target="_blank" rel="noopener">Follow on Instagram</a>
+      </div>
+
+      <p class="soon-footer">
+        Woman-owned. Thoughtfully crafted. Made with care.<br />
+        <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a> &middot; Handcrafted in the USA
+      </p>
+    </div>
   </div>
-
-  <p class="soon-footer">
-    Woman-owned. Thoughtfully crafted. Made with care.<br />
-    <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a> &middot; Handcrafted in the USA
-  </p>
-</div>
+</header>
 
 <script>
   var notifyForm = document.getElementById("notify-form");
