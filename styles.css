@@ -653,6 +653,8 @@ p { margin: 0; }
 .footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: 0.92rem; }
 .footer a { text-decoration: none; opacity: 0.92; }
 .footer a:hover { opacity: 1; text-decoration: underline; }
+.footer-social { display: inline-flex; align-items: center; gap: 6px; }
+.footer-social svg { flex: none; }
 .footer-bottom {
   margin-top: 44px;
   padding-top: 24px;
