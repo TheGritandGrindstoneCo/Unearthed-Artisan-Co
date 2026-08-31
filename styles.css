@@ -12,6 +12,7 @@
   --charcoal: #2b2820;
   --accent: #8a6a35;
   --accent-pale: #f6ecd3;
+  --tan-pale: #f3e6c9;
   --line: rgba(32, 30, 23, 0.14);
   --shadow: 0 18px 40px -24px rgba(43, 40, 32, 0.35);
 
@@ -32,6 +33,7 @@
     --charcoal: #d8d4c4;
     --accent: #d9be86;
     --accent-pale: #2a2013;
+    --tan-pale: #332818;
     --line: rgba(233, 236, 217, 0.14);
     --shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.6);
     color-scheme: dark;
@@ -48,6 +50,7 @@
   --charcoal: #d8d4c4;
   --accent: #d9be86;
   --accent-pale: #2a2013;
+  --tan-pale: #332818;
   --line: rgba(233, 236, 217, 0.14);
   --shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.6);
   color-scheme: dark;
@@ -201,13 +204,14 @@ p { margin: 0; }
   font-size: 0.65rem;
 }
 .brand-line {
-  margin-top: 18px;
-  max-width: 60ch;
+  margin: 18px auto 0;
+  max-width: 56ch;
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   font-style: italic;
   color: var(--charcoal);
 }
+.brand-line--left { margin-left: 0; margin-right: 0; }
 .hero-cta-row {
   margin-top: 36px;
   display: flex;
@@ -303,12 +307,13 @@ p { margin: 0; }
   position: absolute;
   top: 34px;
   left: 34px;
-  background: var(--forest);
-  color: var(--accent-pale);
+  background: color-mix(in srgb, var(--ivory-card) 90%, transparent);
+  color: var(--forest);
+  border: 1px solid var(--line);
   font-family: var(--font-body);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 6px 12px;
   border-radius: 6px 6px 6px 0;
@@ -353,7 +358,7 @@ p { margin: 0; }
   opacity: 0.85;
 }
 .buy-btn {
-  background: var(--forest);
+  background: var(--sage-deep);
   color: var(--ivory-card);
   border: none;
   border-radius: 999px;
@@ -364,7 +369,7 @@ p { margin: 0; }
   cursor: pointer;
   transition: background 0.18s ease, transform 0.18s ease;
 }
-.buy-btn:hover { background: var(--sage-deep); transform: translateY(-1px); }
+.buy-btn:hover { background: var(--forest); transform: translateY(-1px); }
 .buy-btn:focus-visible { outline: 2px solid var(--sage-deep); outline-offset: 3px; }
 
 .shelf-note {
@@ -377,7 +382,7 @@ p { margin: 0; }
 .shelf--two { grid-template-columns: repeat(2, 1fr); }
 
 .card-art--label {
-  background: var(--ivory-card);
+  background: var(--tan-pale);
   display: flex;
   justify-content: center;
   padding: 26px 26px 0;
@@ -385,6 +390,7 @@ p { margin: 0; }
 .card-art--label img {
   width: min(220px, 100%);
   border-radius: 50%;
+  box-shadow: var(--shadow);
 }
 
 .shelf--coming-soon { grid-template-columns: 1fr; }
