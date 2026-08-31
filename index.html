@@ -17,7 +17,7 @@
   }
   .soon-wrap {
     margin: 0 auto;
-    max-width: 640px;
+    max-width: 800px;
     padding: 64px 32px;
     text-align: center;
   }
@@ -27,21 +27,29 @@
     border-radius: 50%;
     box-shadow: var(--shadow);
   }
+  .soon-wrap h1 {
+    font-size: clamp(2.3rem, 5vw, 3.1rem);
+    margin-top: 18px;
+  }
   .soon-list {
     margin-top: 40px;
     display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
     flex-wrap: wrap;
     font-family: var(--font-display);
-    font-size: 1.15rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--forest);
   }
   .soon-list .dot {
     color: var(--sage-deep);
-    font-size: 0.8rem;
+    font-size: 0.7rem;
+  }
+  @media (max-width: 560px) {
+    .soon-list { font-size: 0.8rem; gap: 7px; }
   }
   .soon-badge {
     display: inline-block;
@@ -153,8 +161,9 @@
     <span>Tallow &amp; Beeswax Lip Balm</span>
   </div>
 
-  <p class="brand-line">Organic oils, scented by nature, colored by the earth — no filler oils,
-    no synthetic dye, no synthetic fragrance, never synthetic.</p>
+  <p class="brand-line">The ritual your skin has been waiting for — organic oils, grass-fed
+    tallow, colored only by the earth. No filler oils, no synthetic dye, no synthetic fragrance,
+    never synthetic.</p>
 
   <span class="soon-badge">Preorders Opening Soon</span>
 
