@@ -31,7 +31,6 @@ const CA_TAX_RATE = 0.0725;
 // ============================================================
 (function () {
   const RATES = {
-    pickup: { cost: () => 0 },
     delivery: { cost: (subtotal) => (subtotal >= 35 ? 0 : 5) },
     shipping: {
       cost: (subtotal, qty) => {
@@ -139,7 +138,7 @@ const CA_TAX_RATE = 0.0725;
     const sub = subtotal();
     const method = selectedMethod();
     const shipCost = qty === 0 ? 0 : RATES[method].cost(sub, qty);
-    // CA tax applies to Local Pickup/Delivery (always CA transactions). For
+    // CA tax applies to Local Delivery (always a CA transaction). For
     // Standard Shipping, destination is unknown here, so tax is confirmed
     // at follow-up rather than guessed in the live total.
     const taxApplies = qty > 0 && method !== "shipping";
