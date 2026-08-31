@@ -93,6 +93,27 @@ const CA_TAX_RATE = 0.0725;
 })();
 
 // ============================================================
+// Mobile nav toggle
+// ============================================================
+(function () {
+  const toggle = document.getElementById("nav-toggle");
+  const links = document.getElementById("nav-links");
+  if (!toggle || !links) return;
+
+  toggle.addEventListener("click", () => {
+    const isOpen = links.classList.toggle("is-open");
+    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+
+  links.querySelectorAll("a").forEach((a) => {
+    a.addEventListener("click", () => {
+      links.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+    });
+  });
+})();
+
+// ============================================================
 // Cart — add to bag, adjust quantities, live totals.
 // Persists to localStorage so the bag survives a page reload.
 // Checkout currently emails the order summary (no payment processor
