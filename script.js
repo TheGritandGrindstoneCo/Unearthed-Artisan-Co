@@ -325,6 +325,15 @@ const CA_TAX_RATE = 0.0725;
     });
   });
 
+  document.querySelectorAll(".add-giftset").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const selects = btn.closest(".card-body").querySelectorAll(".bundle-select");
+      const picks = Array.from(selects).map((s) => s.value);
+      const name = "Gift Set: " + picks[0] + " Soap, " + picks[1] + ", " + picks[2] + " Lip Balm";
+      addItem("giftset-" + Date.now(), name, parseFloat(btn.dataset.price));
+    });
+  });
+
   itemsEl.addEventListener("click", (e) => {
     const btn = e.target.closest("button[data-action]");
     if (!btn) return;
