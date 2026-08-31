@@ -246,32 +246,8 @@ const CA_TAX_RATE = 0.0725;
     });
 
     if (qty > 0) {
-      const lines = cart.map((item) => item.qty + " x " + item.name + " - " + money(item.qty * item.price));
-      const methodOption = document.querySelector('input[name="cart-method"]:checked').closest(".radio-option");
-      const methodLabel = methodOption.querySelector(".rlabel").textContent.trim();
-      const taxLine =
-        method === "shipping"
-          ? "CA sales tax: TBD — only applies if shipping within California, confirmed when we follow up"
-          : "CA sales tax (7.25%): " + money(taxCost);
-      const body = [
-        "Hi! I'd like to order:",
-        "",
-        lines.join("\n"),
-        "",
-        "Subtotal: " + money(sub),
-        "Delivery method: " + methodLabel + " (" + money(shipCost) + ")",
-        taxLine,
-        "Estimated total: " + money(total),
-        "",
-        "Name:",
-        "Address (if shipping or delivery):",
-        "Phone:",
-      ].join("\n");
-      checkoutBtn.href =
-        "mailto:" + ORDER_EMAIL + "?subject=" + encodeURIComponent("New order from the website") + "&body=" + encodeURIComponent(body);
       checkoutBtn.classList.remove("is-disabled");
     } else {
-      checkoutBtn.href = "#";
       checkoutBtn.classList.add("is-disabled");
     }
 
@@ -352,8 +328,42 @@ const CA_TAX_RATE = 0.0725;
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeDrawer();
   });
-  checkoutBtn.addEventListener("click", (e) => {
-    if (checkoutBtn.classList.contains("is-disabled")) e.preventDefault();
+  checkoutBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    if (checkoutBtn.classList.contains("is-disabled")) return;
+
+    const sub = subtotal();
+    const qty = totalQty();
+    const method = selectedMethod();
+    const shipCost = RATES[method].cost(sub, qty);
+    const taxCost = method === "shipping" ? 0 : sub * CA_TAX_RATE;
+    const methodOption = document.querySelector('input[name="cart-method"]:checked').closest(".radio-option");
+    const shippingLabel = methodOption.querySelector(".rlabel").textContent.trim();
+
+    const originalText = checkoutBtn.textContent;
+    checkoutBtn.textContent = "Redirecting to checkout…";
+    checkoutBtn.classList.add("is-disabled");
+
+    try {
+      const res = await fetch("/.netlify/functions/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: cart.map((item) => ({ name: item.name, price: item.price, qty: item.qty })),
+          shippingLabel: shippingLabel,
+          shippingCost: shipCost,
+          taxCost: taxCost,
+          siteUrl: window.location.origin,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error((data && data.error) || "Checkout failed");
+      window.location.href = data.url;
+    } catch (err) {
+      checkoutBtn.textContent = originalText;
+      checkoutBtn.classList.remove("is-disabled");
+      alert("Something went wrong starting checkout. Please try again, or email us directly at " + ORDER_EMAIL + ".");
+    }
   });
 
   render();
