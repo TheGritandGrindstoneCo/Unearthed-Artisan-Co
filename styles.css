@@ -402,6 +402,41 @@ p { margin: 0; }
 
 .shelf--two { grid-template-columns: repeat(2, 1fr); }
 
+/* ---------- faq ---------- */
+.faq-list { max-width: 760px; }
+.faq-item {
+  border-bottom: 1px solid var(--line);
+  padding: 22px 0;
+}
+.faq-item summary {
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--forest);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: "+";
+  font-size: 1.4rem;
+  color: var(--sage-deep);
+  flex: none;
+  transition: transform 0.2s ease;
+}
+.faq-item[open] summary::after { transform: rotate(45deg); }
+.faq-item p {
+  margin-top: 14px;
+  font-size: 0.95rem;
+  color: var(--charcoal);
+  line-height: 1.6;
+}
+.faq-item p a { color: var(--sage-deep); text-decoration: underline; }
+
 .bundle-picks {
   display: grid;
   gap: 10px;
