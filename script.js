@@ -268,6 +268,15 @@ const CA_TAX_RATE = 0.0725;
     openDrawer();
   }
 
+  // Bundles store qty as the actual bar count (not "1 bundle") so shipping-tier
+  // math based on totalQty() still reflects real bar count. price is per-bar
+  // (bundle total / bar count), so qty * price still equals the flat bundle price.
+  function addBundleItem(name, totalPrice, barQty) {
+    cart.push({ id: name + "-" + Date.now(), name: name, price: totalPrice / barQty, qty: barQty });
+    render();
+    openDrawer();
+  }
+
   function openDrawer() {
     drawer.classList.add("is-open");
     overlay.classList.add("is-open");
@@ -283,6 +292,15 @@ const CA_TAX_RATE = 0.0725;
   document.querySelectorAll(".add-to-cart").forEach((btn) => {
     btn.addEventListener("click", () => {
       addItem(btn.dataset.id, btn.dataset.name, parseFloat(btn.dataset.price));
+    });
+  });
+
+  document.querySelectorAll(".add-bundle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const selects = btn.closest(".card-body").querySelectorAll(".bundle-select");
+      const scents = Array.from(selects).map((s) => s.value);
+      const name = btn.dataset.bundleName + ": " + scents.join(", ");
+      addBundleItem(name, parseFloat(btn.dataset.bundlePrice), scents.length);
     });
   });
 
