@@ -200,6 +200,14 @@ p { margin: 0; }
   color: var(--sage-deep);
   font-size: 0.65rem;
 }
+.brand-line {
+  margin-top: 18px;
+  max-width: 60ch;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--charcoal);
+}
 .hero-cta-row {
   margin-top: 36px;
   display: flex;
