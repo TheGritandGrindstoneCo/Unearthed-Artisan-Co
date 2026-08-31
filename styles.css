@@ -181,24 +181,24 @@ p { margin: 0; }
   color: var(--forest);
 }
 .tag-row {
-  margin-top: 18px;
+  margin-top: 20px;
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 12px;
   flex-wrap: wrap;
   justify-content: center;
 }
 .tag-row--left { justify-content: flex-start; }
 .tag-row .tag {
-  font-family: var(--font-body);
-  font-size: 0.72rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--sage-deep);
-  background: var(--sage-pale);
-  padding: 7px 14px;
-  border-radius: 999px;
+  color: var(--forest);
   white-space: nowrap;
+}
+.tag-row .dot {
+  color: var(--sage-deep);
+  font-size: 0.65rem;
 }
 .hero-cta-row {
   margin-top: 36px;
@@ -295,7 +295,7 @@ p { margin: 0; }
   position: absolute;
   top: 34px;
   left: 34px;
-  background: var(--accent);
+  background: var(--forest);
   color: var(--accent-pale);
   font-family: var(--font-body);
   font-size: 0.68rem;
@@ -328,19 +328,21 @@ p { margin: 0; }
 }
 .card-price {
   font-family: var(--font-display);
-  font-size: 1.7rem;
-  font-weight: 600;
-  color: var(--forest);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--charcoal);
+  opacity: 0.75;
   font-variant-numeric: tabular-nums;
 }
 .card-price span {
   display: block;
   font-family: var(--font-body);
-  font-size: 0.68rem;
+  font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--sage-deep);
+  opacity: 0.85;
 }
 .buy-btn {
   background: var(--forest);
