@@ -35,7 +35,7 @@ exports.handler = async (event) => {
   const params = new URLSearchParams();
   params.append("mode", "payment");
   params.append("success_url", siteUrl + "/checkout-success.html");
-  params.append("cancel_url", siteUrl + "/shop.html");
+  params.append("cancel_url", siteUrl + "/shipping.html");
 
   let i = 0;
   items.forEach((item) => {

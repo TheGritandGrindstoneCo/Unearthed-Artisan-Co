@@ -20,7 +20,7 @@
     </a>
     <ul class="nav-links" id="nav-links">
       <li><a href="shop.html">Shop</a></li>
-      <li><a href="shipping.html">Shipping &amp; Delivery</a></li>
+      <li><a href="shipping.html">Bag &amp; Shipping</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="faq.html">FAQ</a></li>
       <li><a href="#contact">Contact</a></li>
@@ -31,13 +31,13 @@
           <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
       </button>
-      <button class="cart-toggle" id="cart-toggle" aria-haspopup="true" aria-controls="cart-drawer" aria-label="Open your bag">
+      <a class="cart-toggle" id="cart-toggle" href="shipping.html" aria-label="Your bag">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M6 8h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
           <path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
         <span class="cart-count" id="cart-count">0</span>
-      </button>
+      </a>
     </div>
   </div>
 </nav>
@@ -113,7 +113,7 @@
       <details class="faq-item">
         <summary>Do you ship nationwide?</summary>
         <p>Yes — every order ships from within the USA via USPS. See our
-          <a href="shipping.html">Shipping &amp; Delivery</a> page for full rates and an order
+          <a href="shipping.html">Bag &amp; Shipping</a> page for full rates and an order
           estimate.</p>
       </details>
 
@@ -165,7 +165,7 @@
       <h4>Shop</h4>
       <ul>
         <li><a href="shop.html">The Collection</a></li>
-        <li><a href="shipping.html">Shipping &amp; Delivery</a></li>
+        <li><a href="shipping.html">Bag &amp; Shipping</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="faq.html">FAQ</a></li>
       </ul>
@@ -176,50 +176,6 @@
     <span>Prices shown are per item and do not include shipping.</span>
   </div>
 </footer>
-
-<div class="cart-overlay" id="cart-overlay"></div>
-<aside class="cart-drawer" id="cart-drawer" aria-hidden="true" aria-label="Your bag">
-  <div class="cart-drawer-head">
-    <h3>Your Bag</h3>
-    <button class="cart-close" id="cart-close" aria-label="Close bag">&times;</button>
-  </div>
-
-  <div class="cart-items" id="cart-items">
-    <p class="cart-empty" id="cart-empty">Your bag is empty — add something from the collection.</p>
-  </div>
-
-  <div class="cart-shipping">
-    <label>Delivery method</label>
-    <div class="radio-group">
-      <label class="radio-option">
-        <span class="rlabel"><input type="radio" name="cart-method" value="pickup" /> Local Pickup</span>
-        <span class="ramt">Free</span>
-      </label>
-      <label class="radio-option">
-        <span class="rlabel"><input type="radio" name="cart-method" value="delivery" /> Local Delivery</span>
-        <span class="ramt">$5.00</span>
-      </label>
-      <label class="radio-option">
-        <span class="rlabel"><input type="radio" name="cart-method" value="shipping" checked /> Standard Shipping</span>
-        <span class="ramt">$8.95</span>
-      </label>
-    </div>
-  </div>
-
-  <div class="cart-totals">
-    <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
-    <div class="cart-total-row"><span>Shipping</span><span id="cart-shipping">&mdash;</span></div>
-    <div class="cart-total-row"><span>CA Sales Tax</span><span id="cart-tax">&mdash;</span></div>
-    <div class="cart-total-row cart-total-row--grand"><span>Total</span><span id="cart-total">$0.00</span></div>
-  </div>
-
-  <button type="button" class="btn btn--primary cart-checkout is-disabled" id="cart-checkout">Checkout</button>
-  <p class="cart-note">Checkout is handled securely by Stripe — enter your card details on their
-    payment page, and you'll get an email receipt right away. Shipping shown here is estimated
-    on soap-bar weight — bags mixing in lotion or lip balm get a confirmed shipping cost after we
-    follow up. CA sales tax (7.25%) is included for Local Pickup and Local Delivery; Standard
-    Shipping orders only owe CA tax if shipping within California, confirmed at follow-up.</p>
-</aside>
 
 <script src="script.js"></script>
 </body>

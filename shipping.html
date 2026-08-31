@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Shipping &amp; Delivery — Unearthed Artisan Co.</title>
-<meta name="description" content="Local pickup, local delivery, and nationwide shipping for Unearthed Artisan Co. soap, tallow lotion, and lip balm." />
+<title>Your Bag &amp; Shipping — Unearthed Artisan Co.</title>
+<meta name="description" content="Review your bag and see local pickup, local delivery, and nationwide shipping rates for Unearthed Artisan Co. soap, tallow lotion, and lip balm." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -20,7 +20,7 @@
     </a>
     <ul class="nav-links" id="nav-links">
       <li><a href="shop.html">Shop</a></li>
-      <li><a href="shipping.html">Shipping &amp; Delivery</a></li>
+      <li><a href="shipping.html">Bag &amp; Shipping</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="faq.html">FAQ</a></li>
       <li><a href="#contact">Contact</a></li>
@@ -31,13 +31,13 @@
           <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
       </button>
-      <button class="cart-toggle" id="cart-toggle" aria-haspopup="true" aria-controls="cart-drawer" aria-label="Open your bag">
+      <a class="cart-toggle" id="cart-toggle" href="shipping.html" aria-label="Your bag">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M6 8h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
           <path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
         <span class="cart-count" id="cart-count">0</span>
-      </button>
+      </a>
     </div>
   </div>
 </nav>
@@ -45,14 +45,18 @@
 <section class="band">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">Getting It To You</p>
-      <h2>Shipping &amp; delivery</h2>
-      <p>Every order ships from within the USA. Choose your method at checkout —
-        estimate it below first.</p>
+      <p class="eyebrow">Your Bag</p>
+      <h2>Review your order, shipping &amp; delivery.</h2>
+      <p>Everything in your bag ships or is delivered together, with one method for the whole order.</p>
     </div>
 
     <div class="ledger">
       <div>
+        <div id="cart-items">
+          <p class="cart-empty" id="cart-empty">Your bag is empty — add something from the collection.</p>
+        </div>
+
+        <h3 style="margin-top:48px;">Delivery Options &amp; Rates</h3>
         <dl class="ledger-table">
           <div class="ledger-row">
             <div>
@@ -103,42 +107,39 @@
       </div>
 
       <div class="estimator">
-        <h3>Estimate your order</h3>
-        <p class="estimator-sub">Based on standard soap bars at $8.95 each (specialty bars run $9.95 — this
-          estimate is close either way). Pick a quantity and a method to see the total; lotion and lip balm
-          weigh differently, so orders mixing products get a confirmed shipping cost when we follow up.</p>
+        <h3>Order Summary</h3>
 
-        <div class="field">
-          <label for="est-qty">Number of bars</label>
-          <div class="stepper">
-            <button type="button" id="est-dec" aria-label="Decrease quantity">&minus;</button>
-            <output id="est-qty">4</output>
-            <button type="button" id="est-inc" aria-label="Increase quantity">+</button>
-          </div>
-        </div>
-
-        <div class="field">
-          <label>Method</label>
+        <div class="cart-shipping">
+          <label>Delivery method</label>
           <div class="radio-group">
             <label class="radio-option">
-              <span class="rlabel"><input type="radio" name="est-method" value="pickup" /> Local Pickup</span>
+              <span class="rlabel"><input type="radio" name="cart-method" value="pickup" /> Local Pickup</span>
               <span class="ramt">Free</span>
             </label>
             <label class="radio-option">
-              <span class="rlabel"><input type="radio" name="est-method" value="delivery" /> Local Delivery</span>
+              <span class="rlabel"><input type="radio" name="cart-method" value="delivery" /> Local Delivery</span>
               <span class="ramt">$5.00</span>
             </label>
             <label class="radio-option">
-              <span class="rlabel"><input type="radio" name="est-method" value="shipping" checked /> Standard Shipping</span>
+              <span class="rlabel"><input type="radio" name="cart-method" value="shipping" checked /> Standard Shipping</span>
               <span class="ramt">$8.95</span>
             </label>
           </div>
         </div>
 
-        <div class="estimate-total">
-          <span class="lbl">Subtotal <span id="est-subtotal">$35.80</span> + shipping <span id="est-shipping">$13.65</span> + tax <span id="est-tax">TBD</span></span>
-          <span class="val" id="est-total">$49.45</span>
+        <div class="cart-totals">
+          <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
+          <div class="cart-total-row"><span>Shipping</span><span id="cart-shipping">&mdash;</span></div>
+          <div class="cart-total-row"><span>CA Sales Tax</span><span id="cart-tax">&mdash;</span></div>
+          <div class="cart-total-row cart-total-row--grand"><span>Total</span><span id="cart-total">$0.00</span></div>
         </div>
+
+        <button type="button" class="btn btn--primary cart-checkout is-disabled" id="cart-checkout">Checkout</button>
+        <p class="cart-note">Checkout is handled securely by Stripe — enter your card details on their
+          payment page, and you'll get an email receipt right away. Shipping shown here is estimated
+          on soap-bar weight — bags mixing in lotion or lip balm get a confirmed shipping cost after we
+          follow up. CA sales tax (7.25%) is included for Local Pickup and Local Delivery; Standard
+          Shipping orders only owe CA tax if shipping within California, confirmed at follow-up.</p>
       </div>
     </div>
   </div>
@@ -162,7 +163,7 @@
       <h4>Shop</h4>
       <ul>
         <li><a href="shop.html">The Collection</a></li>
-        <li><a href="shipping.html">Shipping &amp; Delivery</a></li>
+        <li><a href="shipping.html">Bag &amp; Shipping</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="faq.html">FAQ</a></li>
       </ul>
@@ -173,50 +174,6 @@
     <span>Prices shown are per item and do not include shipping.</span>
   </div>
 </footer>
-
-<div class="cart-overlay" id="cart-overlay"></div>
-<aside class="cart-drawer" id="cart-drawer" aria-hidden="true" aria-label="Your bag">
-  <div class="cart-drawer-head">
-    <h3>Your Bag</h3>
-    <button class="cart-close" id="cart-close" aria-label="Close bag">&times;</button>
-  </div>
-
-  <div class="cart-items" id="cart-items">
-    <p class="cart-empty" id="cart-empty">Your bag is empty — add something from the collection.</p>
-  </div>
-
-  <div class="cart-shipping">
-    <label>Delivery method</label>
-    <div class="radio-group">
-      <label class="radio-option">
-        <span class="rlabel"><input type="radio" name="cart-method" value="pickup" /> Local Pickup</span>
-        <span class="ramt">Free</span>
-      </label>
-      <label class="radio-option">
-        <span class="rlabel"><input type="radio" name="cart-method" value="delivery" /> Local Delivery</span>
-        <span class="ramt">$5.00</span>
-      </label>
-      <label class="radio-option">
-        <span class="rlabel"><input type="radio" name="cart-method" value="shipping" checked /> Standard Shipping</span>
-        <span class="ramt">$8.95</span>
-      </label>
-    </div>
-  </div>
-
-  <div class="cart-totals">
-    <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
-    <div class="cart-total-row"><span>Shipping</span><span id="cart-shipping">&mdash;</span></div>
-    <div class="cart-total-row"><span>CA Sales Tax</span><span id="cart-tax">&mdash;</span></div>
-    <div class="cart-total-row cart-total-row--grand"><span>Total</span><span id="cart-total">$0.00</span></div>
-  </div>
-
-  <button type="button" class="btn btn--primary cart-checkout is-disabled" id="cart-checkout">Checkout</button>
-  <p class="cart-note">Checkout is handled securely by Stripe — enter your card details on their
-    payment page, and you'll get an email receipt right away. Shipping shown here is estimated
-    on soap-bar weight — bags mixing in lotion or lip balm get a confirmed shipping cost after we
-    follow up. CA sales tax (7.25%) is included for Local Pickup and Local Delivery; Standard
-    Shipping orders only owe CA tax if shipping within California, confirmed at follow-up.</p>
-</aside>
 
 <script src="script.js"></script>
 </body>
