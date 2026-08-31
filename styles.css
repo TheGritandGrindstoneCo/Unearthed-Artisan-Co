@@ -655,6 +655,30 @@ p { margin: 0; }
 .footer a:hover { opacity: 1; text-decoration: underline; }
 .footer-social { display: inline-flex; align-items: center; gap: 6px; }
 .footer-social svg { flex: none; }
+
+.about-follow {
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+.about-follow p {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--charcoal);
+}
+.about-follow-links {
+  margin-top: 14px;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.about-follow-links .footer-social {
+  color: var(--sage-deep);
+  font-weight: 600;
+  font-size: 0.92rem;
+  opacity: 1;
+}
+.about-follow-links .footer-social:hover { color: var(--forest); }
 .footer-bottom {
   margin-top: 44px;
   padding-top: 24px;
