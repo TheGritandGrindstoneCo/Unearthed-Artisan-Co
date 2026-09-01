@@ -18,6 +18,15 @@ const SCENT_IDS = [
 const DEFAULT_STOCK = 999;
 
 function inventoryStore() {
+  // Automatic environment injection for Netlify Blobs isn't available in
+  // this site's functions, so the site ID and an access token are supplied
+  // manually. Set NETLIFY_SITE_ID and NETLIFY_API_TOKEN in Netlify's
+  // Environment Variables — never commit them to the repo.
+  const siteID = process.env.NETLIFY_SITE_ID;
+  const token = process.env.NETLIFY_API_TOKEN;
+  if (siteID && token) {
+    return getStore({ name: "soap-inventory", consistency: "strong", siteID, token });
+  }
   return getStore({ name: "soap-inventory", consistency: "strong" });
 }
 

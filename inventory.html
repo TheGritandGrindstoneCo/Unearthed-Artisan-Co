@@ -170,7 +170,6 @@
         if (result.ok) {
           statusEl.textContent = "Saved.";
           statusEl.className = "inv-status is-ok";
-          renderRows(result.data && result.data.stock);
           loadInventory();
         } else {
           statusEl.textContent = (result.data && result.data.error) || "Something went wrong.";
