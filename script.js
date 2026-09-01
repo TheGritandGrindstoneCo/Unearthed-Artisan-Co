@@ -3,18 +3,40 @@
 // filing; third-party rate aggregators disagreed when this was set.
 const CA_TAX_RATE = 0.0725;
 
+// Maps the display names shown on soap "Add to Bag" buttons and in
+// bundle/gift-set dropdowns (soap scents, and — for the gift set — lotion
+// and lip balm picks) to the slug ids used for inventory tracking. Shared by
+// the sold-out marking below and the cart logic further down this file.
+const SCENT_SLUGS = {
+  "Quiet Clay": "quiet-clay",
+  "Jade Hollow": "jade-hollow",
+  "Violet Dusk": "violet-dusk",
+  "Violet Storm": "violet-storm",
+  "Garnet Dawn": "garnet-dawn",
+  "Indigo Grove": "indigo-grove",
+  "Onyx Ember": "onyx-ember",
+  "Lavender Body Lotion": "lavender-tallow-lotion",
+  "Frankincense Facial Lotion": "frankincense-facial-lotion",
+  "Vanilla": "vanilla-lip-balm",
+  "Peppermint": "peppermint-lip-balm",
+  "Guava": "guava-lip-balm",
+};
+
 // ============================================================
 // Product stock — marks sold-out soap, lotion, and lip balm items on the
-// shop page. Only runs where "Add to Bag" buttons exist (shop.html).
+// shop page, both on the "Add to Bag" buttons and inside bundle/gift-set
+// scent dropdowns. Only runs where those exist (shop.html).
 // ============================================================
 (function () {
   const buttons = document.querySelectorAll(".add-to-cart[data-id]");
-  if (buttons.length === 0) return;
+  const selects = document.querySelectorAll(".bundle-select");
+  if (buttons.length === 0 && selects.length === 0) return;
 
   fetch("/.netlify/functions/get-inventory")
     .then((res) => res.json())
     .then((data) => {
       const stock = data.stock || {};
+
       buttons.forEach((btn) => {
         const count = stock[btn.dataset.id];
         if (typeof count === "number" && count <= 0) {
@@ -23,9 +45,41 @@ const CA_TAX_RATE = 0.0725;
           btn.classList.add("is-sold-out");
         }
       });
+
+      selects.forEach((select) => {
+        Array.from(select.options).forEach((option) => {
+          const slug = SCENT_SLUGS[option.textContent.trim()];
+          const count = slug ? stock[slug] : undefined;
+          if (typeof count === "number" && count <= 0) {
+            option.disabled = true;
+            option.textContent += " (Sold Out)";
+          }
+        });
+        // If the option preselected in the page markup turned out to be sold
+        // out, move the selection to the first scent that's still in stock.
+        if (select.selectedOptions[0] && select.selectedOptions[0].disabled) {
+          const firstAvailable = Array.from(select.options).find((o) => !o.disabled);
+          if (firstAvailable) select.value = firstAvailable.value;
+        }
+      });
+
+      // If every scent in one of a bundle/gift set's dropdowns is sold out,
+      // there's no valid pick left for that slot — disable the whole "Add to
+      // Bag" button for that card rather than leave a broken selection.
+      document.querySelectorAll(".add-bundle, .add-giftset").forEach((btn) => {
+        const cardSelects = btn.closest(".card-body").querySelectorAll(".bundle-select");
+        const blocked = Array.from(cardSelects).some((select) =>
+          Array.from(select.options).every((o) => o.disabled)
+        );
+        if (blocked) {
+          btn.disabled = true;
+          btn.textContent = "Sold Out";
+          btn.classList.add("is-sold-out");
+        }
+      });
     })
     .catch(() => {
-      // If inventory can't be reached, leave every button as-is rather than
+      // If inventory can't be reached, leave everything as-is rather than
       // blocking sales over a transient network issue.
     });
 })();
@@ -71,24 +125,6 @@ const CA_TAX_RATE = 0.0725;
 
   const STORAGE_KEY = "uac-cart";
   const ORDER_EMAIL = "unearthedartisanco@gmail.com";
-
-  // Maps the display names shown in bundle/gift-set dropdowns (soap scents,
-  // and — for the gift set — lotion and lip balm picks) to the slug ids used
-  // for inventory tracking (matches the "Add to Bag" buttons' data-id values).
-  const SCENT_SLUGS = {
-    "Quiet Clay": "quiet-clay",
-    "Jade Hollow": "jade-hollow",
-    "Violet Dusk": "violet-dusk",
-    "Violet Storm": "violet-storm",
-    "Garnet Dawn": "garnet-dawn",
-    "Indigo Grove": "indigo-grove",
-    "Onyx Ember": "onyx-ember",
-    "Lavender Body Lotion": "lavender-tallow-lotion",
-    "Frankincense Facial Lotion": "frankincense-facial-lotion",
-    "Vanilla": "vanilla-lip-balm",
-    "Peppermint": "peppermint-lip-balm",
-    "Guava": "guava-lip-balm",
-  };
 
   const countEl = document.getElementById("cart-count");
   if (!countEl) return; // no cart icon on this page (e.g. the preorder teaser)
