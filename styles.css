@@ -353,6 +353,25 @@ p { margin: 0; }
   font-weight: 500;
 }
 .card-desc { font-size: 0.95rem; color: var(--charcoal); flex: 1; }
+.card-inci { font-size: 0.72rem; }
+.card-inci summary {
+  cursor: pointer;
+  color: var(--sage-deep);
+  font-weight: 600;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.card-inci summary::-webkit-details-marker { display: none; }
+.card-inci summary::after { content: "+"; font-size: 0.85rem; }
+.card-inci[open] summary::after { content: "\2212"; }
+.card-inci p {
+  margin-top: 6px;
+  color: var(--charcoal);
+  opacity: 0.65;
+  line-height: 1.5;
+}
 .card-foot {
   display: flex;
   align-items: center;
