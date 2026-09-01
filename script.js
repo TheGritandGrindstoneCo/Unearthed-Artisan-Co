@@ -4,8 +4,8 @@
 const CA_TAX_RATE = 0.0725;
 
 // ============================================================
-// Soap stock — marks sold-out scents on the shop page. Only runs where the
-// soap "Add to Bag" buttons exist (shop.html).
+// Product stock — marks sold-out soap, lotion, and lip balm items on the
+// shop page. Only runs where "Add to Bag" buttons exist (shop.html).
 // ============================================================
 (function () {
   const buttons = document.querySelectorAll(".add-to-cart[data-id]");
@@ -72,9 +72,9 @@ const CA_TAX_RATE = 0.0725;
   const STORAGE_KEY = "uac-cart";
   const ORDER_EMAIL = "unearthedartisanco@gmail.com";
 
-  // Maps the scent display names shown in bundle/gift-set dropdowns to the
-  // slug ids used for inventory tracking (matches the soap "Add to Bag"
-  // buttons' data-id values).
+  // Maps the display names shown in bundle/gift-set dropdowns (soap scents,
+  // and — for the gift set — lotion and lip balm picks) to the slug ids used
+  // for inventory tracking (matches the "Add to Bag" buttons' data-id values).
   const SCENT_SLUGS = {
     "Quiet Clay": "quiet-clay",
     "Jade Hollow": "jade-hollow",
@@ -83,6 +83,11 @@ const CA_TAX_RATE = 0.0725;
     "Garnet Dawn": "garnet-dawn",
     "Indigo Grove": "indigo-grove",
     "Onyx Ember": "onyx-ember",
+    "Lavender Body Lotion": "lavender-tallow-lotion",
+    "Frankincense Facial Lotion": "frankincense-facial-lotion",
+    "Vanilla": "vanilla-lip-balm",
+    "Peppermint": "peppermint-lip-balm",
+    "Guava": "guava-lip-balm",
   };
 
   const countEl = document.getElementById("cart-count");
@@ -248,8 +253,10 @@ const CA_TAX_RATE = 0.0725;
       const selects = btn.closest(".card-body").querySelectorAll(".bundle-select");
       const picks = Array.from(selects).map((s) => s.value);
       const name = "Gift Set: " + picks[0] + " Soap, " + picks[1] + ", " + picks[2] + " Lip Balm";
-      const soapSlug = SCENT_SLUGS[picks[0]];
-      addItem("giftset-" + Date.now(), name, parseFloat(btn.dataset.price), soapSlug ? [soapSlug] : undefined);
+      // Deduct one of each picked item's own stock — the soap scent, the
+      // lotion, and the lip balm — from their respective pools.
+      const pickSlugs = picks.map((p) => SCENT_SLUGS[p]).filter(Boolean);
+      addItem("giftset-" + Date.now(), name, parseFloat(btn.dataset.price), pickSlugs.length ? pickSlugs : undefined);
     });
   });
 

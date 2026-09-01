@@ -73,6 +73,15 @@
     color: var(--charcoal);
   }
   .inv-scent-row.is-sold-out input { border-color: var(--accent); }
+  .inv-group-heading {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sage-deep);
+    margin: 0;
+  }
+  .inv-group-heading:not(:first-child) { margin-top: 8px; }
   .inv-status {
     margin-top: 20px;
     font-size: 0.9rem;
@@ -85,8 +94,8 @@
 
 <div class="inv-wrap">
   <p class="eyebrow">Internal Tool</p>
-  <h1>Soap Inventory</h1>
-  <p>Set the current stock count for each scent. Anything set to 0 shows as "Sold Out" on the shop page immediately.</p>
+  <h1>Inventory</h1>
+  <p>Set the current stock count for each item. Anything set to 0 shows as "Sold Out" on the shop page immediately.</p>
 
   <div class="inv-field">
     <label for="inv-password">Admin Password</label>
@@ -103,13 +112,18 @@
 
 <script>
   var SCENTS = [
-    { id: "quiet-clay", name: "Quiet Clay" },
-    { id: "jade-hollow", name: "Jade Hollow" },
-    { id: "violet-dusk", name: "Violet Dusk" },
-    { id: "violet-storm", name: "Violet Storm" },
-    { id: "garnet-dawn", name: "Garnet Dawn" },
-    { id: "indigo-grove", name: "Indigo Grove" },
-    { id: "onyx-ember", name: "Onyx Ember" },
+    { id: "quiet-clay", name: "Quiet Clay", group: "Soap" },
+    { id: "jade-hollow", name: "Jade Hollow", group: "Soap" },
+    { id: "violet-dusk", name: "Violet Dusk", group: "Soap" },
+    { id: "violet-storm", name: "Violet Storm", group: "Soap" },
+    { id: "garnet-dawn", name: "Garnet Dawn", group: "Soap" },
+    { id: "indigo-grove", name: "Indigo Grove", group: "Soap" },
+    { id: "onyx-ember", name: "Onyx Ember", group: "Soap" },
+    { id: "lavender-tallow-lotion", name: "Lavender Tallow Body Lotion", group: "Lotion" },
+    { id: "frankincense-facial-lotion", name: "Frankincense Tallow Facial Lotion", group: "Lotion" },
+    { id: "vanilla-lip-balm", name: "Vanilla Tallow Lip Balm", group: "Lip Balm" },
+    { id: "peppermint-lip-balm", name: "Peppermint Tallow Lip Balm", group: "Lip Balm" },
+    { id: "guava-lip-balm", name: "Guava Tallow Lip Balm", group: "Lip Balm" },
   ];
 
   var scentsEl = document.getElementById("inv-scents");
@@ -119,7 +133,15 @@
 
   function renderRows(stock) {
     scentsEl.innerHTML = "";
+    var lastGroup = null;
     SCENTS.forEach(function (scent) {
+      if (scent.group !== lastGroup) {
+        lastGroup = scent.group;
+        var heading = document.createElement("p");
+        heading.className = "inv-group-heading";
+        heading.textContent = scent.group;
+        scentsEl.appendChild(heading);
+      }
       var count = stock && typeof stock[scent.id] === "number" ? stock[scent.id] : 0;
       var row = document.createElement("div");
       row.className = "inv-scent-row" + (count <= 0 ? " is-sold-out" : "");

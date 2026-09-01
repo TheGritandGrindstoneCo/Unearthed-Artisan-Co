@@ -1,6 +1,7 @@
-// Stripe calls this the moment a checkout session completes. Decrements soap
-// inventory by the amounts recorded in the session's metadata at checkout
-// time. Set STRIPE_WEBHOOK_SECRET in Netlify's Environment Variables — get it
+// Stripe calls this the moment a checkout session completes. Decrements
+// tracked product inventory (soap, lotion, lip balm) by the amounts recorded
+// in the session's metadata at checkout time. Set STRIPE_WEBHOOK_SECRET in
+// Netlify's Environment Variables — get it
 // from the Stripe Dashboard when you create the webhook endpoint (Developers
 // > Webhooks > Add endpoint, pointed at /.netlify/functions/stripe-webhook,
 // listening for the checkout.session.completed event).

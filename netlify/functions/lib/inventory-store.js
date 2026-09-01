@@ -1,7 +1,8 @@
 const { getStore } = require("@netlify/blobs");
 
-// The 7 soap scents — the only products with tracked inventory. Matches the
-// data-id values used on the soap "Add to Bag" buttons in shop.html.
+// The products with tracked inventory — 7 soap scents, 2 tallow lotions, and
+// 3 lip balms. Matches the data-id values used on the "Add to Bag" buttons
+// in shop.html.
 const SCENT_IDS = [
   "quiet-clay",
   "jade-hollow",
@@ -10,6 +11,11 @@ const SCENT_IDS = [
   "garnet-dawn",
   "indigo-grove",
   "onyx-ember",
+  "lavender-tallow-lotion",
+  "frankincense-facial-lotion",
+  "vanilla-lip-balm",
+  "peppermint-lip-balm",
+  "guava-lip-balm",
 ];
 
 // Display names for building customer-facing messages (e.g. stock shortages).
@@ -21,11 +27,16 @@ const SCENT_NAMES = {
   "garnet-dawn": "Garnet Dawn",
   "indigo-grove": "Indigo Grove",
   "onyx-ember": "Onyx Ember",
+  "lavender-tallow-lotion": "Lavender Tallow Body Lotion",
+  "frankincense-facial-lotion": "Frankincense Tallow Facial Lotion",
+  "vanilla-lip-balm": "Vanilla Tallow Lip Balm",
+  "peppermint-lip-balm": "Peppermint Tallow Lip Balm",
+  "guava-lip-balm": "Guava Tallow Lip Balm",
 };
 
-// New scents default to "in stock" (not sold out) until a real count is set
-// via the inventory admin page — avoids an accidental "everything sold out"
-// state on first deploy, before anyone has entered real numbers.
+// New products default to "in stock" (not sold out) until a real count is
+// set via the inventory admin page — avoids an accidental "everything sold
+// out" state on first deploy, before anyone has entered real numbers.
 const DEFAULT_STOCK = 999;
 
 function inventoryStore() {
