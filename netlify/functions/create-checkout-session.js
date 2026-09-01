@@ -3,7 +3,7 @@
 // reach the browser. Set STRIPE_SECRET_KEY in Netlify's Environment Variables —
 // never commit it to the repo.
 const Stripe = require("stripe");
-const { SCENT_IDS, readInventory } = require("./lib/inventory-store");
+const { SCENT_IDS, SCENT_NAMES, readInventory } = require("./lib/inventory-store");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -59,10 +59,19 @@ exports.handler = async (event) => {
       const currentStock = await readInventory();
       const shortages = Object.keys(deductions).filter((id) => deductions[id] > (currentStock[id] || 0));
       if (shortages.length > 0) {
+        const details = shortages
+          .map((id) => {
+            const available = currentStock[id] || 0;
+            const name = SCENT_NAMES[id] || id;
+            return available > 0
+              ? name + " (only " + available + " left, " + deductions[id] + " in your bag)"
+              : name + " (sold out)";
+          })
+          .join(", ");
         return {
           statusCode: 409,
           body: JSON.stringify({
-            error: "Sorry, one or more scents in your bag just sold out. Please update your bag and try again.",
+            error: "Sorry, not enough in stock: " + details + ". Please update your bag and try again.",
             shortages: shortages,
           }),
         };

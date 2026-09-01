@@ -12,6 +12,17 @@ const SCENT_IDS = [
   "onyx-ember",
 ];
 
+// Display names for building customer-facing messages (e.g. stock shortages).
+const SCENT_NAMES = {
+  "quiet-clay": "Quiet Clay",
+  "jade-hollow": "Jade Hollow",
+  "violet-dusk": "Violet Dusk",
+  "violet-storm": "Violet Storm",
+  "garnet-dawn": "Garnet Dawn",
+  "indigo-grove": "Indigo Grove",
+  "onyx-ember": "Onyx Ember",
+};
+
 // New scents default to "in stock" (not sold out) until a real count is set
 // via the inventory admin page — avoids an accidental "everything sold out"
 // state on first deploy, before anyone has entered real numbers.
@@ -43,4 +54,4 @@ async function readInventory() {
   return stock;
 }
 
-module.exports = { SCENT_IDS, DEFAULT_STOCK, inventoryStore, readInventory };
+module.exports = { SCENT_IDS, SCENT_NAMES, DEFAULT_STOCK, inventoryStore, readInventory };
