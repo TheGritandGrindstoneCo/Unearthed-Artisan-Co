@@ -6,9 +6,9 @@ const { getStore } = require("@netlify/blobs");
 const SCENT_IDS = [
   "quiet-clay",
   "jade-hollow",
-  "violet-dusk",
+  "lavender-dawn",
   "lilac-bloom",
-  "garnet-dawn",
+  "garnet-dusk",
   "indigo-grove",
   "onyx-ember",
   "lavender-tallow-lotion",
@@ -22,9 +22,9 @@ const SCENT_IDS = [
 const SCENT_NAMES = {
   "quiet-clay": "Quiet Clay",
   "jade-hollow": "Jade Hollow",
-  "violet-dusk": "Violet Dusk",
+  "lavender-dawn": "Lavender Dawn",
   "lilac-bloom": "Lilac Bloom",
-  "garnet-dawn": "Garnet Dawn",
+  "garnet-dusk": "Garnet Dusk",
   "indigo-grove": "Indigo Grove",
   "onyx-ember": "Onyx Ember",
   "lavender-tallow-lotion": "Lavender Tallow Body Lotion",

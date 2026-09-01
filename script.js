@@ -10,9 +10,9 @@ const CA_TAX_RATE = 0.0725;
 const SCENT_SLUGS = {
   "Quiet Clay": "quiet-clay",
   "Jade Hollow": "jade-hollow",
-  "Violet Dusk": "violet-dusk",
+  "Lavender Dawn": "lavender-dawn",
   "Lilac Bloom": "lilac-bloom",
-  "Garnet Dawn": "garnet-dawn",
+  "Garnet Dusk": "garnet-dusk",
   "Indigo Grove": "indigo-grove",
   "Onyx Ember": "onyx-ember",
   "Lavender Body Lotion": "lavender-tallow-lotion",
