@@ -3,6 +3,87 @@
 // filing; third-party rate aggregators disagreed when this was set.
 const CA_TAX_RATE = 0.0725;
 
+// Maps the display names shown on soap "Add to Bag" buttons and in
+// bundle/gift-set dropdowns (soap scents, and — for the gift set — lotion
+// and lip balm picks) to the slug ids used for inventory tracking. Shared by
+// the sold-out marking below and the cart logic further down this file.
+const SCENT_SLUGS = {
+  "Quiet Clay": "quiet-clay",
+  "Jade Hollow": "jade-hollow",
+  "Violet Dusk": "violet-dusk",
+  "Violet Storm": "violet-storm",
+  "Garnet Dawn": "garnet-dawn",
+  "Indigo Grove": "indigo-grove",
+  "Onyx Ember": "onyx-ember",
+  "Lavender Body Lotion": "lavender-tallow-lotion",
+  "Frankincense Facial Lotion": "frankincense-facial-lotion",
+  "Vanilla": "vanilla-lip-balm",
+  "Peppermint": "peppermint-lip-balm",
+  "Guava": "guava-lip-balm",
+};
+
+// ============================================================
+// Product stock — marks sold-out soap, lotion, and lip balm items on the
+// shop page, both on the "Add to Bag" buttons and inside bundle/gift-set
+// scent dropdowns. Only runs where those exist (shop.html).
+// ============================================================
+(function () {
+  const buttons = document.querySelectorAll(".add-to-cart[data-id]");
+  const selects = document.querySelectorAll(".bundle-select");
+  if (buttons.length === 0 && selects.length === 0) return;
+
+  fetch("/.netlify/functions/get-inventory")
+    .then((res) => res.json())
+    .then((data) => {
+      const stock = data.stock || {};
+
+      buttons.forEach((btn) => {
+        const count = stock[btn.dataset.id];
+        if (typeof count === "number" && count <= 0) {
+          btn.disabled = true;
+          btn.textContent = "Sold Out";
+          btn.classList.add("is-sold-out");
+        }
+      });
+
+      selects.forEach((select) => {
+        Array.from(select.options).forEach((option) => {
+          const slug = SCENT_SLUGS[option.textContent.trim()];
+          const count = slug ? stock[slug] : undefined;
+          if (typeof count === "number" && count <= 0) {
+            option.disabled = true;
+            option.textContent += " (Sold Out)";
+          }
+        });
+        // If the option preselected in the page markup turned out to be sold
+        // out, move the selection to the first scent that's still in stock.
+        if (select.selectedOptions[0] && select.selectedOptions[0].disabled) {
+          const firstAvailable = Array.from(select.options).find((o) => !o.disabled);
+          if (firstAvailable) select.value = firstAvailable.value;
+        }
+      });
+
+      // If every scent in one of a bundle/gift set's dropdowns is sold out,
+      // there's no valid pick left for that slot — disable the whole "Add to
+      // Bag" button for that card rather than leave a broken selection.
+      document.querySelectorAll(".add-bundle, .add-giftset").forEach((btn) => {
+        const cardSelects = btn.closest(".card-body").querySelectorAll(".bundle-select");
+        const blocked = Array.from(cardSelects).some((select) =>
+          Array.from(select.options).every((o) => o.disabled)
+        );
+        if (blocked) {
+          btn.disabled = true;
+          btn.textContent = "Sold Out";
+          btn.classList.add("is-sold-out");
+        }
+      });
+    })
+    .catch(() => {
+      // If inventory can't be reached, leave everything as-is rather than
+      // blocking sales over a transient network issue.
+    });
+})();
+
 // ============================================================
 // Mobile nav toggle
 // ============================================================
@@ -162,12 +243,17 @@ const CA_TAX_RATE = 0.0725;
     }
   }
 
-  function addItem(id, name, price) {
-    const existing = cart.find((item) => item.id === id);
+  function addItem(id, name, price, scents) {
+    // Items carrying a scents list (currently just the gift set) always get
+    // a fresh cart line, since re-picking a different scent shouldn't merge
+    // with a previous pick under the same id.
+    const existing = !scents ? cart.find((item) => item.id === id) : null;
     if (existing) {
       existing.qty += 1;
     } else {
-      cart.push({ id: id, name: name, price: price, qty: 1 });
+      const entry = { id: id, name: name, price: price, qty: 1 };
+      if (scents) entry.scents = scents;
+      cart.push(entry);
     }
     render();
   }
@@ -175,8 +261,10 @@ const CA_TAX_RATE = 0.0725;
   // Bundles store qty as the actual bar count (not "1 bundle") so shipping-tier
   // math based on totalQty() still reflects real bar count. price is per-bar
   // (bundle total / bar count), so qty * price still equals the flat bundle price.
-  function addBundleItem(name, totalPrice, barQty) {
-    cart.push({ id: name + "-" + Date.now(), name: name, price: totalPrice / barQty, qty: barQty });
+  // scents lists each chosen scent's slug id, one per bar, so a bundle pulls
+  // from the same per-scent stock pool as buying that bar individually.
+  function addBundleItem(name, totalPrice, barQty, scents) {
+    cart.push({ id: name + "-" + Date.now(), name: name, price: totalPrice / barQty, qty: barQty, scents: scents });
     render();
   }
 
@@ -189,9 +277,10 @@ const CA_TAX_RATE = 0.0725;
   document.querySelectorAll(".add-bundle").forEach((btn) => {
     btn.addEventListener("click", () => {
       const selects = btn.closest(".card-body").querySelectorAll(".bundle-select");
-      const scents = Array.from(selects).map((s) => s.value);
-      const name = btn.dataset.bundleName + ": " + scents.join(", ");
-      addBundleItem(name, parseFloat(btn.dataset.bundlePrice), scents.length);
+      const scentNames = Array.from(selects).map((s) => s.value);
+      const scentSlugs = scentNames.map((n) => SCENT_SLUGS[n]).filter(Boolean);
+      const name = btn.dataset.bundleName + ": " + scentNames.join(", ");
+      addBundleItem(name, parseFloat(btn.dataset.bundlePrice), scentNames.length, scentSlugs);
     });
   });
 
@@ -200,7 +289,10 @@ const CA_TAX_RATE = 0.0725;
       const selects = btn.closest(".card-body").querySelectorAll(".bundle-select");
       const picks = Array.from(selects).map((s) => s.value);
       const name = "Gift Set: " + picks[0] + " Soap, " + picks[1] + ", " + picks[2] + " Lip Balm";
-      addItem("giftset-" + Date.now(), name, parseFloat(btn.dataset.price));
+      // Deduct one of each picked item's own stock — the soap scent, the
+      // lotion, and the lip balm — from their respective pools.
+      const pickSlugs = picks.map((p) => SCENT_SLUGS[p]).filter(Boolean);
+      addItem("giftset-" + Date.now(), name, parseFloat(btn.dataset.price), pickSlugs.length ? pickSlugs : undefined);
     });
   });
 
@@ -273,7 +365,7 @@ const CA_TAX_RATE = 0.0725;
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            items: cart.map((item) => ({ name: item.name, price: item.price, qty: item.qty })),
+            items: cart.map((item) => ({ id: item.id, name: item.name, price: item.price, qty: item.qty, scents: item.scents })),
             method: method,
             shippingLabel: shippingLabel,
             shippingCost: shipCost,
@@ -287,7 +379,11 @@ const CA_TAX_RATE = 0.0725;
       } catch (err) {
         checkoutBtn.textContent = originalText;
         checkoutBtn.classList.remove("is-disabled");
-        alert("Something went wrong starting checkout. Please try again, or email us directly at " + ORDER_EMAIL + ".");
+        const message =
+          err && err.message && err.message !== "Checkout failed"
+            ? err.message
+            : "Something went wrong starting checkout. Please try again, or email us directly at " + ORDER_EMAIL + ".";
+        alert(message);
       }
     });
   }

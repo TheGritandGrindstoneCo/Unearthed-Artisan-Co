@@ -306,7 +306,7 @@ p { margin: 0; }
 /* ---------- product shelf ---------- */
 .shelf {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 32px;
 }
 .card {
@@ -411,6 +411,13 @@ p { margin: 0; }
 }
 .buy-btn:hover { background: var(--forest); transform: translateY(-1px); }
 .buy-btn:focus-visible { outline: 2px solid var(--sage-deep); outline-offset: 3px; }
+.buy-btn.is-sold-out {
+  background: var(--line);
+  color: var(--charcoal);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.buy-btn.is-sold-out:hover { background: var(--line); transform: none; }
 
 .shelf-note {
   margin-top: 28px;
@@ -471,6 +478,7 @@ p { margin: 0; }
 }
 .bundle-select {
   flex: 1;
+  min-width: 0;
   max-width: 62%;
   font-family: var(--font-body);
   font-size: 0.85rem;

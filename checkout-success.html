@@ -36,5 +36,17 @@
   </div>
 </div>
 
+<script>
+  // Reaching this page confirms Stripe redirected back after a successful
+  // payment, so it's the right moment to empty the bag — clearing it earlier
+  // (e.g. right before redirecting to Stripe) would wrongly empty it even if
+  // someone backs out of payment without completing it.
+  try {
+    localStorage.removeItem("uac-cart");
+  } catch (e) {
+    /* private browsing / storage blocked — nothing to clear */
+  }
+</script>
+
 </body>
 </html>

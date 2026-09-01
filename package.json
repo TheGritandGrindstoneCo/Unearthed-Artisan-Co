@@ -1,0 +1,8 @@
+{
+  "name": "unearthed-artisan-co-website",
+  "private": true,
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0",
+    "stripe": "^17.4.0"
+  }
+}
