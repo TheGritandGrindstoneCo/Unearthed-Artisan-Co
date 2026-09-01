@@ -487,7 +487,6 @@ p { margin: 0; }
   border: 1px solid var(--line);
   background: var(--ivory-card);
   color: var(--charcoal);
-  text-overflow: ellipsis;
 }
 .bundle-select:focus-visible {
   outline: 2px solid var(--sage-deep);
