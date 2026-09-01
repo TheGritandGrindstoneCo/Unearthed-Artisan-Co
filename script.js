@@ -11,7 +11,7 @@ const SCENT_SLUGS = {
   "Quiet Clay": "quiet-clay",
   "Jade Hollow": "jade-hollow",
   "Violet Dusk": "violet-dusk",
-  "Violet Storm": "violet-storm",
+  "Lilac Bloom": "lilac-bloom",
   "Garnet Dawn": "garnet-dawn",
   "Indigo Grove": "indigo-grove",
   "Onyx Ember": "onyx-ember",
