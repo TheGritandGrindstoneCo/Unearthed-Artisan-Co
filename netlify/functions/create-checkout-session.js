@@ -2,6 +2,9 @@
 // Runs server-side (Netlify Function) because the Stripe secret key must never
 // reach the browser. Set STRIPE_SECRET_KEY in Netlify's Environment Variables —
 // never commit it to the repo.
+const Stripe = require("stripe");
+const { SCENT_IDS, readInventory } = require("./lib/inventory-store");
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
@@ -32,67 +35,92 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: "Your bag is empty." }) };
   }
 
-  const params = new URLSearchParams();
-  params.append("mode", "payment");
-  params.append("success_url", siteUrl + "/checkout-success.html");
-  params.append("cancel_url", siteUrl + "/shipping.html");
-  params.append("phone_number_collection[enabled]", "true");
-  // Both Local Delivery and Standard Shipping need a mailing address.
-  params.append("shipping_address_collection[allowed_countries][0]", "US");
+  // Sum up how many of each tracked soap scent this order would use — from
+  // plain soap bars (item.id is the scent slug) and from bundles/gift sets
+  // (item.scents lists each scent chosen), so a bundle pulls from the same
+  // stock pool as buying that scent individually.
+  const scentIdSet = new Set(SCENT_IDS);
+  const deductions = {};
+  const addDeduction = (id, qty) => {
+    if (!scentIdSet.has(id)) return;
+    deductions[id] = (deductions[id] || 0) + qty;
+  };
+  items.forEach((item) => {
+    const qty = Math.max(1, parseInt(item.qty, 10) || 1);
+    if (Array.isArray(item.scents) && item.scents.length > 0) {
+      item.scents.forEach((scentId) => addDeduction(scentId, 1));
+    } else if (typeof item.id === "string") {
+      addDeduction(item.id, qty);
+    }
+  });
 
-  let i = 0;
+  if (Object.keys(deductions).length > 0) {
+    try {
+      const currentStock = await readInventory();
+      const shortages = Object.keys(deductions).filter((id) => deductions[id] > (currentStock[id] || 0));
+      if (shortages.length > 0) {
+        return {
+          statusCode: 409,
+          body: JSON.stringify({
+            error: "Sorry, one or more scents in your bag just sold out. Please update your bag and try again.",
+            shortages: shortages,
+          }),
+        };
+      }
+    } catch (e) {
+      return { statusCode: 500, body: JSON.stringify({ error: "Could not check inventory. Please try again." }) };
+    }
+  }
+
+  const stripe = Stripe(secretKey);
+
+  const line_items = [];
   items.forEach((item) => {
     const qty = Math.max(1, parseInt(item.qty, 10) || 1);
     const cents = Math.round((parseFloat(item.price) || 0) * 100);
     const name = (item.name || "").toString().slice(0, 250);
     if (!name || cents <= 0) return;
-    params.append("line_items[" + i + "][quantity]", String(qty));
-    params.append("line_items[" + i + "][price_data][currency]", "usd");
-    params.append("line_items[" + i + "][price_data][unit_amount]", String(cents));
-    params.append("line_items[" + i + "][price_data][product_data][name]", name);
-    i++;
+    line_items.push({
+      quantity: qty,
+      price_data: { currency: "usd", unit_amount: cents, product_data: { name: name } },
+    });
   });
 
   if (shippingCost > 0) {
-    params.append("line_items[" + i + "][quantity]", "1");
-    params.append("line_items[" + i + "][price_data][currency]", "usd");
-    params.append("line_items[" + i + "][price_data][unit_amount]", String(Math.round(shippingCost * 100)));
-    params.append("line_items[" + i + "][price_data][product_data][name]", shippingLabel);
-    i++;
+    line_items.push({
+      quantity: 1,
+      price_data: { currency: "usd", unit_amount: Math.round(shippingCost * 100), product_data: { name: shippingLabel } },
+    });
   }
 
   if (taxCost > 0) {
-    params.append("line_items[" + i + "][quantity]", "1");
-    params.append("line_items[" + i + "][price_data][currency]", "usd");
-    params.append("line_items[" + i + "][price_data][unit_amount]", String(Math.round(taxCost * 100)));
-    params.append("line_items[" + i + "][price_data][product_data][name]", "CA Sales Tax");
-    i++;
+    line_items.push({
+      quantity: 1,
+      price_data: { currency: "usd", unit_amount: Math.round(taxCost * 100), product_data: { name: "CA Sales Tax" } },
+    });
   }
 
-  if (i === 0) {
+  if (line_items.length === 0) {
     return { statusCode: 400, body: JSON.stringify({ error: "Nothing to check out." }) };
   }
 
   try {
-    const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + secretKey,
-        "Content-Type": "application/x-www-form-urlencoded",
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      success_url: siteUrl + "/checkout-success.html",
+      cancel_url: siteUrl + "/shipping.html",
+      phone_number_collection: { enabled: true },
+      // Local Pickup was removed as an option; Local Delivery and Standard
+      // Shipping both need a mailing address.
+      shipping_address_collection: { allowed_countries: ["US"] },
+      line_items: line_items,
+      metadata: {
+        stock_deductions: JSON.stringify(deductions),
       },
-      body: params.toString(),
     });
-    const data = await stripeRes.json();
 
-    if (!stripeRes.ok) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: (data.error && data.error.message) || "Stripe error." }),
-      };
-    }
-
-    return { statusCode: 200, body: JSON.stringify({ url: data.url }) };
+    return { statusCode: 200, body: JSON.stringify({ url: session.url }) };
   } catch (e) {
-    return { statusCode: 500, body: JSON.stringify({ error: "Could not reach Stripe." }) };
+    return { statusCode: 500, body: JSON.stringify({ error: (e && e.message) || "Stripe error." }) };
   }
 };

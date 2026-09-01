@@ -411,6 +411,13 @@ p { margin: 0; }
 }
 .buy-btn:hover { background: var(--forest); transform: translateY(-1px); }
 .buy-btn:focus-visible { outline: 2px solid var(--sage-deep); outline-offset: 3px; }
+.buy-btn.is-sold-out {
+  background: var(--line);
+  color: var(--charcoal);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.buy-btn.is-sold-out:hover { background: var(--line); transform: none; }
 
 .shelf-note {
   margin-top: 28px;

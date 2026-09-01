@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Inventory — Unearthed Artisan Co.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .inv-wrap {
+    margin: 0 auto;
+    max-width: 520px;
+    padding: 64px 32px;
+  }
+  .inv-wrap h1 { font-size: clamp(1.8rem, 4vw, 2.3rem); margin-top: 14px; }
+  .inv-wrap > p { margin-top: 14px; color: var(--charcoal); }
+  .inv-field {
+    margin-top: 24px;
+  }
+  .inv-field label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sage-deep);
+    margin-bottom: 8px;
+  }
+  .inv-field input {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--ivory-card);
+    color: var(--charcoal);
+  }
+  .inv-field input:focus-visible {
+    outline: 2px solid var(--sage-deep);
+    outline-offset: 2px;
+  }
+  .inv-scents {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: grid;
+    gap: 16px;
+  }
+  .inv-scent-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .inv-scent-row label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--forest);
+  }
+  .inv-scent-row input {
+    width: 90px;
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--ivory-card);
+    color: var(--charcoal);
+  }
+  .inv-scent-row.is-sold-out input { border-color: var(--accent); }
+  .inv-status {
+    margin-top: 20px;
+    font-size: 0.9rem;
+  }
+  .inv-status.is-ok { color: var(--sage-deep); }
+  .inv-status.is-error { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="inv-wrap">
+  <p class="eyebrow">Internal Tool</p>
+  <h1>Soap Inventory</h1>
+  <p>Set the current stock count for each scent. Anything set to 0 shows as "Sold Out" on the shop page immediately.</p>
+
+  <div class="inv-field">
+    <label for="inv-password">Admin Password</label>
+    <input type="password" id="inv-password" autocomplete="current-password" />
+  </div>
+
+  <div class="inv-scents" id="inv-scents">
+    <p>Loading current stock…</p>
+  </div>
+
+  <button type="button" class="btn btn--primary" id="inv-save" style="margin-top:28px;">Save Changes</button>
+  <p class="inv-status" id="inv-status"></p>
+</div>
+
+<script>
+  var SCENTS = [
+    { id: "quiet-clay", name: "Quiet Clay" },
+    { id: "jade-hollow", name: "Jade Hollow" },
+    { id: "violet-dusk", name: "Violet Dusk" },
+    { id: "violet-storm", name: "Violet Storm" },
+    { id: "garnet-dawn", name: "Garnet Dawn" },
+    { id: "indigo-grove", name: "Indigo Grove" },
+    { id: "onyx-ember", name: "Onyx Ember" },
+  ];
+
+  var scentsEl = document.getElementById("inv-scents");
+  var statusEl = document.getElementById("inv-status");
+  var saveBtn = document.getElementById("inv-save");
+  var passwordEl = document.getElementById("inv-password");
+
+  function renderRows(stock) {
+    scentsEl.innerHTML = "";
+    SCENTS.forEach(function (scent) {
+      var count = stock && typeof stock[scent.id] === "number" ? stock[scent.id] : 0;
+      var row = document.createElement("div");
+      row.className = "inv-scent-row" + (count <= 0 ? " is-sold-out" : "");
+      row.innerHTML =
+        '<label for="stock-' + scent.id + '">' + scent.name + "</label>" +
+        '<input type="number" min="0" step="1" id="stock-' + scent.id + '" data-scent="' + scent.id + '" value="' + count + '" />';
+      scentsEl.appendChild(row);
+    });
+  }
+
+  function loadInventory() {
+    fetch("/.netlify/functions/get-inventory")
+      .then(function (res) { return res.json(); })
+      .then(function (data) { renderRows(data.stock || {}); })
+      .catch(function () {
+        scentsEl.innerHTML = "<p>Could not load current stock.</p>";
+      });
+  }
+
+  saveBtn.addEventListener("click", function () {
+    var password = passwordEl.value.trim();
+    if (!password) {
+      statusEl.textContent = "Enter the admin password first.";
+      statusEl.className = "inv-status is-error";
+      return;
+    }
+
+    var stock = {};
+    SCENTS.forEach(function (scent) {
+      var input = document.getElementById("stock-" + scent.id);
+      stock[scent.id] = parseInt(input.value, 10) || 0;
+    });
+
+    statusEl.textContent = "Saving…";
+    statusEl.className = "inv-status";
+    saveBtn.disabled = true;
+
+    fetch("/.netlify/functions/update-inventory", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: password, stock: stock }),
+    })
+      .then(function (res) {
+        return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+      })
+      .then(function (result) {
+        saveBtn.disabled = false;
+        if (result.ok) {
+          statusEl.textContent = "Saved.";
+          statusEl.className = "inv-status is-ok";
+          renderRows(result.data && result.data.stock);
+          loadInventory();
+        } else {
+          statusEl.textContent = (result.data && result.data.error) || "Something went wrong.";
+          statusEl.className = "inv-status is-error";
+        }
+      })
+      .catch(function () {
+        saveBtn.disabled = false;
+        statusEl.textContent = "Could not reach the server.";
+        statusEl.className = "inv-status is-error";
+      });
+  });
+
+  loadInventory();
+</script>
+
+</body>
+</html>
