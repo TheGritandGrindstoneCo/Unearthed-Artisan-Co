@@ -21,12 +21,17 @@ exports.handler = async (event) => {
   const stripe = Stripe(secretKey);
   const signature = event.headers["stripe-signature"];
 
+  // Must use the raw, untouched body — not a re-serialized JSON.parse of it —
+  // or Stripe's signature check will fail. Netlify sometimes delivers the
+  // body base64-encoded (event.isBase64Encoded), which also breaks the
+  // signature check unless decoded back to the original bytes first.
+  const rawBody = event.isBase64Encoded ? Buffer.from(event.body, "base64") : event.body;
+
   let stripeEvent;
   try {
-    // Must use the raw, untouched body — not a re-serialized JSON.parse of it
-    // — or Stripe's signature check will fail.
-    stripeEvent = stripe.webhooks.constructEvent(event.body, signature, webhookSecret);
+    stripeEvent = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
   } catch (e) {
+    console.error("Stripe webhook signature verification failed:", e && e.message);
     return { statusCode: 400, body: "Signature verification failed." };
   }
 
@@ -38,6 +43,8 @@ exports.handler = async (event) => {
     } catch (e) {
       deductions = {};
     }
+
+    console.log("Stripe webhook: checkout.session.completed, deductions:", deductions);
 
     const scentIdSet = new Set(SCENT_IDS);
     const store = inventoryStore();
