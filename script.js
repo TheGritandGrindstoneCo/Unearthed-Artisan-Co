@@ -115,7 +115,7 @@ const SCENT_SLUGS = {
     delivery: { cost: (subtotal) => (subtotal >= 45 ? 0 : 5) },
     shipping: {
       cost: (subtotal, qty) => {
-        if (subtotal >= 75) return 0;
+        if (subtotal >= 100) return 0;
         if (qty <= 3) return 8.95;
         if (qty <= 9) return 13.65;
         return 24.8;
