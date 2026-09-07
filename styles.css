@@ -323,7 +323,13 @@ p { margin: 0; }
   background: var(--sage-pale);
   padding: 22px 22px 0;
 }
-.card-art img { border-radius: 50%; box-shadow: var(--shadow); }
+.card-art img {
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
 .card-tag {
   position: absolute;
   top: 34px;
