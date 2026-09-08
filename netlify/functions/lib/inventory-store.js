@@ -65,4 +65,81 @@ async function readInventory() {
   return stock;
 }
 
-module.exports = { SCENT_IDS, SCENT_NAMES, DEFAULT_STOCK, inventoryStore, readInventory };
+// Atomically reserves (decrements) stock for each id in `deductions`
+// ({ id: qty, ... }), using Netlify Blobs' onlyIfMatch conditional write so
+// two concurrent checkouts can't both succeed in reserving the same last
+// unit — one of them will lose the race, retry against the fresh value, and
+// eventually see the real (now-lower) count.
+//
+// Returns { ok: true, reserved: [{id, qty}, ...] } on success, or
+// { ok: false, shortageId, available, reserved } if `shortageId` didn't have
+// enough stock (or the write kept losing the race) — `reserved` lists what
+// was already reserved before the failure, so the caller can roll it back
+// with releaseStock().
+//
+// An id that has never been explicitly stocked (still at its untracked
+// default) is treated as unlimited and skipped — nothing to reserve.
+async function reserveStock(deductions) {
+  const store = inventoryStore();
+  const reserved = [];
+
+  for (const id of Object.keys(deductions)) {
+    const qty = parseInt(deductions[id], 10);
+    if (!Number.isFinite(qty) || qty <= 0) continue;
+
+    let done = false;
+    for (let attempt = 0; attempt < 5 && !done; attempt++) {
+      const result = await store.getWithMetadata(id, { type: "text" });
+      const raw = result ? result.data : null;
+      const current = raw === null ? null : parseInt(raw, 10);
+
+      if (current === null || !Number.isFinite(current)) {
+        done = true; // untracked — unlimited, nothing to reserve
+        break;
+      }
+      if (current < qty) {
+        return { ok: false, shortageId: id, available: current, reserved };
+      }
+
+      const { modified } = await store.set(id, String(current - qty), { onlyIfMatch: result.etag });
+      if (modified) {
+        reserved.push({ id, qty });
+        done = true;
+      }
+      // else: someone else wrote first — loop and retry against a fresh read
+    }
+
+    if (!done) {
+      return { ok: false, shortageId: id, available: null, reserved };
+    }
+  }
+
+  return { ok: true, reserved };
+}
+
+// Adds stock back for each { id, qty } in `reserved` — the inverse of
+// reserveStock(), used to release a reservation that expired unpaid or that
+// needs to be rolled back after a partial failure. Best-effort per id: a
+// write that keeps losing the race after 5 attempts is skipped rather than
+// failing the whole release, since under/over-restocking one id shouldn't
+// block the others.
+async function releaseStock(reserved) {
+  const store = inventoryStore();
+
+  for (const item of reserved) {
+    const qty = parseInt(item.qty, 10);
+    if (!Number.isFinite(qty) || qty <= 0) continue;
+
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const result = await store.getWithMetadata(item.id, { type: "text" });
+      const raw = result ? result.data : null;
+      const current = raw === null ? null : parseInt(raw, 10);
+      if (current === null || !Number.isFinite(current)) break; // untracked — nothing to release
+
+      const { modified } = await store.set(item.id, String(current + qty), { onlyIfMatch: result.etag });
+      if (modified) break;
+    }
+  }
+}
+
+module.exports = { SCENT_IDS, SCENT_NAMES, DEFAULT_STOCK, inventoryStore, readInventory, reserveStock, releaseStock };
