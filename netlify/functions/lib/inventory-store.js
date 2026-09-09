@@ -101,8 +101,8 @@ async function reserveStock(deductions) {
         return { ok: false, shortageId: id, available: current, reserved };
       }
 
-      const { modified } = await store.set(id, String(current - qty), { onlyIfMatch: result.etag });
-      if (modified) {
+      const setResult = await store.set(id, String(current - qty), { onlyIfMatch: result.etag });
+      if (setResult && setResult.modified) {
         reserved.push({ id, qty });
         done = true;
       }
