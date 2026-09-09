@@ -146,6 +146,7 @@ exports.handler = async (event) => {
       // Local Pickup was removed as an option; Local Delivery and Standard
       // Shipping both need a mailing address.
       shipping_address_collection: { allowed_countries: ["US"] },
+      allow_promotion_codes: true,
       line_items: line_items,
       // Unpaid sessions expire after 30 minutes (Stripe's minimum) so stock
       // reserved above reliably frees up rather than staying locked for the
