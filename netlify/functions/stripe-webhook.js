@@ -1,15 +1,18 @@
 // Stripe calls this on checkout session events. Inventory is reserved
 // (decremented) up front when the session is created — see
 // create-checkout-session.js — so a completed session needs no further
-// inventory action; this instead releases that reservation if the session
-// expires or fails without ever being paid. Set STRIPE_WEBHOOK_SECRET in
-// Netlify's Environment Variables — get it from the Stripe Dashboard when
+// inventory action, only the branded order-confirmation email (see
+// lib/order-email.js); expired/failed sessions instead release that
+// reservation since they never turned into a sale. Set STRIPE_WEBHOOK_SECRET
+// in Netlify's Environment Variables — get it from the Stripe Dashboard when
 // you create the webhook endpoint (Developers > Webhooks > Add endpoint,
 // pointed at /.netlify/functions/stripe-webhook). Subscribe it to
 // checkout.session.completed, checkout.session.expired, and
-// checkout.session.async_payment_failed.
+// checkout.session.async_payment_failed. Also set GMAIL_USER and
+// GMAIL_APP_PASSWORD for the confirmation email — see lib/order-email.js.
 const Stripe = require("stripe");
 const { releaseStock } = require("./lib/inventory-store");
+const { sendOrderConfirmationEmail } = require("./lib/order-email");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -41,9 +44,17 @@ exports.handler = async (event) => {
 
   if (stripeEvent.type === "checkout.session.completed") {
     // Stock for this session was already reserved (decremented) when it was
-    // created — nothing left to do here. This confirms the reservation
-    // turned into an actual sale rather than expiring unpaid.
+    // created — nothing left to do here for inventory. This confirms the
+    // reservation turned into an actual sale rather than expiring unpaid.
     console.log("Stripe webhook: checkout.session.completed (stock already reserved at checkout).");
+
+    try {
+      await sendOrderConfirmationEmail(stripe, stripeEvent.data.object);
+    } catch (e) {
+      // Best-effort — this function already returns 200 below regardless,
+      // so a failure here never causes Stripe to retry the whole event.
+      console.error("Order confirmation email failed:", e && e.message);
+    }
   } else if (
     stripeEvent.type === "checkout.session.expired" ||
     stripeEvent.type === "checkout.session.async_payment_failed"
