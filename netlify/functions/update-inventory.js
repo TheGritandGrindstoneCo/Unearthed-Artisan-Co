@@ -47,6 +47,7 @@ exports.handler = async (event) => {
     await Promise.all(updates);
     return { statusCode: 200, body: JSON.stringify({ ok: true }) };
   } catch (e) {
-    return { statusCode: 500, body: JSON.stringify({ error: "Could not save inventory." }) };
+    console.error("update-inventory failed:", e && e.message, e);
+    return { statusCode: 500, body: JSON.stringify({ error: "Could not save inventory: " + ((e && e.message) || "unknown error") }) };
   }
 };
