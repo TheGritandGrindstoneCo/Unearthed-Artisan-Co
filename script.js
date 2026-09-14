@@ -19,6 +19,8 @@ const SCENT_SLUGS = {
   "Emerald Meadow": "emerald-meadow",
   "Lavender Body Cream": "lavender-tallow-lotion",
   "Frankincense Facial Cream": "frankincense-facial-lotion",
+  "Unscented Body Cream": "unscented-body-cream",
+  "Unscented Facial Cream": "unscented-facial-cream",
   "Vanilla": "vanilla-lip-balm",
   "Peppermint": "peppermint-lip-balm",
   "Guava": "guava-lip-balm",
