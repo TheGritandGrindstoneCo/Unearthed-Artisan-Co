@@ -1,6 +1,6 @@
 const { getStore } = require("@netlify/blobs");
 
-// The products with tracked inventory — 9 soap scents, 2 tallow creams, and
+// The products with tracked inventory — 9 soap scents, 4 tallow creams, and
 // 3 lip balms. Matches the data-id values used on the "Add to Bag" buttons
 // in shop.html.
 const SCENT_IDS = [
@@ -15,6 +15,8 @@ const SCENT_IDS = [
   "emerald-meadow",
   "lavender-tallow-lotion",
   "frankincense-facial-lotion",
+  "unscented-body-cream",
+  "unscented-facial-cream",
   "vanilla-lip-balm",
   "peppermint-lip-balm",
   "guava-lip-balm",
@@ -33,6 +35,8 @@ const SCENT_NAMES = {
   "emerald-meadow": "Emerald Meadow",
   "lavender-tallow-lotion": "Lavender Tallow Body Cream",
   "frankincense-facial-lotion": "Frankincense Tallow Facial Cream",
+  "unscented-body-cream": "Unscented Tallow Body Cream",
+  "unscented-facial-cream": "Unscented Tallow Facial Cream",
   "vanilla-lip-balm": "Vanilla Tallow Lip Balm",
   "peppermint-lip-balm": "Peppermint Tallow Lip Balm",
   "guava-lip-balm": "Guava Tallow Lip Balm",
