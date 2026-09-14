@@ -38,7 +38,7 @@ exports.handler = async (event) => {
   // Sum up how many of each tracked product this order would use — from a
   // single item (item.id is the product slug) and from bundles/gift sets
   // (item.scents lists each product chosen — e.g. a gift set's soap scent,
-  // lotion, and lip balm picks), so these pull from the same stock pool as
+  // cream, and lip balm picks), so these pull from the same stock pool as
   // buying that item individually.
   const scentIdSet = new Set(SCENT_IDS);
   const deductions = {};
