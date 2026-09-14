@@ -4,26 +4,28 @@
 const CA_TAX_RATE = 0.0725;
 
 // Maps the display names shown on soap "Add to Bag" buttons and in
-// bundle/gift-set dropdowns (soap scents, and — for the gift set — lotion
+// bundle/gift-set dropdowns (soap scents, and — for the gift set — cream
 // and lip balm picks) to the slug ids used for inventory tracking. Shared by
 // the sold-out marking below and the cart logic further down this file.
 const SCENT_SLUGS = {
   "Quiet Clay": "quiet-clay",
   "Jade Hollow": "jade-hollow",
-  "Violet Dusk": "violet-dusk",
-  "Violet Storm": "violet-storm",
-  "Garnet Dawn": "garnet-dawn",
+  "Lavender Dawn": "lavender-dawn",
+  "Lilac Bloom": "lilac-bloom",
+  "Garnet Dusk": "garnet-dusk",
   "Indigo Grove": "indigo-grove",
   "Onyx Ember": "onyx-ember",
-  "Lavender Body Lotion": "lavender-tallow-lotion",
-  "Frankincense Facial Lotion": "frankincense-facial-lotion",
+  "Golden Harvest": "golden-harvest",
+  "Emerald Meadow": "emerald-meadow",
+  "Lavender Body Cream": "lavender-tallow-lotion",
+  "Frankincense Facial Cream": "frankincense-facial-lotion",
   "Vanilla": "vanilla-lip-balm",
   "Peppermint": "peppermint-lip-balm",
   "Guava": "guava-lip-balm",
 };
 
 // ============================================================
-// Product stock — marks sold-out soap, lotion, and lip balm items on the
+// Product stock — marks sold-out soap, cream, and lip balm items on the
 // shop page, both on the "Add to Bag" buttons and inside bundle/gift-set
 // scent dropdowns. Only runs where those exist (shop.html).
 // ============================================================
@@ -115,7 +117,7 @@ const SCENT_SLUGS = {
     delivery: { cost: (subtotal) => (subtotal >= 45 ? 0 : 5) },
     shipping: {
       cost: (subtotal, qty) => {
-        if (subtotal >= 75) return 0;
+        if (subtotal >= 100) return 0;
         if (qty <= 3) return 8.95;
         if (qty <= 9) return 13.65;
         return 24.8;
@@ -290,7 +292,7 @@ const SCENT_SLUGS = {
       const picks = Array.from(selects).map((s) => s.value);
       const name = "Gift Set: " + picks[0] + " Soap, " + picks[1] + ", " + picks[2] + " Lip Balm";
       // Deduct one of each picked item's own stock — the soap scent, the
-      // lotion, and the lip balm — from their respective pools.
+      // cream, and the lip balm — from their respective pools.
       const pickSlugs = picks.map((p) => SCENT_SLUGS[p]).filter(Boolean);
       addItem("giftset-" + Date.now(), name, parseFloat(btn.dataset.price), pickSlugs.length ? pickSlugs : undefined);
     });

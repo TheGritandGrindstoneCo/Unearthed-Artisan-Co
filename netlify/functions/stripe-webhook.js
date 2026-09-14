@@ -1,12 +1,18 @@
-// Stripe calls this the moment a checkout session completes. Decrements
-// tracked product inventory (soap, lotion, lip balm) by the amounts recorded
-// in the session's metadata at checkout time. Set STRIPE_WEBHOOK_SECRET in
-// Netlify's Environment Variables — get it
-// from the Stripe Dashboard when you create the webhook endpoint (Developers
-// > Webhooks > Add endpoint, pointed at /.netlify/functions/stripe-webhook,
-// listening for the checkout.session.completed event).
+// Stripe calls this on checkout session events. Inventory is reserved
+// (decremented) up front when the session is created — see
+// create-checkout-session.js — so a completed session needs no further
+// inventory action, only the branded order-confirmation email (see
+// lib/order-email.js); expired/failed sessions instead release that
+// reservation since they never turned into a sale. Set STRIPE_WEBHOOK_SECRET
+// in Netlify's Environment Variables — get it from the Stripe Dashboard when
+// you create the webhook endpoint (Developers > Webhooks > Add endpoint,
+// pointed at /.netlify/functions/stripe-webhook). Subscribe it to
+// checkout.session.completed, checkout.session.expired, and
+// checkout.session.async_payment_failed. Also set GMAIL_USER and
+// GMAIL_APP_PASSWORD for the confirmation email — see lib/order-email.js.
 const Stripe = require("stripe");
-const { SCENT_IDS, inventoryStore } = require("./lib/inventory-store");
+const { releaseStock } = require("./lib/inventory-store");
+const { sendOrderConfirmationEmail } = require("./lib/order-email");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -37,6 +43,22 @@ exports.handler = async (event) => {
   }
 
   if (stripeEvent.type === "checkout.session.completed") {
+    // Stock for this session was already reserved (decremented) when it was
+    // created — nothing left to do here for inventory. This confirms the
+    // reservation turned into an actual sale rather than expiring unpaid.
+    console.log("Stripe webhook: checkout.session.completed (stock already reserved at checkout).");
+
+    try {
+      await sendOrderConfirmationEmail(stripe, stripeEvent.data.object);
+    } catch (e) {
+      // Best-effort — this function already returns 200 below regardless,
+      // so a failure here never causes Stripe to retry the whole event.
+      console.error("Order confirmation email failed:", e && e.message);
+    }
+  } else if (
+    stripeEvent.type === "checkout.session.expired" ||
+    stripeEvent.type === "checkout.session.async_payment_failed"
+  ) {
     const session = stripeEvent.data.object;
     let deductions = {};
     try {
@@ -45,27 +67,17 @@ exports.handler = async (event) => {
       deductions = {};
     }
 
-    console.log("Stripe webhook: checkout.session.completed, deductions:", deductions);
+    const reserved = Object.keys(deductions)
+      .map((id) => ({ id, qty: parseInt(deductions[id], 10) }))
+      .filter((item) => Number.isFinite(item.qty) && item.qty > 0);
 
-    const scentIdSet = new Set(SCENT_IDS);
-    const store = inventoryStore();
+    console.log("Stripe webhook:", stripeEvent.type, "- releasing reserved stock:", reserved);
 
-    for (const id of Object.keys(deductions)) {
-      if (!scentIdSet.has(id)) continue;
-      const qty = parseInt(deductions[id], 10);
-      if (!Number.isFinite(qty) || qty <= 0) continue;
-
-      try {
-        const raw = await store.get(id);
-        const current = raw === null ? null : parseInt(raw, 10);
-        // If no count was ever set for this scent, there's nothing meaningful
-        // to decrement from (it's been treated as unlimited) — skip it.
-        if (current === null || !Number.isFinite(current)) continue;
-        await store.set(id, String(Math.max(0, current - qty)));
-      } catch (e) {
-        // Best-effort — one scent failing to update shouldn't fail the whole
-        // webhook response (Stripe would just retry the whole event).
-      }
+    try {
+      await releaseStock(reserved);
+    } catch (e) {
+      // Best-effort — Stripe will retry the whole event on a non-2xx
+      // response if this ever throws, which is the desired fallback.
     }
   }
 

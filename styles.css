@@ -323,7 +323,13 @@ p { margin: 0; }
   background: var(--sage-pale);
   padding: 22px 22px 0;
 }
-.card-art img { border-radius: 50%; box-shadow: var(--shadow); }
+.card-art img {
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
 .card-tag {
   position: absolute;
   top: 34px;
@@ -462,6 +468,38 @@ p { margin: 0; }
   line-height: 1.6;
 }
 .faq-item p a { color: var(--sage-deep); text-decoration: underline; }
+
+/* ---------- policy pages ---------- */
+.policy-content { max-width: 760px; }
+.policy-content h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--forest);
+  margin-top: 32px;
+}
+.policy-content h3:first-child { margin-top: 0; }
+.policy-content p {
+  margin-top: 14px;
+  font-size: 0.95rem;
+  color: var(--charcoal);
+  line-height: 1.6;
+}
+.policy-content p a { color: var(--sage-deep); text-decoration: underline; }
+.policy-content .policy-updated {
+  font-size: 0.85rem;
+  color: var(--charcoal);
+  opacity: 0.75;
+  margin-top: -8px;
+}
+.policy-content .policy-note {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  font-size: 0.85rem;
+  color: var(--charcoal);
+  opacity: 0.75;
+}
 
 .bundle-picks {
   display: grid;
