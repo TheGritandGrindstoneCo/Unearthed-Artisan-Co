@@ -537,10 +537,18 @@ p { margin: 0; }
   justify-content: center;
   padding: 26px 26px 0;
 }
-.card-art--label img {
+.card-art-media {
+  position: relative;
   width: min(220px, 100%);
+}
+.card-art--label img {
+  width: 100%;
   border-radius: 50%;
   box-shadow: var(--shadow);
+}
+.card-art-media .card-tag {
+  top: 12px;
+  left: 12px;
 }
 
 .shelf--coming-soon { grid-template-columns: 1fr; }
