@@ -594,12 +594,14 @@ p { margin: 0; }
 
 .bundle-picks {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 10px;
 }
 .bundle-picks label {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--charcoal);
@@ -610,6 +612,9 @@ p { margin: 0; }
 .bundle-select {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font-family: var(--font-body);
   font-size: 0.85rem;
   padding: 8px 10px;
