@@ -599,11 +599,13 @@ p { margin: 0; }
 .bundle-picks label {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--charcoal);
+}
+.bundle-label-text {
+  flex: 0 0 100px;
 }
 .bundle-select {
   flex: 1;
