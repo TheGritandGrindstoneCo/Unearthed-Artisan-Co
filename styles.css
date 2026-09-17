@@ -486,11 +486,6 @@ p { margin: 0; }
   align-items: center;
   gap: 10px;
 }
-.mix-row .mix-select {
-  flex: 1;
-  min-width: 0;
-  max-width: none;
-}
 .mix-remove {
   flex: none;
   width: 28px;
@@ -613,7 +608,6 @@ p { margin: 0; }
 .bundle-select {
   flex: 1;
   min-width: 0;
-  max-width: 62%;
   font-family: var(--font-body);
   font-size: 0.85rem;
   padding: 8px 10px;
