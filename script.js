@@ -26,6 +26,44 @@ const SCENT_SLUGS = {
   "Guava": "guava-lip-balm",
 };
 
+// Per-item retail prices, keyed the same as SCENT_SLUGS. Used to price the
+// Mix & Match card live as picks change, and to build its cart line item.
+const PRODUCT_PRICES = {
+  "Quiet Clay": 9.95,
+  "Jade Hollow": 9.95,
+  "Lavender Dawn": 9.95,
+  "Lavender Swirl": 10.95,
+  "Garnet Dusk": 10.95,
+  "Indigo Grove": 10.95,
+  "Onyx Ember": 10.95,
+  "Golden Harvest": 10.95,
+  "Emerald Meadow": 10.95,
+  "Lavender Body Cream": 24.99,
+  "Frankincense Facial Cream": 26.99,
+  "Unscented Body Cream": 24.99,
+  "Unscented Facial Cream": 26.99,
+  "Vanilla": 6.99,
+  "Peppermint": 6.99,
+  "Guava": 6.99,
+};
+
+// Discount applied on the Mix & Match card (any 2-5 items, any type).
+const MIX_MATCH_DISCOUNT = 0.1;
+
+// Populated by the stock-marking block below once /get-inventory resolves.
+// Read by the Mix & Match card so rows added later (via "+ Add Another
+// Item") also come in pre-marked for anything already sold out.
+let STOCK = {};
+
+// Options for the Mix & Match card's per-slot dropdown, grouped the same way
+// the shop shelves are. Shared by the initial slots and any slot added via
+// "+ Add Another Item".
+const MIX_MATCH_GROUPS = [
+  { label: "Soap", items: ["Quiet Clay", "Jade Hollow", "Lavender Dawn", "Lavender Swirl", "Garnet Dusk", "Indigo Grove", "Onyx Ember", "Golden Harvest", "Emerald Meadow"] },
+  { label: "Tallow Cream", items: ["Lavender Body Cream", "Frankincense Facial Cream", "Unscented Body Cream", "Unscented Facial Cream"] },
+  { label: "Lip Balm", items: ["Vanilla", "Peppermint", "Guava"] },
+];
+
 // ============================================================
 // Product stock — marks sold-out soap, cream, and lip balm items on the
 // shop page, both on the "Add to Bag" buttons and inside bundle/gift-set
@@ -40,6 +78,7 @@ const SCENT_SLUGS = {
     .then((res) => res.json())
     .then((data) => {
       const stock = data.stock || {};
+      STOCK = stock;
 
       buttons.forEach((btn) => {
         const count = stock[btn.dataset.id];
@@ -70,7 +109,7 @@ const SCENT_SLUGS = {
       // If every scent in one of a bundle/gift set's dropdowns is sold out,
       // there's no valid pick left for that slot — disable the whole "Add to
       // Bag" button for that card rather than leave a broken selection.
-      document.querySelectorAll(".add-bundle, .add-giftset").forEach((btn) => {
+      document.querySelectorAll(".add-bundle, .add-giftset, .add-mixmatch").forEach((btn) => {
         const cardSelects = btn.closest(".card-body").querySelectorAll(".bundle-select");
         const blocked = Array.from(cardSelects).some((select) =>
           Array.from(select.options).every((o) => o.disabled)
@@ -305,6 +344,108 @@ const SCENT_SLUGS = {
       const pickSlugs = picks.map((p) => SCENT_SLUGS[p]).filter(Boolean);
       addItem("giftset-" + Date.now(), name, parseFloat(btn.dataset.price), pickSlugs.length ? pickSlugs : undefined);
     });
+  });
+
+  // Mix & Match — pick any 2-5 items, any type, with a live-updating price
+  // (MIX_MATCH_DISCOUNT off the sum) as slots are added, removed, or
+  // changed. Unlike the other bundle cards, slot count isn't fixed, so rows
+  // are built and torn down in JS rather than living in the page markup.
+  document.querySelectorAll(".mix-match-card").forEach((card) => {
+    const picksEl = card.querySelector(".mix-picks");
+    const addRowBtn = card.querySelector(".mix-add");
+    const countEl2 = card.querySelector(".mix-count");
+    const totalEl2 = card.querySelector(".mix-total");
+    const addToBagBtn = card.querySelector(".add-mixmatch");
+    if (!picksEl || !addRowBtn || !countEl2 || !totalEl2 || !addToBagBtn) return;
+
+    const MIN_SLOTS = 2;
+    const MAX_SLOTS = 5;
+    const ALL_ITEM_NAMES = MIX_MATCH_GROUPS.flatMap((g) => g.items);
+
+    function buildOptions(select) {
+      MIX_MATCH_GROUPS.forEach((group) => {
+        const optgroup = document.createElement("optgroup");
+        optgroup.label = group.label;
+        group.items.forEach((itemName) => {
+          const option = document.createElement("option");
+          option.textContent = itemName;
+          const slug = SCENT_SLUGS[itemName];
+          const count = slug ? STOCK[slug] : undefined;
+          if (typeof count === "number" && count <= 0) {
+            option.disabled = true;
+            option.textContent += " (Sold Out)";
+          }
+          optgroup.appendChild(option);
+        });
+        select.appendChild(optgroup);
+      });
+    }
+
+    function makeRow(defaultValue) {
+      const row = document.createElement("div");
+      row.className = "mix-row";
+      const select = document.createElement("select");
+      select.className = "bundle-select mix-select";
+      buildOptions(select);
+      if (defaultValue) select.value = defaultValue;
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "mix-remove";
+      remove.setAttribute("aria-label", "Remove this item");
+      remove.textContent = "×";
+      row.appendChild(select);
+      row.appendChild(remove);
+      return row;
+    }
+
+    function updateRowControls() {
+      const rows = picksEl.querySelectorAll(".mix-row");
+      rows.forEach((row) => {
+        row.querySelector(".mix-remove").hidden = rows.length <= MIN_SLOTS;
+      });
+      addRowBtn.hidden = rows.length >= MAX_SLOTS;
+    }
+
+    function recalc() {
+      const selects = picksEl.querySelectorAll(".mix-select");
+      const subtotal = Array.from(selects).reduce((sum, s) => sum + (PRODUCT_PRICES[s.value] || 0), 0);
+      const discounted = subtotal * (1 - MIX_MATCH_DISCOUNT);
+      countEl2.textContent = selects.length + (selects.length === 1 ? " item" : " items") + " — " + Math.round(MIX_MATCH_DISCOUNT * 100) + "% off";
+      totalEl2.textContent = money(discounted);
+      addToBagBtn.dataset.total = discounted.toFixed(2);
+    }
+
+    picksEl.addEventListener("change", (e) => {
+      if (e.target.classList.contains("mix-select")) recalc();
+    });
+
+    picksEl.addEventListener("click", (e) => {
+      const removeBtn = e.target.closest(".mix-remove");
+      if (!removeBtn) return;
+      if (picksEl.querySelectorAll(".mix-row").length <= MIN_SLOTS) return;
+      removeBtn.closest(".mix-row").remove();
+      updateRowControls();
+      recalc();
+    });
+
+    addRowBtn.addEventListener("click", () => {
+      if (picksEl.querySelectorAll(".mix-row").length >= MAX_SLOTS) return;
+      const used = Array.from(picksEl.querySelectorAll(".mix-select")).map((s) => s.value);
+      const nextDefault = ALL_ITEM_NAMES.find((n) => !used.includes(n)) || ALL_ITEM_NAMES[0];
+      picksEl.appendChild(makeRow(nextDefault));
+      updateRowControls();
+      recalc();
+    });
+
+    addToBagBtn.addEventListener("click", () => {
+      const picks = Array.from(picksEl.querySelectorAll(".mix-select")).map((s) => s.value);
+      const slugs = picks.map((p) => SCENT_SLUGS[p]).filter(Boolean);
+      const name = "Mix & Match: " + picks.join(", ");
+      addItem("mixmatch-" + Date.now(), name, parseFloat(addToBagBtn.dataset.total), slugs.length ? slugs : undefined);
+    });
+
+    updateRowControls();
+    recalc();
   });
 
   if (onCartPage) {

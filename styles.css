@@ -434,6 +434,19 @@ p { margin: 0; }
   color: var(--sage-deep);
   opacity: 0.85;
 }
+/* The Mix & Match price updates live in JS, so both the label and the
+   amount are spans (for easy targeting) - reset the amount back to look
+   like the plain trailing price text the other cards use. */
+.card-price .mix-total {
+  display: inline;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--charcoal);
+  opacity: 1;
+}
 .buy-btn {
   background: var(--sage-deep);
   color: var(--ivory-card);
@@ -462,6 +475,58 @@ p { margin: 0; }
   color: var(--sage-deep);
   max-width: 62ch;
 }
+
+/* ---------- mix & match ---------- */
+.mix-picks {
+  display: grid;
+  gap: 10px;
+}
+.mix-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mix-row .mix-select {
+  flex: 1;
+  min-width: 0;
+  max-width: none;
+}
+.mix-remove {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--ivory-card);
+  color: var(--charcoal);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.mix-remove:hover, .mix-remove:focus-visible {
+  border-color: var(--sage-deep);
+  color: var(--sage-deep);
+}
+.mix-remove[hidden] { display: none; }
+.mix-add {
+  margin-top: 12px;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--sage-deep);
+  background: transparent;
+  border: 1px dashed var(--sage);
+  border-radius: 999px;
+  padding: 8px 18px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.mix-add:hover, .mix-add:focus-visible {
+  border-style: solid;
+  background: var(--sage-pale);
+}
+.mix-add[hidden] { display: none; }
 
 .shelf--two { grid-template-columns: repeat(2, 1fr); }
 
