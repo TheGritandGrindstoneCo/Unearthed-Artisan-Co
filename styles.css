@@ -310,28 +310,28 @@ p { margin: 0; }
 .shop-jump {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  align-items: center;
+  gap: 14px;
   margin-bottom: 40px;
 }
 .shop-jump a {
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  font-weight: 500;
-  letter-spacing: 0.03em;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.02rem;
+  font-weight: 600;
   color: var(--forest);
   text-decoration: none;
-  padding: 9px 20px;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  background: var(--ivory-card);
-  box-shadow: 0 1px 3px rgba(43, 40, 32, 0.08);
-  transition: border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
 }
 .shop-jump a:hover, .shop-jump a:focus-visible {
-  border-color: var(--sage-deep);
   color: var(--sage-deep);
-  box-shadow: var(--shadow);
-  transform: translateY(-1px);
+  border-color: var(--sage-deep);
+}
+.shop-jump .dot {
+  color: var(--sage-deep);
+  font-size: 0.6rem;
 }
 
 /* ---------- product shelf ---------- */
