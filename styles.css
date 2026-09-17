@@ -638,10 +638,19 @@ p { margin: 0; }
   position: relative;
   width: min(220px, 100%);
 }
+.card-art-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
 .card-art--label img {
   width: 100%;
-  border-radius: 50%;
-  box-shadow: var(--shadow);
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.4);
+  display: block;
 }
 .card-art-media .card-tag {
   top: 12px;
