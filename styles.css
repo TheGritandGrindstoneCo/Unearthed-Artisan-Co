@@ -300,8 +300,32 @@ p { margin: 0; }
   margin: 56px 0 24px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--line);
+  scroll-margin-top: 90px;
 }
 .shelf-heading:first-of-type { margin-top: 0; }
+
+.shop-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 40px;
+}
+.shop-jump a {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--forest);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--ivory-card);
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.shop-jump a:hover, .shop-jump a:focus-visible {
+  border-color: var(--sage-deep);
+  color: var(--sage-deep);
+}
 
 /* ---------- product shelf ---------- */
 .shelf {
