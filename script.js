@@ -11,7 +11,7 @@ const SCENT_SLUGS = {
   "Quiet Clay": "quiet-clay",
   "Jade Hollow": "jade-hollow",
   "Lavender Dawn": "lavender-dawn",
-  "Lilac Bloom": "lilac-bloom",
+  "Lavender Swirl": "lilac-bloom",
   "Garnet Dusk": "garnet-dusk",
   "Indigo Grove": "indigo-grove",
   "Onyx Ember": "onyx-ember",
@@ -292,9 +292,16 @@ const SCENT_SLUGS = {
     btn.addEventListener("click", () => {
       const selects = btn.closest(".card-body").querySelectorAll(".bundle-select");
       const picks = Array.from(selects).map((s) => s.value);
-      const name = "Gift Set: " + picks[0] + " Soap, " + picks[1] + ", " + picks[2] + " Lip Balm";
-      // Deduct one of each picked item's own stock — the soap scent, the
-      // cream, and the lip balm — from their respective pools.
+      // Each select sits in a <label>Slot Name<select>...</select></label> —
+      // pull the slot name (e.g. "Soap", "Body Cream") to build a readable
+      // line-item name without hardcoding how many picks a set has.
+      const slots = Array.from(selects).map((s) => {
+        const clone = s.closest("label").cloneNode(true);
+        clone.querySelector("select").remove();
+        return clone.textContent.trim();
+      });
+      const name = btn.dataset.setName + ": " + slots.map((slot, i) => slot + " - " + picks[i]).join(", ");
+      // Deduct one of each picked item's own stock from its respective pool.
       const pickSlugs = picks.map((p) => SCENT_SLUGS[p]).filter(Boolean);
       addItem("giftset-" + Date.now(), name, parseFloat(btn.dataset.price), pickSlugs.length ? pickSlugs : undefined);
     });

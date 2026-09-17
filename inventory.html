@@ -91,6 +91,24 @@
   }
   .inv-status.is-ok { color: var(--sage-deep); }
   .inv-status.is-error { color: var(--accent); }
+
+  .inv-section {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+  .inv-section h2 { font-size: 1.3rem; }
+  .inv-section > p { margin-top: 10px; color: var(--charcoal); font-size: 0.92rem; }
+  .inv-export-row {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: var(--charcoal);
+  }
+  .inv-export-row input[type="checkbox"] { width: auto; }
+  .inv-export-row label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -111,6 +129,20 @@
 
   <button type="button" class="btn btn--primary" id="inv-save" style="margin-top:28px;">Save Changes</button>
   <p class="inv-status" id="inv-status"></p>
+
+  <div class="inv-section">
+    <p class="eyebrow">Internal Tool</p>
+    <h2>Shipping Export</h2>
+    <p>Pirate Ship doesn't connect to this site directly, so this downloads a CSV of paid orders
+      (name, address, phone, items) that you can upload at pirateship.com under "Upload a
+      Spreadsheet" to buy and print labels. Uses the admin password above. Only new orders — ones
+      not already in a previous export — are included by default.</p>
+    <div class="inv-export-row">
+      <label for="inv-export-include"><input type="checkbox" id="inv-export-include" /> Re-include orders already exported</label>
+    </div>
+    <button type="button" class="btn btn--primary" id="inv-export-btn" style="margin-top:20px;">Download Orders CSV</button>
+    <p class="inv-status" id="inv-export-status"></p>
+  </div>
 </div>
 
 <script>
@@ -118,7 +150,7 @@
     { id: "quiet-clay", name: "Quiet Clay", group: "Soap" },
     { id: "jade-hollow", name: "Jade Hollow", group: "Soap" },
     { id: "lavender-dawn", name: "Lavender Dawn", group: "Soap" },
-    { id: "lilac-bloom", name: "Lilac Bloom", group: "Soap" },
+    { id: "lilac-bloom", name: "Lavender Swirl", group: "Soap" },
     { id: "garnet-dusk", name: "Garnet Dusk", group: "Soap" },
     { id: "indigo-grove", name: "Indigo Grove", group: "Soap" },
     { id: "onyx-ember", name: "Onyx Ember", group: "Soap" },
@@ -213,6 +245,60 @@
   });
 
   loadInventory();
+
+  var exportBtn = document.getElementById("inv-export-btn");
+  var exportStatusEl = document.getElementById("inv-export-status");
+  var exportIncludeEl = document.getElementById("inv-export-include");
+
+  exportBtn.addEventListener("click", function () {
+    var password = passwordEl.value.trim();
+    if (!password) {
+      exportStatusEl.textContent = "Enter the admin password first.";
+      exportStatusEl.className = "inv-status is-error";
+      return;
+    }
+
+    exportStatusEl.textContent = "Building CSV…";
+    exportStatusEl.className = "inv-status";
+    exportBtn.disabled = true;
+
+    fetch("/.netlify/functions/export-orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: password, includeExported: exportIncludeEl.checked }),
+    })
+      .then(function (res) {
+        if (!res.ok) {
+          return res.json().then(function (data) {
+            throw new Error((data && data.error) || "Something went wrong.");
+          });
+        }
+        var disposition = res.headers.get("Content-Disposition") || "";
+        var match = disposition.match(/filename="([^"]+)"/);
+        var filename = match ? match[1] : "orders.csv";
+        return res.blob().then(function (blob) {
+          return { blob: blob, filename: filename };
+        });
+      })
+      .then(function (result) {
+        exportBtn.disabled = false;
+        var objectUrl = URL.createObjectURL(result.blob);
+        var a = document.createElement("a");
+        a.href = objectUrl;
+        a.download = result.filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(objectUrl);
+        exportStatusEl.textContent = "Downloaded " + result.filename + ".";
+        exportStatusEl.className = "inv-status is-ok";
+      })
+      .catch(function (err) {
+        exportBtn.disabled = false;
+        exportStatusEl.textContent = err.message || "Could not reach the server.";
+        exportStatusEl.className = "inv-status is-error";
+      });
+  });
 </script>
 
 </body>
