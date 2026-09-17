@@ -109,7 +109,7 @@ const MIX_MATCH_GROUPS = [
       // If every scent in one of a bundle/gift set's dropdowns is sold out,
       // there's no valid pick left for that slot — disable the whole "Add to
       // Bag" button for that card rather than leave a broken selection.
-      document.querySelectorAll(".add-bundle, .add-giftset, .add-mixmatch").forEach((btn) => {
+      document.querySelectorAll(".add-giftset, .add-mixmatch").forEach((btn) => {
         const cardSelects = btn.closest(".card-body").querySelectorAll(".bundle-select");
         const blocked = Array.from(cardSelects).some((select) =>
           Array.from(select.options).every((o) => o.disabled)
@@ -301,29 +301,9 @@ const MIX_MATCH_GROUPS = [
     render();
   }
 
-  // Bundles store qty as the actual bar count (not "1 bundle") so shipping-tier
-  // math based on totalQty() still reflects real bar count. price is per-bar
-  // (bundle total / bar count), so qty * price still equals the flat bundle price.
-  // scents lists each chosen scent's slug id, one per bar, so a bundle pulls
-  // from the same per-scent stock pool as buying that bar individually.
-  function addBundleItem(name, totalPrice, barQty, scents) {
-    cart.push({ id: name + "-" + Date.now(), name: name, price: totalPrice / barQty, qty: barQty, scents: scents });
-    render();
-  }
-
   document.querySelectorAll(".add-to-cart").forEach((btn) => {
     btn.addEventListener("click", () => {
       addItem(btn.dataset.id, btn.dataset.name, parseFloat(btn.dataset.price));
-    });
-  });
-
-  document.querySelectorAll(".add-bundle").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const selects = btn.closest(".card-body").querySelectorAll(".bundle-select");
-      const scentNames = Array.from(selects).map((s) => s.value);
-      const scentSlugs = scentNames.map((n) => SCENT_SLUGS[n]).filter(Boolean);
-      const name = btn.dataset.bundleName + ": " + scentNames.join(", ");
-      addBundleItem(name, parseFloat(btn.dataset.bundlePrice), scentNames.length, scentSlugs);
     });
   });
 
@@ -410,7 +390,7 @@ const MIX_MATCH_GROUPS = [
       const selects = picksEl.querySelectorAll(".mix-select");
       const subtotal = Array.from(selects).reduce((sum, s) => sum + (PRODUCT_PRICES[s.value] || 0), 0);
       const discounted = subtotal * (1 - MIX_MATCH_DISCOUNT);
-      countEl2.textContent = selects.length + (selects.length === 1 ? " item" : " items") + " — " + Math.round(MIX_MATCH_DISCOUNT * 100) + "% off";
+      countEl2.textContent = selects.length + (selects.length === 1 ? " item" : " items");
       totalEl2.textContent = money(discounted);
       addToBagBtn.dataset.total = discounted.toFixed(2);
     }
@@ -440,7 +420,7 @@ const MIX_MATCH_GROUPS = [
     addToBagBtn.addEventListener("click", () => {
       const picks = Array.from(picksEl.querySelectorAll(".mix-select")).map((s) => s.value);
       const slugs = picks.map((p) => SCENT_SLUGS[p]).filter(Boolean);
-      const name = "Mix & Match: " + picks.join(", ");
+      const name = "Curated Ritual: " + picks.join(", ");
       addItem("mixmatch-" + Date.now(), name, parseFloat(addToBagBtn.dataset.total), slugs.length ? slugs : undefined);
     });
 
