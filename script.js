@@ -17,10 +17,10 @@ const SCENT_SLUGS = {
   "Onyx Ember": "onyx-ember",
   "Golden Harvest": "golden-harvest",
   "Emerald Meadow": "emerald-meadow",
-  "Lavender Body Cream": "lavender-tallow-lotion",
-  "Frankincense Facial Cream": "frankincense-facial-lotion",
-  "Unscented Body Cream": "unscented-body-cream",
-  "Unscented Facial Cream": "unscented-facial-cream",
+  "Lavender Tallow Body Cream": "lavender-tallow-lotion",
+  "Frankincense Tallow Facial Cream": "frankincense-facial-lotion",
+  "Unscented Tallow Body Cream": "unscented-body-cream",
+  "Unscented Tallow Facial Cream": "unscented-facial-cream",
   "Vanilla": "vanilla-lip-balm",
   "Peppermint": "peppermint-lip-balm",
   "Guava": "guava-lip-balm",
@@ -38,10 +38,10 @@ const PRODUCT_PRICES = {
   "Onyx Ember": 10.95,
   "Golden Harvest": 10.95,
   "Emerald Meadow": 10.95,
-  "Lavender Body Cream": 24.99,
-  "Frankincense Facial Cream": 26.99,
-  "Unscented Body Cream": 24.99,
-  "Unscented Facial Cream": 26.99,
+  "Lavender Tallow Body Cream": 24.99,
+  "Frankincense Tallow Facial Cream": 26.99,
+  "Unscented Tallow Body Cream": 24.99,
+  "Unscented Tallow Facial Cream": 26.99,
   "Vanilla": 6.99,
   "Peppermint": 6.99,
   "Guava": 6.99,
@@ -60,7 +60,7 @@ let STOCK = {};
 // "+ Add Another Item".
 const MIX_MATCH_GROUPS = [
   { label: "Soap", items: ["Quiet Clay", "Jade Hollow", "Lavender Dawn", "Lavender Swirl", "Garnet Dusk", "Indigo Grove", "Onyx Ember", "Golden Harvest", "Emerald Meadow"] },
-  { label: "Tallow Cream", items: ["Lavender Body Cream", "Frankincense Facial Cream", "Unscented Body Cream", "Unscented Facial Cream"] },
+  { label: "Tallow Cream", items: ["Lavender Tallow Body Cream", "Frankincense Tallow Facial Cream", "Unscented Tallow Body Cream", "Unscented Tallow Facial Cream"] },
   { label: "Lip Balm", items: ["Vanilla", "Peppermint", "Guava"] },
 ];
 
