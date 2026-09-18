@@ -434,10 +434,11 @@ p { margin: 0; }
   color: var(--sage-deep);
   opacity: 0.85;
 }
-/* The Mix & Match price updates live in JS, so both the label and the
+/* Ritual card prices update live in JS, so both the label and the
    amount are spans (for easy targeting) - reset the amount back to look
    like the plain trailing price text the other cards use. */
-.card-price .mix-total {
+.card-price .mix-total,
+.card-price .ritual-total {
   display: inline;
   font-family: var(--font-display);
   font-size: 1.05rem;

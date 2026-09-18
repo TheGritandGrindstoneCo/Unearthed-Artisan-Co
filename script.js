@@ -47,8 +47,10 @@ const PRODUCT_PRICES = {
   "Guava": 6.99,
 };
 
-// Discount applied on the Mix & Match card (any 2-5 items, any type).
-const MIX_MATCH_DISCOUNT = 0.1;
+// Discount applied to every Ritual card's price (Starter, Daily, and
+// Curated) — same formula everywhere so an identical set of picks always
+// costs the same no matter which Ritual card it's built from.
+const RITUAL_DISCOUNT = 0.1;
 
 // Populated by the stock-marking block below once /get-inventory resolves.
 // Read by the Mix & Match card so rows added later (via "+ Add Another
@@ -307,9 +309,24 @@ const MIX_MATCH_GROUPS = [
     });
   });
 
+  // Starter Ritual and Daily Ritual — live-priced the same way as Curated
+  // Ritual (sum of the picks minus RITUAL_DISCOUNT), so an identical set of
+  // picks costs the same no matter which Ritual card it's built from.
   document.querySelectorAll(".add-giftset").forEach((btn) => {
+    const selects = btn.closest(".card-body").querySelectorAll(".bundle-select");
+    const totalEl = btn.closest(".card-body").querySelector(".ritual-total");
+
+    function recalcGiftset() {
+      const subtotal = Array.from(selects).reduce((sum, s) => sum + (PRODUCT_PRICES[s.value] || 0), 0);
+      const discounted = subtotal * (1 - RITUAL_DISCOUNT);
+      if (totalEl) totalEl.textContent = money(discounted);
+      btn.dataset.total = discounted.toFixed(2);
+    }
+
+    selects.forEach((s) => s.addEventListener("change", recalcGiftset));
+    recalcGiftset();
+
     btn.addEventListener("click", () => {
-      const selects = btn.closest(".card-body").querySelectorAll(".bundle-select");
       const picks = Array.from(selects).map((s) => s.value);
       // Each select sits in a <label>Slot Name<select>...</select></label> —
       // pull the slot name (e.g. "Soap", "Body Cream") to build a readable
@@ -322,12 +339,12 @@ const MIX_MATCH_GROUPS = [
       const name = btn.dataset.setName + ": " + slots.map((slot, i) => slot + " - " + picks[i]).join(", ");
       // Deduct one of each picked item's own stock from its respective pool.
       const pickSlugs = picks.map((p) => SCENT_SLUGS[p]).filter(Boolean);
-      addItem("giftset-" + Date.now(), name, parseFloat(btn.dataset.price), pickSlugs.length ? pickSlugs : undefined);
+      addItem("giftset-" + Date.now(), name, parseFloat(btn.dataset.total), pickSlugs.length ? pickSlugs : undefined);
     });
   });
 
   // Mix & Match — pick any 2-5 items, any type, with a live-updating price
-  // (MIX_MATCH_DISCOUNT off the sum) as slots are added, removed, or
+  // (RITUAL_DISCOUNT off the sum) as slots are added, removed, or
   // changed. Unlike the other bundle cards, slot count isn't fixed, so rows
   // are built and torn down in JS rather than living in the page markup.
   document.querySelectorAll(".mix-match-card").forEach((card) => {
@@ -389,7 +406,7 @@ const MIX_MATCH_GROUPS = [
     function recalc() {
       const selects = picksEl.querySelectorAll(".mix-select");
       const subtotal = Array.from(selects).reduce((sum, s) => sum + (PRODUCT_PRICES[s.value] || 0), 0);
-      const discounted = subtotal * (1 - MIX_MATCH_DISCOUNT);
+      const discounted = subtotal * (1 - RITUAL_DISCOUNT);
       countEl2.textContent = selects.length + (selects.length === 1 ? " item" : " items");
       totalEl2.textContent = money(discounted);
       addToBagBtn.dataset.total = discounted.toFixed(2);
