@@ -66,6 +66,50 @@ const MIX_MATCH_GROUPS = [
   { label: "Lip Balm", items: ["Vanilla", "Peppermint", "Guava"] },
 ];
 
+// Preorder ship dates, keyed by the same product slug used in SCENT_SLUGS.
+// Soap dates come from the Batch Tracking Log's cure-ready dates (42-day
+// cure), floored at the October 10, 2026 launch date; lotion and lip balm
+// don't need to cure, so they all ship that same launch date. Golden
+// Harvest and Emerald Meadow were poured later (9/10) so their cure
+// finishes later too. Update this table each time a new soap batch is
+// poured — see Batch Tracking Log.xlsx.
+const SHIP_DATES = {
+  "quiet-clay": "2026-10-10",
+  "jade-hollow": "2026-10-10",
+  "lavender-dawn": "2026-10-10",
+  "lilac-bloom": "2026-10-10",
+  "garnet-dusk": "2026-10-10",
+  "indigo-grove": "2026-10-10",
+  "onyx-ember": "2026-10-10",
+  "golden-harvest": "2026-10-22",
+  "emerald-meadow": "2026-10-22",
+  "lavender-tallow-lotion": "2026-10-10",
+  "frankincense-facial-lotion": "2026-10-10",
+  "unscented-body-cream": "2026-10-10",
+  "unscented-facial-cream": "2026-10-10",
+  "vanilla-lip-balm": "2026-10-10",
+  "peppermint-lip-balm": "2026-10-10",
+  "guava-lip-balm": "2026-10-10",
+};
+
+function shipDateLabel(iso) {
+  if (!iso) return "";
+  const d = new Date(iso + "T00:00:00");
+  return "Ships " + d.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+}
+
+// Latest (slowest) ship date among a set of product display names — used so
+// a Ritual's ship date is gated by whichever pick takes longest to cure.
+function maxShipDateIso(names) {
+  let maxIso = null;
+  names.forEach((name) => {
+    const slug = SCENT_SLUGS[name];
+    const iso = slug && SHIP_DATES[slug];
+    if (iso && (!maxIso || iso > maxIso)) maxIso = iso;
+  });
+  return maxIso;
+}
+
 // ============================================================
 // Product stock — marks sold-out soap, cream, and lip balm items on the
 // shop page, both on the "Add to Bag" buttons and inside bundle/gift-set
@@ -127,6 +171,21 @@ const MIX_MATCH_GROUPS = [
       // If inventory can't be reached, leave everything as-is rather than
       // blocking sales over a transient network issue.
     });
+})();
+
+// ============================================================
+// Preorder ship-date badges — shows each product card's "Ships [date]"
+// line from SHIP_DATES. Static data, so this runs immediately rather than
+// waiting on the inventory fetch above.
+// ============================================================
+(function () {
+  document.querySelectorAll(".add-to-cart[data-id]").forEach((btn) => {
+    const card = btn.closest(".card-body");
+    const shipEl = card ? card.querySelector(".ship-date") : null;
+    if (!shipEl) return;
+    const label = shipDateLabel(SHIP_DATES[btn.dataset.id]);
+    if (label) shipEl.textContent = label;
+  });
 })();
 
 // ============================================================
@@ -315,11 +374,13 @@ const MIX_MATCH_GROUPS = [
   document.querySelectorAll(".add-giftset").forEach((btn) => {
     const selects = btn.closest(".card-body").querySelectorAll(".bundle-select");
     const totalEl = btn.closest(".card-body").querySelector(".ritual-total");
+    const shipEl = btn.closest(".card-body").querySelector(".ship-date");
 
     function recalcGiftset() {
       const subtotal = Array.from(selects).reduce((sum, s) => sum + (PRODUCT_PRICES[s.value] || 0), 0);
       const discounted = subtotal * (1 - RITUAL_DISCOUNT);
       if (totalEl) totalEl.textContent = money(discounted);
+      if (shipEl) shipEl.textContent = shipDateLabel(maxShipDateIso(Array.from(selects).map((s) => s.value)));
       btn.dataset.total = discounted.toFixed(2);
     }
 
@@ -352,6 +413,7 @@ const MIX_MATCH_GROUPS = [
     const addRowBtn = card.querySelector(".mix-add");
     const countEl2 = card.querySelector(".mix-count");
     const totalEl2 = card.querySelector(".mix-total");
+    const shipEl2 = card.querySelector(".ship-date");
     const addToBagBtn = card.querySelector(".add-mixmatch");
     if (!picksEl || !addRowBtn || !countEl2 || !totalEl2 || !addToBagBtn) return;
 
@@ -409,6 +471,7 @@ const MIX_MATCH_GROUPS = [
       const discounted = subtotal * (1 - RITUAL_DISCOUNT);
       countEl2.textContent = selects.length + (selects.length === 1 ? " item" : " items");
       totalEl2.textContent = money(discounted);
+      if (shipEl2) shipEl2.textContent = shipDateLabel(maxShipDateIso(Array.from(selects).map((s) => s.value)));
       addToBagBtn.dataset.total = discounted.toFixed(2);
     }
 

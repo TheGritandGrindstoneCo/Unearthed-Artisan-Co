@@ -448,6 +448,29 @@ p { margin: 0; }
   color: var(--charcoal);
   opacity: 1;
 }
+.ship-date {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--sage-deep);
+  margin: -6px 0 10px;
+}
+.preorder-banner {
+  background: var(--sage-pale);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 28px;
+  text-align: center;
+}
+.preorder-banner p {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--charcoal);
+  margin: 0;
+}
+.preorder-banner strong { color: var(--forest); }
 .buy-btn {
   background: var(--sage-deep);
   color: var(--ivory-card);
