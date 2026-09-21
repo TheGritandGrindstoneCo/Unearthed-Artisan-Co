@@ -997,6 +997,9 @@ p { margin: 0; }
   color: var(--charcoal);
   opacity: 0.75;
 }
+.cart-item-ship {
+  margin: 4px 0 0;
+}
 .cart-item-controls {
   display: flex;
   align-items: center;
@@ -1100,6 +1103,14 @@ p { margin: 0; }
   color: var(--forest);
 }
 
+.cart-ship-summary {
+  margin-top: 10px;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--sage-deep);
+}
 .cart-checkout {
   margin-top: 18px;
   width: 100%;

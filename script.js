@@ -98,16 +98,21 @@ function shipDateLabel(iso) {
   return "Ships " + d.toLocaleDateString("en-US", { month: "long", day: "numeric" });
 }
 
-// Latest (slowest) ship date among a set of product display names — used so
-// a Ritual's ship date is gated by whichever pick takes longest to cure.
-function maxShipDateIso(names) {
+// Latest (slowest) ship date among a set of product slugs — used so a
+// Ritual, or a whole cart, ships on whichever item takes longest to cure
+// (everything in one order ships together, see shipping.html).
+function maxShipDateIsoFromSlugs(slugs) {
   let maxIso = null;
-  names.forEach((name) => {
-    const slug = SCENT_SLUGS[name];
+  slugs.forEach((slug) => {
     const iso = slug && SHIP_DATES[slug];
     if (iso && (!maxIso || iso > maxIso)) maxIso = iso;
   });
   return maxIso;
+}
+
+// Same, but takes the product display names shown in a bundle's dropdowns.
+function maxShipDateIso(names) {
+  return maxShipDateIsoFromSlugs(names.map((name) => SCENT_SLUGS[name]));
 }
 
 // ============================================================
@@ -240,6 +245,7 @@ function maxShipDateIso(names) {
   const shippingEl = document.getElementById("cart-shipping");
   const taxEl = document.getElementById("cart-tax");
   const totalEl = document.getElementById("cart-total");
+  const shipDateEl = document.getElementById("cart-ship-date");
   const checkoutBtn = document.getElementById("cart-checkout");
   const methodRadios = document.querySelectorAll('input[name="cart-method"]');
   const onCartPage = !!itemsEl;
@@ -281,6 +287,26 @@ function maxShipDateIso(names) {
     return cart.reduce((sum, item) => sum + item.qty * item.price, 0);
   }
 
+  // A single item's own ship date — a bundle ships on whichever of its
+  // picks (item.scents) cures slowest, a plain item ships on its own slug.
+  function itemShipDateIso(item) {
+    if (Array.isArray(item.scents) && item.scents.length > 0) {
+      return maxShipDateIsoFromSlugs(item.scents);
+    }
+    return SHIP_DATES[item.id] || null;
+  }
+
+  // The whole order ships together in one shipment (see the shipping.html
+  // copy), so its ship date is the latest among every line item.
+  function cartShipDateIso() {
+    let maxIso = null;
+    cart.forEach((item) => {
+      const iso = itemShipDateIso(item);
+      if (iso && (!maxIso || iso > maxIso)) maxIso = iso;
+    });
+    return maxIso;
+  }
+
   function render() {
     const qty = totalQty();
     countEl.textContent = qty;
@@ -303,6 +329,7 @@ function maxShipDateIso(names) {
           '<div class="cart-item-info">' +
           '<p class="cart-item-name"></p>' +
           '<p class="cart-item-price"></p>' +
+          '<p class="cart-item-ship ship-date"></p>' +
           "</div>" +
           '<div class="cart-item-controls">' +
           '<button type="button" class="cart-qty-btn" data-action="dec" aria-label="Decrease quantity">&minus;</button>' +
@@ -313,6 +340,8 @@ function maxShipDateIso(names) {
         row.querySelector(".cart-item-name").textContent = item.name;
         row.querySelector(".cart-item-price").textContent = money(item.price) + " each";
         row.querySelector(".cart-item-qty").textContent = item.qty;
+        const shipLabel = shipDateLabel(itemShipDateIso(item));
+        if (shipLabel) row.querySelector(".cart-item-ship").textContent = shipLabel;
         row.querySelectorAll("button[data-action]").forEach((btn) => {
           btn.dataset.id = item.id;
         });
@@ -334,6 +363,12 @@ function maxShipDateIso(names) {
     shippingEl.textContent = qty === 0 ? "—" : money(shipCost);
     taxEl.textContent = qty === 0 ? "—" : method === "shipping" ? "TBD" : money(taxCost);
     totalEl.textContent = money(total);
+
+    if (shipDateEl) {
+      const label = shipDateLabel(cartShipDateIso());
+      shipDateEl.textContent = label || "";
+      shipDateEl.hidden = qty === 0 || !label;
+    }
 
     methodRadios.forEach((r) => {
       const amtEl = r.closest(".radio-option").querySelector(".ramt");
