@@ -27,7 +27,7 @@ const SCENT_NAMES = {
   "quiet-clay": "Quiet Clay",
   "jade-hollow": "Jade Hollow",
   "lavender-dawn": "Lavender Dawn",
-  "lilac-bloom": "Lavender Swirl",
+  "lilac-bloom": "Lavender Bloom",
   "garnet-dusk": "Garnet Dusk",
   "indigo-grove": "Indigo Grove",
   "onyx-ember": "Onyx Ember",

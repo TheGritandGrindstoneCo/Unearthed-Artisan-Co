@@ -11,7 +11,7 @@ const SCENT_SLUGS = {
   "Quiet Clay": "quiet-clay",
   "Jade Hollow": "jade-hollow",
   "Lavender Dawn": "lavender-dawn",
-  "Lavender Swirl": "lilac-bloom",
+  "Lavender Bloom": "lilac-bloom",
   "Garnet Dusk": "garnet-dusk",
   "Indigo Grove": "indigo-grove",
   "Onyx Ember": "onyx-ember",
@@ -32,7 +32,7 @@ const PRODUCT_PRICES = {
   "Quiet Clay": 9.95,
   "Jade Hollow": 9.95,
   "Lavender Dawn": 9.95,
-  "Lavender Swirl": 10.95,
+  "Lavender Bloom": 10.95,
   "Garnet Dusk": 10.95,
   "Indigo Grove": 10.95,
   "Onyx Ember": 10.95,
@@ -61,7 +61,7 @@ let STOCK = {};
 // the shop shelves are. Shared by the initial slots and any slot added via
 // "+ Add Another Item".
 const MIX_MATCH_GROUPS = [
-  { label: "Soap", items: ["Quiet Clay", "Jade Hollow", "Lavender Dawn", "Lavender Swirl", "Garnet Dusk", "Indigo Grove", "Onyx Ember", "Golden Harvest", "Emerald Meadow"] },
+  { label: "Soap", items: ["Quiet Clay", "Jade Hollow", "Lavender Dawn", "Lavender Bloom", "Garnet Dusk", "Indigo Grove", "Onyx Ember", "Golden Harvest", "Emerald Meadow"] },
   { label: "Tallow Cream", items: ["Lavender Tallow Body Cream", "Frankincense Tallow Facial Cream", "Unscented Tallow Body Cream", "Unscented Tallow Facial Cream"] },
   { label: "Lip Balm", items: ["Vanilla", "Peppermint", "Guava"] },
 ];
