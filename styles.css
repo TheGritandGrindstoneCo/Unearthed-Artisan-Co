@@ -458,7 +458,7 @@ p { margin: 0; }
 }
 .preorder-banner {
   background: var(--sage-pale);
-  border: 1px solid var(--line);
+  border: 1px solid var(--sage);
   border-radius: 12px;
   padding: 14px 20px;
   margin-bottom: 28px;
@@ -498,6 +498,27 @@ p { margin: 0; }
   font-size: 0.88rem;
   color: var(--sage-deep);
   max-width: 62ch;
+}
+
+/* ---------- ritual cards (no photo) ---------- */
+.card--ritual .card-body {
+  padding-top: 38px;
+}
+.ritual-eyebrow {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.05rem;
+  color: var(--sage-deep);
+  margin: 0;
+}
+.ritual-eyebrow::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--sage);
+  margin-top: 14px;
 }
 
 /* ---------- mix & match ---------- */
