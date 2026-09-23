@@ -361,13 +361,6 @@ p { margin: 0; }
   aspect-ratio: 1 / 1;
   object-fit: cover;
 }
-/* Ritual bundle photos show several products together, so a slightly
-   smaller circle keeps the whole grouping comfortably in frame. */
-.card-art--ritual img {
-  display: block;
-  width: 88%;
-  margin: 0 auto;
-}
 .card-tag {
   position: absolute;
   top: 34px;
@@ -465,7 +458,7 @@ p { margin: 0; }
 }
 .preorder-banner {
   background: var(--sage-pale);
-  border: 1px solid var(--line);
+  border: 1px solid var(--sage);
   border-radius: 12px;
   padding: 14px 20px;
   margin-bottom: 28px;
