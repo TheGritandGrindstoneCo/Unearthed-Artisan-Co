@@ -500,6 +500,27 @@ p { margin: 0; }
   max-width: 62ch;
 }
 
+/* ---------- ritual cards (no photo) ---------- */
+.card--ritual .card-body {
+  padding-top: 38px;
+}
+.ritual-eyebrow {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.05rem;
+  color: var(--sage-deep);
+  margin: 0;
+}
+.ritual-eyebrow::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--sage);
+  margin-top: 14px;
+}
+
 /* ---------- mix & match ---------- */
 .mix-picks {
   display: grid;
