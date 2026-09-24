@@ -187,8 +187,8 @@ function maxShipDateIso(names) {
 // Cart — add to bag on any page, review and check out on shipping.html.
 // Persists to localStorage so the bag survives a page reload.
 // Checkout hands off to Stripe via a Netlify serverless function.
-// Prices, shipping, and tax come from catalog.js (UACCatalog), which every
-// page loads before this file — the server recalculates all three from it.
+// Prices and shipping come from catalog.js (UACCatalog), which every
+// page loads before this file — the server recalculates both from it.
 // ============================================================
 (function () {
   const STORAGE_KEY = "uac-cart";
@@ -320,12 +320,13 @@ function maxShipDateIso(names) {
     const sub = subtotal();
     const method = selectedMethod();
     const shipCost = UACCatalog.shippingCost(cart, method, sub);
-    const taxCost = UACCatalog.taxCost(cart, method, sub);
-    const total = sub + shipCost + taxCost;
+    // Sales tax depends on the delivery address, which Stripe collects on its
+    // checkout page, so it's added there (Stripe Tax) rather than here.
+    const total = sub + shipCost;
 
     subtotalEl.textContent = money(sub);
     shippingEl.textContent = qty === 0 ? "—" : money(shipCost);
-    taxEl.textContent = qty === 0 ? "—" : method === "shipping" ? "TBD" : money(taxCost);
+    taxEl.textContent = qty === 0 ? "—" : "At checkout";
     totalEl.textContent = money(total);
 
     if (shipDateEl) {

@@ -1,6 +1,6 @@
 // ============================================================
-// Catalog — the one place product prices, shipping weights, shipping rates,
-// and tax live. Loaded by every page (before script.js) and by
+// Catalog — the one place product prices, shipping weights, and shipping
+// rates live. Loaded by every page (before script.js) and by
 // create-checkout-session.js on the server, so the prices a customer sees
 // and the prices Stripe charges always come from the same numbers, and
 // can't be edited in the browser before paying.
@@ -71,10 +71,8 @@
   const DELIVERY_PRICE = 5;
   const FREE_DELIVERY_MIN = 45;
 
-  // CA sales tax rate for Simi Valley (93065) — verify against CDTFA's official
-  // "Find a Sales and Use Tax Rate by Address" tool before relying on this for
-  // filing; third-party rate aggregators disagreed when this was set.
-  const CA_TAX_RATE = 0.0725;
+  // Sales tax isn't calculated here — Stripe Tax works it out from the
+  // address entered at checkout (see create-checkout-session.js).
 
   function qtyOf(item) {
     return Math.max(1, parseInt(item.qty, 10) || 1);
@@ -181,13 +179,6 @@
     return roundCents(packages(items).reduce((total, p) => total + p.price, 0));
   }
 
-  // CA sales tax applies to Local Delivery (always a CA transaction). For
-  // Standard Shipping the destination isn't known yet, so it's confirmed at
-  // follow-up instead.
-  function taxCost(items, method, subtotal) {
-    return items.length > 0 && method === "delivery" ? roundCents(subtotal * CA_TAX_RATE) : 0;
-  }
-
   const api = {
     PRODUCTS: PRODUCTS,
     priceOf: priceOf,
@@ -196,7 +187,6 @@
     subtotalOf: subtotalOf,
     packages: packages,
     shippingCost: shippingCost,
-    taxCost: taxCost,
   };
 
   if (typeof module !== "undefined" && module.exports) {

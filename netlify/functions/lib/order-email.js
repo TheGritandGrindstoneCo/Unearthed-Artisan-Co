@@ -12,20 +12,26 @@ function formatMoney(cents) {
   return "$" + (cents / 100).toFixed(2);
 }
 
-function buildHtml({ lineItems, total }) {
-  const rows = lineItems
-    .map(
-      (item) => `
+function row(label, amount) {
+  return `
         <tr>
-          <td style="padding:10px 0;border-bottom:1px solid #e5e0d3;color:#2b2820;font-size:15px;">${item.description}${
-        item.quantity > 1 ? " &times; " + item.quantity : ""
-      }</td>
-          <td style="padding:10px 0;border-bottom:1px solid #e5e0d3;color:#2b2820;font-size:15px;text-align:right;white-space:nowrap;">${formatMoney(
-            item.amount_total
-          )}</td>
-        </tr>`
+          <td style="padding:10px 0;border-bottom:1px solid #e5e0d3;color:#2b2820;font-size:15px;">${label}</td>
+          <td style="padding:10px 0;border-bottom:1px solid #e5e0d3;color:#2b2820;font-size:15px;text-align:right;white-space:nowrap;">${amount}</td>
+        </tr>`;
+}
+
+// Products are listed at their pre-discount, pre-tax price; any promo code
+// discount, shipping, and sales tax (from Stripe Tax) follow as their own
+// rows from the session's totals, so the rows add up to the Total.
+function buildHtml({ lineItems, totals, total }) {
+  let rows = lineItems
+    .map((item) =>
+      row(item.description + (item.quantity > 1 ? " &times; " + item.quantity : ""), formatMoney(item.amount_subtotal))
     )
     .join("");
+  if (totals.amount_discount > 0) rows += row("Discount", "&minus;" + formatMoney(totals.amount_discount));
+  rows += row("Shipping", totals.amount_shipping > 0 ? formatMoney(totals.amount_shipping) : "Free");
+  if (totals.amount_tax > 0) rows += row("Sales Tax", formatMoney(totals.amount_tax));
 
   return `
   <div style="background:#f6f3e9;padding:32px 16px;font-family:Georgia,'Times New Roman',serif;">
@@ -85,7 +91,11 @@ async function sendOrderConfirmationEmail(stripe, session) {
     from: `"Unearthed Artisan Co." <${user}>`,
     to: toEmail,
     subject: "Thank you for your order — Unearthed Artisan Co.",
-    html: buildHtml({ lineItems: lineItemsResponse.data, total: session.amount_total }),
+    html: buildHtml({
+      lineItems: lineItemsResponse.data,
+      totals: session.total_details || {},
+      total: session.amount_total,
+    }),
   });
 }
 
