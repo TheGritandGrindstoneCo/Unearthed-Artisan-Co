@@ -1,6 +1,8 @@
-const { SCENT_IDS, inventoryStore } = require("./lib/inventory-store");
+const { SCENT_IDS, inventoryStore, readInventory } = require("./lib/inventory-store");
 
-// Password-protected. Called by inventory.html to set/restock counts.
+// Password-protected. Called by inventory.html to set/restock counts, and
+// with action "read" to load the current counts once the admin password is
+// entered (the public get-inventory only says what's sold out).
 // Set INVENTORY_ADMIN_PASSWORD in Netlify's environment variables — never
 // commit it to the repo.
 exports.handler = async (event) => {
@@ -25,6 +27,18 @@ exports.handler = async (event) => {
 
   if (payload.password !== adminPassword) {
     return { statusCode: 401, body: JSON.stringify({ error: "Incorrect password." }) };
+  }
+
+  if (payload.action === "read") {
+    try {
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+        body: JSON.stringify({ stock: await readInventory() }),
+      };
+    } catch (e) {
+      return { statusCode: 500, body: JSON.stringify({ error: "Could not read inventory." }) };
+    }
   }
 
   const stock = payload.stock;

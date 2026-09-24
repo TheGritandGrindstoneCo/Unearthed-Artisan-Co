@@ -19,7 +19,7 @@
     padding: 64px 32px;
   }
   .inv-wrap h1 { font-size: clamp(1.8rem, 4vw, 2.3rem); margin-top: 14px; }
-  .inv-wrap > p { margin-top: 14px; color: var(--charcoal); }
+  .inv-wrap > p, #inv-admin > p { margin-top: 14px; color: var(--charcoal); }
   .inv-field {
     margin-top: 24px;
   }
@@ -116,16 +116,19 @@
 <div class="inv-wrap">
   <p class="eyebrow">Internal Tool</p>
   <h1>Inventory</h1>
-  <p>Set the current stock count for each item. Anything set to 0 shows as "Sold Out" on the shop page immediately.</p>
-
-  <div class="inv-field">
+  <form class="inv-field" id="inv-unlock-form">
     <label for="inv-password">Admin Password</label>
     <input type="password" id="inv-password" autocomplete="current-password" />
-  </div>
+    <button type="submit" class="btn btn--primary" id="inv-unlock" style="margin-top:14px;">Unlock</button>
+    <p class="inv-status" id="inv-unlock-status"></p>
+  </form>
 
-  <div class="inv-scents" id="inv-scents">
-    <p>Loading current stock…</p>
-  </div>
+  <!-- Hidden until the server accepts the admin password — stock counts and
+       the order export never load before then. -->
+  <div id="inv-admin" hidden>
+  <p>Set the current stock count for each item. Anything set to 0 shows as "Sold Out" on the shop page immediately.</p>
+
+  <div class="inv-scents" id="inv-scents"></div>
 
   <button type="button" class="btn btn--primary" id="inv-save" style="margin-top:28px;">Save Changes</button>
   <p class="inv-status" id="inv-status"></p>
@@ -145,6 +148,7 @@
     </div>
     <button type="button" class="btn btn--primary" id="inv-export-btn" style="margin-top:20px;">Download Orders CSV</button>
     <p class="inv-status" id="inv-export-status"></p>
+  </div>
   </div>
 </div>
 
@@ -194,14 +198,62 @@
     });
   }
 
+  // Counts come from the password-protected read (the public endpoint only
+  // lists what's sold out). Resolves with the stock, or rejects with the
+  // server's error message (e.g. "Incorrect password.").
+  function fetchInventory(password) {
+    return fetch("/.netlify/functions/update-inventory", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: password, action: "read" }),
+    })
+      .then(function (res) {
+        return res.json().then(function (data) {
+          if (!res.ok) throw new Error((data && data.error) || "Something went wrong.");
+          return data.stock || {};
+        });
+      });
+  }
+
   function loadInventory() {
-    fetch("/.netlify/functions/get-inventory")
-      .then(function (res) { return res.json(); })
-      .then(function (data) { renderRows(data.stock || {}); })
+    fetchInventory(passwordEl.value.trim())
+      .then(renderRows)
       .catch(function () {
         scentsEl.innerHTML = "<p>Could not load current stock.</p>";
       });
   }
+
+  var adminEl = document.getElementById("inv-admin");
+  var unlockForm = document.getElementById("inv-unlock-form");
+  var unlockBtn = document.getElementById("inv-unlock");
+  var unlockStatusEl = document.getElementById("inv-unlock-status");
+
+  unlockForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var password = passwordEl.value.trim();
+    if (!password) {
+      unlockStatusEl.textContent = "Enter the admin password.";
+      unlockStatusEl.className = "inv-status is-error";
+      return;
+    }
+    unlockStatusEl.textContent = "Checking…";
+    unlockStatusEl.className = "inv-status";
+    unlockBtn.disabled = true;
+
+    fetchInventory(password)
+      .then(function (stock) {
+        renderRows(stock);
+        adminEl.hidden = false;
+        unlockBtn.hidden = true;
+        passwordEl.readOnly = true;
+        unlockStatusEl.textContent = "";
+      })
+      .catch(function (err) {
+        unlockBtn.disabled = false;
+        unlockStatusEl.textContent = err.message || "Could not reach the server.";
+        unlockStatusEl.className = "inv-status is-error";
+      });
+  });
 
   saveBtn.addEventListener("click", function () {
     var password = passwordEl.value.trim();
@@ -247,7 +299,6 @@
       });
   });
 
-  loadInventory();
 
   var exportBtn = document.getElementById("inv-export-btn");
   var exportStatusEl = document.getElementById("inv-export-status");

@@ -97,7 +97,12 @@ function maxShipDateIso(names) {
   fetch("/.netlify/functions/get-inventory")
     .then((res) => res.json())
     .then((data) => {
-      const stock = data.stock || {};
+      // The public endpoint only lists sold-out ids (never counts), so mark
+      // each of those as 0 — everything below just checks for <= 0.
+      const stock = {};
+      (data.soldOut || []).forEach((id) => {
+        stock[id] = 0;
+      });
       STOCK = stock;
 
       buttons.forEach((btn) => {
