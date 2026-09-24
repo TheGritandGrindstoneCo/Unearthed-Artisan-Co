@@ -4,6 +4,7 @@
 // never commit it to the repo.
 const Stripe = require("stripe");
 const { SCENT_IDS, SCENT_NAMES, readInventory, reserveStock, releaseStock } = require("./lib/inventory-store");
+const UACCatalog = require("../../catalog.js");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -26,9 +27,20 @@ exports.handler = async (event) => {
   }
 
   const items = Array.isArray(payload.items) ? payload.items : [];
-  const shippingCost = parseFloat(payload.shippingCost) || 0;
-  const shippingLabel = (payload.shippingLabel || "Shipping").toString().slice(0, 250);
-  const taxCost = parseFloat(payload.taxCost) || 0;
+  // Prices and shipping are recalculated here from catalog.js rather than
+  // taken from the browser, so they can't be edited down before paying.
+  // Only which products (and how many) come from the cart. Sales tax is
+  // calculated by Stripe Tax from the address entered at checkout.
+  if (items.some((item) => UACCatalog.linePrice(item) === null)) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Something in your bag is no longer available. Please remove it and try again." }),
+    };
+  }
+  const method = payload.method === "delivery" ? "delivery" : "shipping";
+  const shippingLabel = method === "delivery" ? "Local Delivery" : "Standard Shipping";
+  const subtotal = UACCatalog.subtotalOf(items);
+  const shippingCost = UACCatalog.shippingCost(items, method, subtotal);
   const siteUrl = (payload.siteUrl || "").replace(/\/$/, "");
 
   if (items.length === 0 || !siteUrl) {
@@ -39,7 +51,7 @@ exports.handler = async (event) => {
   // single item (item.id is the product slug) and from bundles/gift sets
   // (item.scents lists each product chosen — e.g. a gift set's soap scent,
   // cream, and lip balm picks), so these pull from the same stock pool as
-  // buying that item individually.
+  // buying that item individually. A bundle with qty 2 uses two of each pick.
   const scentIdSet = new Set(SCENT_IDS);
   const deductions = {};
   const addDeduction = (id, qty) => {
@@ -49,7 +61,7 @@ exports.handler = async (event) => {
   items.forEach((item) => {
     const qty = Math.max(1, parseInt(item.qty, 10) || 1);
     if (Array.isArray(item.scents) && item.scents.length > 0) {
-      item.scents.forEach((scentId) => addDeduction(scentId, 1));
+      item.scents.forEach((scentId) => addDeduction(scentId, qty));
     } else if (typeof item.id === "string") {
       addDeduction(item.id, qty);
     }
@@ -87,28 +99,35 @@ exports.handler = async (event) => {
   const line_items = [];
   items.forEach((item) => {
     const qty = Math.max(1, parseInt(item.qty, 10) || 1);
-    const cents = Math.round((parseFloat(item.price) || 0) * 100);
-    const name = (item.name || "").toString().slice(0, 250);
-    if (!name || cents <= 0) return;
+    const cents = Math.round(UACCatalog.linePrice(item) * 100);
+    const name = (item.name || item.id || "Item").toString().slice(0, 250);
     line_items.push({
       quantity: qty,
-      price_data: { currency: "usd", unit_amount: cents, product_data: { name: name } },
+      price_data: {
+        currency: "usd",
+        unit_amount: cents,
+        // Prices are before tax; Stripe Tax adds tax on top.
+        tax_behavior: "exclusive",
+        // "General - Tangible Goods" — soap, cream, and lip balm.
+        product_data: { name: name, tax_code: "txcd_99999999" },
+      },
     });
   });
 
-  if (shippingCost > 0) {
-    line_items.push({
-      quantity: 1,
-      price_data: { currency: "usd", unit_amount: Math.round(shippingCost * 100), product_data: { name: shippingLabel } },
-    });
-  }
-
-  if (taxCost > 0) {
-    line_items.push({
-      quantity: 1,
-      price_data: { currency: "usd", unit_amount: Math.round(taxCost * 100), product_data: { name: "CA Sales Tax" } },
-    });
-  }
+  // Shipping goes in Stripe's own shipping field rather than as a line item,
+  // so Stripe Tax can apply each state's rules for taxing shipping charges
+  // and promo codes don't discount it.
+  const shipping_options = [
+    {
+      shipping_rate_data: {
+        type: "fixed_amount",
+        display_name: shippingLabel,
+        fixed_amount: { amount: Math.round(shippingCost * 100), currency: "usd" },
+        tax_behavior: "exclusive",
+        tax_code: "txcd_92010001", // Shipping
+      },
+    },
+  ];
 
   if (line_items.length === 0) {
     return { statusCode: 400, body: JSON.stringify({ error: "Nothing to check out." }) };
@@ -148,6 +167,12 @@ exports.handler = async (event) => {
       shipping_address_collection: { allowed_countries: ["US"] },
       allow_promotion_codes: true,
       line_items: line_items,
+      shipping_options: shipping_options,
+      // Stripe Tax calculates sales tax from the shipping address the
+      // customer enters on Stripe's page — California addresses are taxed at
+      // their local rate; other states aren't until a registration is added
+      // in the Stripe Dashboard (Tax > Registrations).
+      automatic_tax: { enabled: true },
       // Unpaid sessions expire after 30 minutes (Stripe's minimum) so stock
       // reserved above reliably frees up rather than staying locked for the
       // default 24 hours.

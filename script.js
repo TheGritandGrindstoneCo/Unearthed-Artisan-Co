@@ -1,8 +1,3 @@
-// CA sales tax rate for Simi Valley (93065) — verify against CDTFA's official
-// "Find a Sales and Use Tax Rate by Address" tool before relying on this for
-// filing; third-party rate aggregators disagreed when this was set.
-const CA_TAX_RATE = 0.0725;
-
 // Maps the display names shown on soap "Add to Bag" buttons and in
 // bundle/gift-set dropdowns (soap scents, and — for the gift set — cream
 // and lip balm picks) to the slug ids used for inventory tracking. Shared by
@@ -25,32 +20,6 @@ const SCENT_SLUGS = {
   "Peppermint": "peppermint-lip-balm",
   "Guava": "guava-lip-balm",
 };
-
-// Per-item retail prices, keyed the same as SCENT_SLUGS. Used to price the
-// Mix & Match card live as picks change, and to build its cart line item.
-const PRODUCT_PRICES = {
-  "Quiet Clay": 9.95,
-  "Jade Hollow": 9.95,
-  "Lavender Dawn": 9.95,
-  "Lavender Bloom": 10.95,
-  "Garnet Dusk": 10.95,
-  "Indigo Grove": 10.95,
-  "Onyx Ember": 10.95,
-  "Golden Harvest": 10.95,
-  "Emerald Meadow": 10.95,
-  "Lavender Tallow Body Cream": 24.99,
-  "Frankincense Tallow Facial Cream": 26.99,
-  "Unscented Tallow Body Cream": 24.99,
-  "Unscented Tallow Facial Cream": 26.99,
-  "Vanilla": 6.99,
-  "Peppermint": 6.99,
-  "Guava": 6.99,
-};
-
-// Discount applied to every Ritual card's price (Starter, Daily, and
-// Curated) — same formula everywhere so an identical set of picks always
-// costs the same no matter which Ritual card it's built from.
-const RITUAL_DISCOUNT = 0.1;
 
 // Populated by the stock-marking block below once /get-inventory resolves.
 // Read by the Mix & Match card so rows added later (via "+ Add Another
@@ -218,20 +187,10 @@ function maxShipDateIso(names) {
 // Cart — add to bag on any page, review and check out on shipping.html.
 // Persists to localStorage so the bag survives a page reload.
 // Checkout hands off to Stripe via a Netlify serverless function.
+// Prices and shipping come from catalog.js (UACCatalog), which every
+// page loads before this file — the server recalculates both from it.
 // ============================================================
 (function () {
-  const RATES = {
-    delivery: { cost: (subtotal) => (subtotal >= 45 ? 0 : 5) },
-    shipping: {
-      cost: (subtotal, qty) => {
-        if (subtotal >= 100) return 0;
-        if (qty <= 3) return 8.95;
-        if (qty <= 9) return 13.65;
-        return 24.8;
-      },
-    },
-  };
-
   const STORAGE_KEY = "uac-cart";
   const ORDER_EMAIL = "unearthedartisanco@gmail.com";
 
@@ -252,11 +211,20 @@ function maxShipDateIso(names) {
 
   let cart = loadCart();
 
+  // Re-prices every saved line from catalog.js, so a bag saved before a
+  // price change shows what checkout will actually charge, and drops
+  // anything that's no longer sold.
   function loadCart() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       const parsed = raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed) ? parsed : [];
+      if (!Array.isArray(parsed)) return [];
+      return parsed.filter((item) => {
+        const price = UACCatalog.linePrice(item);
+        if (price === null) return false;
+        item.price = price;
+        return true;
+      });
     } catch (e) {
       return [];
     }
@@ -351,17 +319,14 @@ function maxShipDateIso(names) {
 
     const sub = subtotal();
     const method = selectedMethod();
-    const shipCost = qty === 0 ? 0 : RATES[method].cost(sub, qty);
-    // CA tax applies to Local Delivery (always a CA transaction). For
-    // Standard Shipping, destination is unknown here, so tax is confirmed
-    // at follow-up rather than guessed in the live total.
-    const taxApplies = qty > 0 && method !== "shipping";
-    const taxCost = taxApplies ? sub * CA_TAX_RATE : 0;
-    const total = sub + shipCost + taxCost;
+    const shipCost = UACCatalog.shippingCost(cart, method, sub);
+    // Sales tax depends on the delivery address, which Stripe collects on its
+    // checkout page, so it's added there (Stripe Tax) rather than here.
+    const total = sub + shipCost;
 
     subtotalEl.textContent = money(sub);
     shippingEl.textContent = qty === 0 ? "—" : money(shipCost);
-    taxEl.textContent = qty === 0 ? "—" : method === "shipping" ? "TBD" : money(taxCost);
+    taxEl.textContent = qty === 0 ? "—" : "At checkout";
     totalEl.textContent = money(total);
 
     if (shipDateEl) {
@@ -372,7 +337,7 @@ function maxShipDateIso(names) {
 
     methodRadios.forEach((r) => {
       const amtEl = r.closest(".radio-option").querySelector(".ramt");
-      amtEl.textContent = money(RATES[r.value].cost(sub, qty));
+      amtEl.textContent = qty === 0 ? "—" : money(UACCatalog.shippingCost(cart, r.value, sub));
     });
 
     if (qty > 0) {
@@ -382,16 +347,20 @@ function maxShipDateIso(names) {
     }
   }
 
-  function addItem(id, name, price, scents) {
-    // Items carrying a scents list (currently just the gift set) always get
-    // a fresh cart line, since re-picking a different scent shouldn't merge
-    // with a previous pick under the same id.
+  // The price always comes from catalog.js — a plain item's slug, or a
+  // Ritual's picks (scents) — never from the page.
+  function addItem(id, name, scents) {
+    // Items carrying a scents list (the Rituals) always get a fresh cart
+    // line, since re-picking a different scent shouldn't merge with a
+    // previous pick under the same id.
     const existing = !scents ? cart.find((item) => item.id === id) : null;
     if (existing) {
       existing.qty += 1;
     } else {
-      const entry = { id: id, name: name, price: price, qty: 1 };
+      const entry = { id: id, name: name, qty: 1 };
       if (scents) entry.scents = scents;
+      entry.price = UACCatalog.linePrice(entry);
+      if (entry.price === null) return;
       cart.push(entry);
     }
     render();
@@ -399,24 +368,33 @@ function maxShipDateIso(names) {
 
   document.querySelectorAll(".add-to-cart").forEach((btn) => {
     btn.addEventListener("click", () => {
-      addItem(btn.dataset.id, btn.dataset.name, parseFloat(btn.dataset.price));
+      addItem(btn.dataset.id, btn.dataset.name);
     });
   });
 
+  // Shop card prices ("Per bar $9.95") come from catalog.js too, so the
+  // price shown always matches what's charged. The price typed in the page
+  // markup is just a fallback if this script doesn't run.
+  document.querySelectorAll(".add-to-cart[data-id]").forEach((btn) => {
+    const price = UACCatalog.priceOf(btn.dataset.id);
+    const priceEl = btn.closest(".card-foot") && btn.closest(".card-foot").querySelector(".card-price");
+    if (price === null || !priceEl || !priceEl.lastChild || priceEl.lastChild.nodeType !== Node.TEXT_NODE) return;
+    priceEl.lastChild.textContent = money(price);
+  });
+
   // Starter Ritual and Daily Ritual — live-priced the same way as Curated
-  // Ritual (sum of the picks minus RITUAL_DISCOUNT), so an identical set of
-  // picks costs the same no matter which Ritual card it's built from.
+  // Ritual (UACCatalog.ritualPrice: sum of the picks minus the Ritual
+  // discount), so an identical set of picks costs the same no matter which
+  // Ritual card it's built from.
   document.querySelectorAll(".add-giftset").forEach((btn) => {
     const selects = btn.closest(".card-body").querySelectorAll(".bundle-select");
     const totalEl = btn.closest(".card-body").querySelector(".ritual-total");
     const shipEl = btn.closest(".card-body").querySelector(".ship-date");
 
     function recalcGiftset() {
-      const subtotal = Array.from(selects).reduce((sum, s) => sum + (PRODUCT_PRICES[s.value] || 0), 0);
-      const discounted = subtotal * (1 - RITUAL_DISCOUNT);
-      if (totalEl) totalEl.textContent = money(discounted);
+      const slugs = Array.from(selects).map((s) => SCENT_SLUGS[s.value]);
+      if (totalEl) totalEl.textContent = money(UACCatalog.ritualPrice(slugs) || 0);
       if (shipEl) shipEl.textContent = shipDateLabel(maxShipDateIso(Array.from(selects).map((s) => s.value)));
-      btn.dataset.total = discounted.toFixed(2);
     }
 
     selects.forEach((s) => s.addEventListener("change", recalcGiftset));
@@ -435,12 +413,12 @@ function maxShipDateIso(names) {
       const name = btn.dataset.setName + ": " + slots.map((slot, i) => slot + " - " + picks[i]).join(", ");
       // Deduct one of each picked item's own stock from its respective pool.
       const pickSlugs = picks.map((p) => SCENT_SLUGS[p]).filter(Boolean);
-      addItem("giftset-" + Date.now(), name, parseFloat(btn.dataset.total), pickSlugs.length ? pickSlugs : undefined);
+      addItem("giftset-" + Date.now(), name, pickSlugs.length ? pickSlugs : undefined);
     });
   });
 
   // Mix & Match — pick any 2-5 items, any type, with a live-updating price
-  // (RITUAL_DISCOUNT off the sum) as slots are added, removed, or
+  // (UACCatalog.ritualPrice, same as the other Rituals) as slots are added, removed, or
   // changed. Unlike the other bundle cards, slot count isn't fixed, so rows
   // are built and torn down in JS rather than living in the page markup.
   document.querySelectorAll(".mix-match-card").forEach((card) => {
@@ -502,12 +480,10 @@ function maxShipDateIso(names) {
 
     function recalc() {
       const selects = picksEl.querySelectorAll(".mix-select");
-      const subtotal = Array.from(selects).reduce((sum, s) => sum + (PRODUCT_PRICES[s.value] || 0), 0);
-      const discounted = subtotal * (1 - RITUAL_DISCOUNT);
+      const slugs = Array.from(selects).map((s) => SCENT_SLUGS[s.value]);
       countEl2.textContent = selects.length + (selects.length === 1 ? " item" : " items");
-      totalEl2.textContent = money(discounted);
+      totalEl2.textContent = money(UACCatalog.ritualPrice(slugs) || 0);
       if (shipEl2) shipEl2.textContent = shipDateLabel(maxShipDateIso(Array.from(selects).map((s) => s.value)));
-      addToBagBtn.dataset.total = discounted.toFixed(2);
     }
 
     picksEl.addEventListener("change", (e) => {
@@ -536,7 +512,7 @@ function maxShipDateIso(names) {
       const picks = Array.from(picksEl.querySelectorAll(".mix-select")).map((s) => s.value);
       const slugs = picks.map((p) => SCENT_SLUGS[p]).filter(Boolean);
       const name = "Curated Ritual: " + picks.join(", ");
-      addItem("mixmatch-" + Date.now(), name, parseFloat(addToBagBtn.dataset.total), slugs.length ? slugs : undefined);
+      addItem("mixmatch-" + Date.now(), name, slugs.length ? slugs : undefined);
     });
 
     updateRowControls();
@@ -595,13 +571,7 @@ function maxShipDateIso(names) {
       e.preventDefault();
       if (checkoutBtn.classList.contains("is-disabled")) return;
 
-      const sub = subtotal();
-      const qty = totalQty();
       const method = selectedMethod();
-      const shipCost = RATES[method].cost(sub, qty);
-      const taxCost = method === "shipping" ? 0 : sub * CA_TAX_RATE;
-      const methodOption = document.querySelector('input[name="cart-method"]:checked').closest(".radio-option");
-      const shippingLabel = methodOption.querySelector(".rlabel").textContent.trim();
 
       const originalText = checkoutBtn.textContent;
       checkoutBtn.textContent = "Redirecting to checkout…";
@@ -614,9 +584,6 @@ function maxShipDateIso(names) {
           body: JSON.stringify({
             items: cart.map((item) => ({ id: item.id, name: item.name, price: item.price, qty: item.qty, scents: item.scents })),
             method: method,
-            shippingLabel: shippingLabel,
-            shippingCost: shipCost,
-            taxCost: taxCost,
             siteUrl: window.location.origin,
           }),
         });
