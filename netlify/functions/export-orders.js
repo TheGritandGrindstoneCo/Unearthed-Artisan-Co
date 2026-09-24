@@ -76,8 +76,11 @@ exports.handler = async (event) => {
         created: { gte: sinceTimestamp },
         limit: 100,
         starting_after: startingAfter,
+        // Pulls in each order's charge so fully refunded orders can be
+        // skipped below.
+        expand: ["data.payment_intent.latest_charge"],
       });
-      sessions = sessions.concat(result.data);
+      sessions = sessions.concat(result.data.filter((s) => !isFullyRefunded(s)));
       if (!result.has_more || result.data.length === 0) break;
       startingAfter = result.data[result.data.length - 1].id;
     }
@@ -238,6 +241,13 @@ exports.handler = async (event) => {
 };
 
 const NON_PRODUCT_LINES = ["Standard Shipping", "Local Delivery", "CA Sales Tax"];
+
+// Fully refunded orders have nothing to ship, so they're left out of both
+// lists. A partial refund (e.g. one item) still ships, so it stays in.
+function isFullyRefunded(session) {
+  const charge = session.payment_intent && session.payment_intent.latest_charge;
+  return !!(charge && typeof charge === "object" && charge.refunded);
+}
 
 // "delivery" or "shipping". Orders placed since the export split record it
 // in metadata; for older ones, fall back to how the shipping charge was
