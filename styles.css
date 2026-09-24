@@ -777,7 +777,7 @@ p { margin: 0; }
 }
 .ledger-facts li {
   display: grid;
-  grid-template-columns: 5.5rem 1fr;
+  grid-template-columns: 6.75rem 1fr;
   gap: 12px;
   line-height: 1.45;
 }
@@ -788,6 +788,11 @@ p { margin: 0; }
   text-transform: uppercase;
   color: var(--sage-deep);
   padding-top: 0.2em;
+}
+.ledger-facts b {
+  font-weight: 600;
+  color: var(--forest);
+  font-variant-numeric: tabular-nums;
 }
 .ledger-row .amt {
   font-family: var(--font-body);
