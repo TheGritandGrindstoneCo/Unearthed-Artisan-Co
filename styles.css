@@ -851,16 +851,18 @@ p { margin: 0; }
   gap: 64px;
   align-items: center;
 }
+/* Center the logo in its column rather than hugging the left edge. */
+.about-medallion { display: flex; justify-content: center; }
 .about-medallion img { border-radius: 50%; box-shadow: var(--shadow); width: 100%; max-width: 340px; }
 .about-copy h2 { font-style: italic; margin-top: 12px; margin-bottom: 22px; }
 .about-copy p + p { margin-top: 16px; }
-.about-copy p { font-size: 1.02rem; }
+.about-copy p { font-size: 1.02rem; line-height: 1.5; }
 .about-copy p.about-lede {
   font-family: var(--font-display);
   font-size: 1.35rem;
   font-weight: 600;
   color: var(--forest);
-  line-height: 1.4;
+  line-height: 1.3;
 }
 .about-signoff {
   margin-top: 22px;
