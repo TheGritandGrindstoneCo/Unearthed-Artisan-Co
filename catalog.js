@@ -41,26 +41,37 @@
   // Prices are set just above the worst-case (Zone 8 / territories) Pirate
   // Ship rates in Pricing/PirateShip-August-22-2026-USPS-Rates.xlsx:
   //   under 1 lb, any package ........ Ground Advantage   max $8.40  -> $8.95
-  //   Small/Medium box (0.1 cu ft) ... Ground Adv. Cubic  max $10.13 -> $10.50
+  //   Medium box (6x4x4, 0.1 cu ft) .. Ground Adv. Cubic  max $10.13 -> $10.95
   //   Large box (8x6x4, 0.2 cu ft) ... Ground Adv. Cubic  max $11.84 -> $12.50
+  // USPS holiday surcharge, Oct 4 2026 - Jan 17 2027 (Shipping/Pirate Ship
+  // Notification - USPS is raising rates for the holidays on Oct 4th.pdf):
+  // +$0.55 in zones 5-9, so the worst cases become $8.95 / $10.68 / $12.39.
+  // Medium was raised from $10.50 to $10.95 to stay covered; $8.95 breaks
+  // even at worst and Large still covers. Medium can go back to $10.50 after
+  // Jan 17 if the regular 2027 rates allow.
   // Cubic pricing only applies when the box dimensions are entered in Pirate
   // Ship. Recheck these prices after each USPS rate change (usually January
   // and July).
 
   // A single soap, or 1-5 lip balms on their own, go in the sage 4x4x1 gift
   // box (with crinkle paper, sticker, and thank-you card) inside a kraft
-  // bubble mailer.
+  // bubble mailer. dims (here and on BOXES) are outside length x width x
+  // height in inches, as entered in Pirate Ship — the order export
+  // (export-orders.js) fills them into the label spreadsheet.
   const GIFT_BOX_OZ = 1.0;
   const MAILER_OZ = 0.7;
   const MAX_MAILER_BALMS = 5;
+  const MAILER_DIMS = [9, 6, 1.25];
 
   // Everything else goes loose into a white box. FILL_OZ is an allowance for
-  // the crinkle paper and card that go in with it.
+  // the crinkle paper and card that go in with it. The Small 4x4x4 box isn't
+  // listed — USPS won't take anything under 6" long (min 6 x 3 x 0.25"), so
+  // orders it would have held ship in the Medium box instead (it's still
+  // fine for Local Delivery).
   const FILL_OZ = 1.0;
   const BOXES = [
-    { name: "Small", oz: 2.93, space: 2, maxCreams: 1, price: 10.5 },
-    { name: "Medium", oz: 4.1, space: 3, maxCreams: 3, price: 10.5 },
-    { name: "Large", oz: 7.8, space: 10, maxCreams: 10, price: 12.5 },
+    { name: "Medium box", oz: 4.1, space: 3, maxCreams: 3, price: 10.95, dims: [6, 4, 4] },
+    { name: "Large box", oz: 7.8, space: 10, maxCreams: 10, price: 12.5, dims: [8, 6, 4] },
   ];
   const LARGE = BOXES[BOXES.length - 1];
 
@@ -134,7 +145,7 @@
 
   function boxPackage(box, units) {
     const oz = sum(units, "oz") + box.oz + FILL_OZ;
-    return { box: box.name, oz: oz, price: oz < 16 ? UNDER_1LB_PRICE : box.price };
+    return { box: box.name, oz: oz, dims: box.dims, price: oz < 16 ? UNDER_1LB_PRICE : box.price };
   }
 
   // Splits the order into the packages it would actually ship in. Orders
@@ -148,7 +159,7 @@
     const singleSoap = units.length === 1 && kinds[0] === "soap";
     const onlyBalms = units.length <= MAX_MAILER_BALMS && kinds.every((k) => k === "balm");
     if (singleSoap || onlyBalms) {
-      return [{ box: "Bubble mailer", oz: sum(units, "oz") + GIFT_BOX_OZ + MAILER_OZ, price: UNDER_1LB_PRICE }];
+      return [{ box: "Bubble mailer", oz: sum(units, "oz") + GIFT_BOX_OZ + MAILER_OZ, dims: MAILER_DIMS, price: UNDER_1LB_PRICE }];
     }
 
     // Biggest items first, so a partly-filled last box holds the small ones.
