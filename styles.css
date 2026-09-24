@@ -469,21 +469,38 @@ p { margin: 0; }
   color: var(--sage-deep);
   margin: -6px 0 10px;
 }
-.preorder-banner {
-  background: var(--sage-pale);
-  border: 1px solid var(--sage);
-  border-radius: 12px;
-  padding: 14px 20px;
-  margin-bottom: 28px;
-  text-align: center;
+/* Preorder note above the shop shelves — an open, unboxed note (small
+   label with a sage dot, then one line of detail) so it reads as part of
+   the page intro rather than an alert. */
+.preorder-note {
+  max-width: 60ch;
+  margin-bottom: 36px;
 }
-.preorder-banner p {
-  font-family: var(--font-body);
-  font-size: 0.9rem;
+.preorder-note-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.preorder-note-title::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sage);
+  box-shadow: 0 0 0 4px var(--sage-pale);
+  margin-left: 4px; /* keeps the halo flush with the text's left edge */
+  flex: none;
+}
+.preorder-note p + p {
+  margin-top: 6px;
+  font-size: 0.95rem;
   color: var(--charcoal);
-  margin: 0;
 }
-.preorder-banner strong { color: var(--forest); }
 .buy-btn {
   background: var(--sage-deep);
   color: var(--ivory-card);
