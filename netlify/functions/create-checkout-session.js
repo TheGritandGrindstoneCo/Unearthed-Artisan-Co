@@ -179,6 +179,9 @@ exports.handler = async (event) => {
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
       metadata: {
         stock_deductions: JSON.stringify(deductions),
+        // Read by export-orders.js to split Pirate Ship labels from the
+        // Local Delivery list.
+        delivery_method: method,
       },
     });
 

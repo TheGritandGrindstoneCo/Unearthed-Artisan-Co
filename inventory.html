@@ -133,9 +133,12 @@
   <div class="inv-section">
     <p class="eyebrow">Internal Tool</p>
     <h2>Shipping Export</h2>
-    <p>Pirate Ship doesn't connect to this site directly, so this downloads a CSV of paid orders
-      (name, address, phone, items) that you can upload at pirateship.com under "Upload a
-      Spreadsheet" to buy and print labels. Uses the admin password above. Only new orders — ones
+    <p>Pirate Ship doesn't connect to this site directly, so this downloads paid orders as
+      spreadsheets. <strong>pirate-ship-labels</strong> has every Standard Shipping order — one row
+      per package, with its estimated weight and box size — ready to upload at pirateship.com under
+      "Import Spreadsheet" to buy and print labels. Weigh each package before buying its label, since
+      weights are estimates. <strong>local-delivery</strong> (only when there are any) lists Local
+      Delivery orders for your delivery run. Uses the admin password above. Only new orders — ones
       not already in a previous export — are included by default.</p>
     <div class="inv-export-row">
       <label for="inv-export-include"><input type="checkbox" id="inv-export-include" /> Re-include orders already exported</label>
@@ -268,29 +271,33 @@
       body: JSON.stringify({ password: password, includeExported: exportIncludeEl.checked }),
     })
       .then(function (res) {
-        if (!res.ok) {
-          return res.json().then(function (data) {
-            throw new Error((data && data.error) || "Something went wrong.");
-          });
-        }
-        var disposition = res.headers.get("Content-Disposition") || "";
-        var match = disposition.match(/filename="([^"]+)"/);
-        var filename = match ? match[1] : "orders.csv";
-        return res.blob().then(function (blob) {
-          return { blob: blob, filename: filename };
+        return res.json().then(function (data) {
+          if (!res.ok) throw new Error((data && data.error) || "Something went wrong.");
+          return data;
         });
       })
-      .then(function (result) {
+      .then(function (data) {
         exportBtn.disabled = false;
-        var objectUrl = URL.createObjectURL(result.blob);
-        var a = document.createElement("a");
-        a.href = objectUrl;
-        a.download = result.filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(objectUrl);
-        exportStatusEl.textContent = "Downloaded " + result.filename + ".";
+        // One file for Pirate Ship labels, plus a Local Delivery list when
+        // there are delivery orders. Spaced out slightly so the browser
+        // doesn't drop the second download.
+        (data.files || []).forEach(function (file, i) {
+          setTimeout(function () {
+            var objectUrl = URL.createObjectURL(new Blob([file.csv], { type: "text/csv;charset=utf-8" }));
+            var a = document.createElement("a");
+            a.href = objectUrl;
+            a.download = file.filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(function () { URL.revokeObjectURL(objectUrl); }, 1000);
+          }, i * 400);
+        });
+        var parts = [data.shippingOrders + " to ship"];
+        if (data.deliveryOrders > 0) parts.push(data.deliveryOrders + " for local delivery");
+        exportStatusEl.textContent =
+          "Downloaded " + (data.files || []).map(function (f) { return f.filename; }).join(" and ") +
+          " (" + parts.join(", ") + ").";
         exportStatusEl.className = "inv-status is-ok";
       })
       .catch(function (err) {
