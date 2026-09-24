@@ -41,8 +41,14 @@
   // Prices are set just above the worst-case (Zone 8 / territories) Pirate
   // Ship rates in Pricing/PirateShip-August-22-2026-USPS-Rates.xlsx:
   //   under 1 lb, any package ........ Ground Advantage   max $8.40  -> $8.95
-  //   Medium box (6x4x4, 0.1 cu ft) .. Ground Adv. Cubic  max $10.13 -> $10.50
+  //   Medium box (6x4x4, 0.1 cu ft) .. Ground Adv. Cubic  max $10.13 -> $10.95
   //   Large box (8x6x4, 0.2 cu ft) ... Ground Adv. Cubic  max $11.84 -> $12.50
+  // USPS holiday surcharge, Oct 4 2026 - Jan 17 2027 (Shipping/Pirate Ship
+  // Notification - USPS is raising rates for the holidays on Oct 4th.pdf):
+  // +$0.55 in zones 5-9, so the worst cases become $8.95 / $10.68 / $12.39.
+  // Medium was raised from $10.50 to $10.95 to stay covered; $8.95 breaks
+  // even at worst and Large still covers. Medium can go back to $10.50 after
+  // Jan 17 if the regular 2027 rates allow.
   // Cubic pricing only applies when the box dimensions are entered in Pirate
   // Ship. Recheck these prices after each USPS rate change (usually January
   // and July).
@@ -64,7 +70,7 @@
   // fine for Local Delivery).
   const FILL_OZ = 1.0;
   const BOXES = [
-    { name: "Medium box", oz: 4.1, space: 3, maxCreams: 3, price: 10.5, dims: [6, 4, 4] },
+    { name: "Medium box", oz: 4.1, space: 3, maxCreams: 3, price: 10.95, dims: [6, 4, 4] },
     { name: "Large box", oz: 7.8, space: 10, maxCreams: 10, price: 12.5, dims: [8, 6, 4] },
   ];
   const LARGE = BOXES[BOXES.length - 1];
