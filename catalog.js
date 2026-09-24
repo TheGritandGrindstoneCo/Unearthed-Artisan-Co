@@ -41,7 +41,7 @@
   // Prices are set just above the worst-case (Zone 8 / territories) Pirate
   // Ship rates in Pricing/PirateShip-August-22-2026-USPS-Rates.xlsx:
   //   under 1 lb, any package ........ Ground Advantage   max $8.40  -> $8.95
-  //   Small/Medium box (0.1 cu ft) ... Ground Adv. Cubic  max $10.13 -> $10.50
+  //   Medium box (6x4x4, 0.1 cu ft) .. Ground Adv. Cubic  max $10.13 -> $10.50
   //   Large box (8x6x4, 0.2 cu ft) ... Ground Adv. Cubic  max $11.84 -> $12.50
   // Cubic pricing only applies when the box dimensions are entered in Pirate
   // Ship. Recheck these prices after each USPS rate change (usually January
@@ -55,10 +55,12 @@
   const MAX_MAILER_BALMS = 5;
 
   // Everything else goes loose into a white box. FILL_OZ is an allowance for
-  // the crinkle paper and card that go in with it.
+  // the crinkle paper and card that go in with it. The Small 4x4x4 box isn't
+  // listed — USPS won't take anything under 6" long (min 6 x 3 x 0.25"), so
+  // orders it would have held ship in the Medium box instead (it's still
+  // fine for Local Delivery).
   const FILL_OZ = 1.0;
   const BOXES = [
-    { name: "Small", oz: 2.93, space: 2, maxCreams: 1, price: 10.5 },
     { name: "Medium", oz: 4.1, space: 3, maxCreams: 3, price: 10.5 },
     { name: "Large", oz: 7.8, space: 10, maxCreams: 10, price: 12.5 },
   ];
