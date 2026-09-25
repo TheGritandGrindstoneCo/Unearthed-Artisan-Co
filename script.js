@@ -59,6 +59,9 @@ const SHIP_DATES = {
   "vanilla-lip-balm": "2026-10-10",
   "peppermint-lip-balm": "2026-10-10",
   "guava-lip-balm": "2026-10-10",
+  // Accessories are bought in, not made — ship with the launch.
+  "soap-saver-bag": "2026-10-10",
+  "teak-soap-dish": "2026-10-10",
 };
 
 function shipDateLabel(iso) {
