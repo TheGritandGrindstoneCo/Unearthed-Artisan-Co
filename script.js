@@ -174,6 +174,71 @@ function maxShipDateIso(names) {
 })();
 
 // ============================================================
+// Photo zoom — tap/click a product photo to see the full square photo
+// (not the circle crop) large, over a dimmed page. Closes with the ×,
+// a click outside the photo, or Esc. Only runs where product cards exist.
+// ============================================================
+(function () {
+  const photos = document.querySelectorAll(".card-art img");
+  if (photos.length === 0) return;
+
+  const overlay = document.createElement("div");
+  overlay.className = "lightbox";
+  overlay.hidden = true;
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.innerHTML =
+    '<button type="button" class="lightbox-close" aria-label="Close photo">&times;</button>' +
+    '<figure class="lightbox-figure"><img alt="" /><figcaption></figcaption></figure>';
+  document.body.appendChild(overlay);
+
+  const bigImg = overlay.querySelector("img");
+  const caption = overlay.querySelector("figcaption");
+  const closeBtn = overlay.querySelector(".lightbox-close");
+  let opener = null;
+
+  function open(img) {
+    opener = img;
+    bigImg.src = img.currentSrc || img.src;
+    bigImg.alt = img.alt;
+    caption.textContent = img.alt;
+    overlay.setAttribute("aria-label", img.alt);
+    overlay.hidden = false;
+    document.body.classList.add("lightbox-open");
+    closeBtn.focus();
+  }
+
+  function close() {
+    overlay.hidden = true;
+    document.body.classList.remove("lightbox-open");
+    if (opener) opener.focus();
+  }
+
+  photos.forEach((img) => {
+    img.classList.add("zoomable");
+    img.tabIndex = 0;
+    img.setAttribute("role", "button");
+    img.setAttribute("aria-label", "Enlarge photo: " + img.alt);
+    img.addEventListener("click", () => open(img));
+    img.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        open(img);
+      }
+    });
+  });
+
+  closeBtn.addEventListener("click", close);
+  // A click on the dimmed backdrop (not the photo itself) closes it.
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay || e.target.classList.contains("lightbox-figure")) close();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !overlay.hidden) close();
+  });
+})();
+
+// ============================================================
 // Mobile nav toggle
 // ============================================================
 (function () {
