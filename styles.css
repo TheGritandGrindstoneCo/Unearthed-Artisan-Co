@@ -597,6 +597,13 @@ p { margin: 0; }
   background: var(--sage-pale);
 }
 .mix-add[hidden] { display: none; }
+/* Curated Ritual note shown while the picks are accessories only. */
+.mix-hint {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: var(--accent);
+}
+.mix-hint[hidden] { display: none; }
 
 .shelf--two { grid-template-columns: repeat(2, 1fr); }
 

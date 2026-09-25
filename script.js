@@ -489,12 +489,24 @@ function maxShipDateIso(names) {
       addRowBtn.hidden = rows.length >= MAX_SLOTS;
     }
 
+    // Shown (and Add to Bag held) while the picks are accessories only — a
+    // Ritual needs at least one soap, cream, or lip balm (see
+    // UACCatalog.ritualHasProduct, which checkout enforces too).
+    const hintEl = document.createElement("p");
+    hintEl.className = "mix-hint";
+    hintEl.textContent = "Add at least one soap, cream, or lip balm — accessories can join a Ritual, but can't make one on their own.";
+    hintEl.hidden = true;
+    addRowBtn.insertAdjacentElement("afterend", hintEl);
+
     function recalc() {
       const selects = picksEl.querySelectorAll(".mix-select");
       const slugs = Array.from(selects).map((s) => SCENT_SLUGS[s.value]);
+      const valid = UACCatalog.ritualHasProduct(slugs);
       countEl2.textContent = selects.length + (selects.length === 1 ? " item" : " items");
-      totalEl2.textContent = money(UACCatalog.ritualPrice(slugs) || 0);
+      totalEl2.textContent = valid ? money(UACCatalog.ritualPrice(slugs) || 0) : "—";
       if (shipEl2) shipEl2.textContent = shipDateLabel(maxShipDateIso(Array.from(selects).map((s) => s.value)));
+      hintEl.hidden = valid;
+      if (!addToBagBtn.classList.contains("is-sold-out")) addToBagBtn.disabled = !valid;
     }
 
     picksEl.addEventListener("change", (e) => {

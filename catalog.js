@@ -112,9 +112,18 @@
     return PRODUCTS[slug] ? PRODUCTS[slug].price : null;
   }
 
-  // Ritual price for a set of picks: their sum minus RITUAL_DISCOUNT.
+  // A Ritual needs at least one soap, cream, or lip balm — accessories can
+  // join one, but a set of accessories alone isn't a Ritual (and doesn't get
+  // the Ritual discount).
+  function ritualHasProduct(slugs) {
+    return slugs.some((slug) => PRODUCTS[slug] && PRODUCTS[slug].kind !== "accessory");
+  }
+
+  // Ritual price for a set of picks: their sum minus RITUAL_DISCOUNT. null if
+  // any pick isn't in the catalog or the set is accessories only.
   function ritualPrice(slugs) {
     if (slugs.length === 0 || slugs.some((slug) => !PRODUCTS[slug])) return null;
+    if (!ritualHasProduct(slugs)) return null;
     const sum = slugs.reduce((total, slug) => total + PRODUCTS[slug].price, 0);
     return roundCents(sum * (1 - RITUAL_DISCOUNT));
   }
@@ -209,6 +218,7 @@
     PRODUCTS: PRODUCTS,
     priceOf: priceOf,
     ritualPrice: ritualPrice,
+    ritualHasProduct: ritualHasProduct,
     linePrice: linePrice,
     subtotalOf: subtotalOf,
     packages: packages,
