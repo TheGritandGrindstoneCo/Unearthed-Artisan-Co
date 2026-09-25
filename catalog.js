@@ -30,6 +30,11 @@
     "vanilla-lip-balm": { kind: "balm", price: 6.99, oz: 0.35, space: 0.5 },
     "peppermint-lip-balm": { kind: "balm", price: 6.99, oz: 0.35, space: 0.5 },
     "guava-lip-balm": { kind: "balm", price: 6.99, oz: 0.35, space: 0.5 },
+    // Accessories (Sunniemade, via Faire) — weights from the maker's specs.
+    // The flat sisal bag takes no real box room; the 4.2 x 3 x 0.6" dish
+    // takes about half a bar's.
+    "soap-saver-bag": { kind: "accessory", price: 5.99, oz: 0.5, space: 0 },
+    "teak-soap-dish": { kind: "accessory", price: 9.95, oz: 1.9, space: 0.5 },
   };
 
   // Discount applied to every Ritual card's price (Starter, Daily, and
@@ -62,6 +67,11 @@
   const MAILER_OZ = 0.7;
   const MAX_MAILER_BALMS = 5;
   const MAILER_DIMS = [9, 6, 1.25];
+  // Accessories can ride along in the mailer (on their own, or beside the
+  // gift box): one teak dish fits next to it, and the flat sisal bags slip
+  // in anywhere. More than that goes in a white box.
+  const MAX_MAILER_DISHES = 1;
+  const MAX_MAILER_BAGS = 3;
 
   // Everything else goes loose into a white box. FILL_OZ is an allowance for
   // the crinkle paper and card that go in with it. The Small 4x4x4 box isn't
@@ -102,9 +112,18 @@
     return PRODUCTS[slug] ? PRODUCTS[slug].price : null;
   }
 
-  // Ritual price for a set of picks: their sum minus RITUAL_DISCOUNT.
+  // A Ritual needs at least one soap, cream, or lip balm — accessories can
+  // join one, but a set of accessories alone isn't a Ritual (and doesn't get
+  // the Ritual discount).
+  function ritualHasProduct(slugs) {
+    return slugs.some((slug) => PRODUCTS[slug] && PRODUCTS[slug].kind !== "accessory");
+  }
+
+  // Ritual price for a set of picks: their sum minus RITUAL_DISCOUNT. null if
+  // any pick isn't in the catalog or the set is accessories only.
   function ritualPrice(slugs) {
     if (slugs.length === 0 || slugs.some((slug) => !PRODUCTS[slug])) return null;
+    if (!ritualHasProduct(slugs)) return null;
     const sum = slugs.reduce((total, slug) => total + PRODUCTS[slug].price, 0);
     return roundCents(sum * (1 - RITUAL_DISCOUNT));
   }
@@ -155,10 +174,15 @@
     const units = unitsIn(items);
     if (units.length === 0) return [];
 
-    const kinds = units.map((u) => u.kind);
-    const singleSoap = units.length === 1 && kinds[0] === "soap";
-    const onlyBalms = units.length <= MAX_MAILER_BALMS && kinds.every((k) => k === "balm");
-    if (singleSoap || onlyBalms) {
+    const products = units.filter((u) => u.kind !== "accessory");
+    const kinds = products.map((u) => u.kind);
+    const singleSoap = products.length === 1 && kinds[0] === "soap";
+    const onlyBalms = products.length <= MAX_MAILER_BALMS && kinds.every((k) => k === "balm");
+    const dishes = units.filter((u) => u === PRODUCTS["teak-soap-dish"]).length;
+    const bags = units.filter((u) => u === PRODUCTS["soap-saver-bag"]).length;
+    const accessoriesFit = dishes <= MAX_MAILER_DISHES && bags <= MAX_MAILER_BAGS;
+    // onlyBalms is also true when the order is accessories alone.
+    if ((singleSoap || onlyBalms) && accessoriesFit) {
       return [{ box: "Bubble mailer", oz: sum(units, "oz") + GIFT_BOX_OZ + MAILER_OZ, dims: MAILER_DIMS, price: UNDER_1LB_PRICE }];
     }
 
@@ -194,6 +218,7 @@
     PRODUCTS: PRODUCTS,
     priceOf: priceOf,
     ritualPrice: ritualPrice,
+    ritualHasProduct: ritualHasProduct,
     linePrice: linePrice,
     subtotalOf: subtotalOf,
     packages: packages,

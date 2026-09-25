@@ -19,6 +19,8 @@ const SCENT_SLUGS = {
   "Vanilla": "vanilla-lip-balm",
   "Peppermint": "peppermint-lip-balm",
   "Guava": "guava-lip-balm",
+  "Teak Soap Dish": "teak-soap-dish",
+  "Sisal Soap Saver Bag": "soap-saver-bag",
 };
 
 // Populated by the stock-marking block below once /get-inventory resolves.
@@ -33,6 +35,7 @@ const MIX_MATCH_GROUPS = [
   { label: "Soap", items: ["Quiet Clay", "Jade Hollow", "Lavender Dawn", "Lavender Bloom", "Garnet Dusk", "Indigo Grove", "Onyx Ember", "Golden Harvest", "Emerald Meadow"] },
   { label: "Tallow Cream", items: ["Lavender Tallow Body Cream", "Frankincense Tallow Facial Cream", "Unscented Tallow Body Cream", "Unscented Tallow Facial Cream"] },
   { label: "Lip Balm", items: ["Vanilla", "Peppermint", "Guava"] },
+  { label: "Accessories", items: ["Teak Soap Dish", "Sisal Soap Saver Bag"] },
 ];
 
 // Preorder ship dates, keyed by the same product slug used in SCENT_SLUGS.
@@ -59,6 +62,9 @@ const SHIP_DATES = {
   "vanilla-lip-balm": "2026-10-10",
   "peppermint-lip-balm": "2026-10-10",
   "guava-lip-balm": "2026-10-10",
+  // Accessories are bought in, not made — ship with the launch.
+  "soap-saver-bag": "2026-10-10",
+  "teak-soap-dish": "2026-10-10",
 };
 
 function shipDateLabel(iso) {
@@ -164,6 +170,71 @@ function maxShipDateIso(names) {
     if (!shipEl) return;
     const label = shipDateLabel(SHIP_DATES[btn.dataset.id]);
     if (label) shipEl.textContent = label;
+  });
+})();
+
+// ============================================================
+// Photo zoom — tap/click a product photo to see the full square photo
+// (not the circle crop) large, over a dimmed page. Closes with the ×,
+// a click outside the photo, or Esc. Only runs where product cards exist.
+// ============================================================
+(function () {
+  const photos = document.querySelectorAll(".card-art img");
+  if (photos.length === 0) return;
+
+  const overlay = document.createElement("div");
+  overlay.className = "lightbox";
+  overlay.hidden = true;
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.innerHTML =
+    '<button type="button" class="lightbox-close" aria-label="Close photo">&times;</button>' +
+    '<figure class="lightbox-figure"><img alt="" /><figcaption></figcaption></figure>';
+  document.body.appendChild(overlay);
+
+  const bigImg = overlay.querySelector("img");
+  const caption = overlay.querySelector("figcaption");
+  const closeBtn = overlay.querySelector(".lightbox-close");
+  let opener = null;
+
+  function open(img) {
+    opener = img;
+    bigImg.src = img.currentSrc || img.src;
+    bigImg.alt = img.alt;
+    caption.textContent = img.alt;
+    overlay.setAttribute("aria-label", img.alt);
+    overlay.hidden = false;
+    document.body.classList.add("lightbox-open");
+    closeBtn.focus();
+  }
+
+  function close() {
+    overlay.hidden = true;
+    document.body.classList.remove("lightbox-open");
+    if (opener) opener.focus();
+  }
+
+  photos.forEach((img) => {
+    img.classList.add("zoomable");
+    img.tabIndex = 0;
+    img.setAttribute("role", "button");
+    img.setAttribute("aria-label", "Enlarge photo: " + img.alt);
+    img.addEventListener("click", () => open(img));
+    img.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        open(img);
+      }
+    });
+  });
+
+  closeBtn.addEventListener("click", close);
+  // A click on the dimmed backdrop (not the photo itself) closes it.
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay || e.target.classList.contains("lightbox-figure")) close();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !overlay.hidden) close();
   });
 })();
 
@@ -483,12 +554,24 @@ function maxShipDateIso(names) {
       addRowBtn.hidden = rows.length >= MAX_SLOTS;
     }
 
+    // Shown (and Add to Bag held) while the picks are accessories only — a
+    // Ritual needs at least one soap, cream, or lip balm (see
+    // UACCatalog.ritualHasProduct, which checkout enforces too).
+    const hintEl = document.createElement("p");
+    hintEl.className = "mix-hint";
+    hintEl.textContent = "Add at least one soap, cream, or lip balm — accessories can join a Ritual, but can't make one on their own.";
+    hintEl.hidden = true;
+    addRowBtn.insertAdjacentElement("afterend", hintEl);
+
     function recalc() {
       const selects = picksEl.querySelectorAll(".mix-select");
       const slugs = Array.from(selects).map((s) => SCENT_SLUGS[s.value]);
+      const valid = UACCatalog.ritualHasProduct(slugs);
       countEl2.textContent = selects.length + (selects.length === 1 ? " item" : " items");
-      totalEl2.textContent = money(UACCatalog.ritualPrice(slugs) || 0);
+      totalEl2.textContent = valid ? money(UACCatalog.ritualPrice(slugs) || 0) : "—";
       if (shipEl2) shipEl2.textContent = shipDateLabel(maxShipDateIso(Array.from(selects).map((s) => s.value)));
+      hintEl.hidden = valid;
+      if (!addToBagBtn.classList.contains("is-sold-out")) addToBagBtn.disabled = !valid;
     }
 
     picksEl.addEventListener("change", (e) => {

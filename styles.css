@@ -554,6 +554,9 @@ p { margin: 0; }
 /* ---------- mix & match ---------- */
 .mix-picks {
   display: grid;
+  /* minmax(0, 1fr) keeps a row from growing to its longest option name —
+     otherwise the × buttons get pushed past the card's right edge. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 }
 .mix-row {
@@ -597,6 +600,13 @@ p { margin: 0; }
   background: var(--sage-pale);
 }
 .mix-add[hidden] { display: none; }
+/* Curated Ritual note shown while the picks are accessories only. */
+.mix-hint {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: var(--accent);
+}
+.mix-hint[hidden] { display: none; }
 
 .shelf--two { grid-template-columns: repeat(2, 1fr); }
 
@@ -1211,3 +1221,62 @@ p { margin: 0; }
   line-height: 1.5;
 }
 
+
+/* ---------- photo zoom (lightbox) ---------- */
+.card-art img.zoomable { cursor: zoom-in; }
+.card-art img.zoomable:focus-visible { outline: 2px solid var(--sage-deep); outline-offset: 4px; }
+body.lightbox-open { overflow: hidden; }
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: rgba(20, 18, 12, 0.84);
+  cursor: zoom-out;
+}
+.lightbox[hidden] { display: none; }
+.lightbox-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 100%;
+}
+.lightbox-figure img {
+  display: block;
+  width: auto;
+  max-width: min(92vw, 820px);
+  max-height: 78vh;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.6);
+  cursor: default;
+}
+.lightbox-figure figcaption {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: #f6f3e9;
+  text-align: center;
+}
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(246, 243, 233, 0.4);
+  background: rgba(20, 18, 12, 0.5);
+  color: #f6f3e9;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.lightbox-close:hover, .lightbox-close:focus-visible {
+  background: rgba(246, 243, 233, 0.15);
+  outline: 2px solid #f6f3e9;
+  outline-offset: 2px;
+}
