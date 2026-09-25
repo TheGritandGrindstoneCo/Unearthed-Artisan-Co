@@ -422,6 +422,18 @@ p { margin: 0; }
   opacity: 0.65;
   line-height: 1.5;
 }
+/* Ingredients dropdown: a plain-English list first (easiest to read),
+   then the exact label wording (INCI names) beneath it. */
+.card-inci p.inci-plain {
+  font-size: 0.82rem;
+  opacity: 0.9;
+}
+.card-inci p.inci-label span {
+  display: block;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--sage-deep);
+}
 .card-foot {
   display: flex;
   align-items: center;
