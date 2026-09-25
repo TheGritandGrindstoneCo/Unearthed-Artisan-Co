@@ -554,6 +554,9 @@ p { margin: 0; }
 /* ---------- mix & match ---------- */
 .mix-picks {
   display: grid;
+  /* minmax(0, 1fr) keeps a row from growing to its longest option name —
+     otherwise the × buttons get pushed past the card's right edge. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 }
 .mix-row {
