@@ -19,6 +19,8 @@ const SCENT_SLUGS = {
   "Vanilla": "vanilla-lip-balm",
   "Peppermint": "peppermint-lip-balm",
   "Guava": "guava-lip-balm",
+  "Teak Soap Dish": "teak-soap-dish",
+  "Sisal Soap Saver Bag": "soap-saver-bag",
 };
 
 // Populated by the stock-marking block below once /get-inventory resolves.
@@ -33,6 +35,7 @@ const MIX_MATCH_GROUPS = [
   { label: "Soap", items: ["Quiet Clay", "Jade Hollow", "Lavender Dawn", "Lavender Bloom", "Garnet Dusk", "Indigo Grove", "Onyx Ember", "Golden Harvest", "Emerald Meadow"] },
   { label: "Tallow Cream", items: ["Lavender Tallow Body Cream", "Frankincense Tallow Facial Cream", "Unscented Tallow Body Cream", "Unscented Tallow Facial Cream"] },
   { label: "Lip Balm", items: ["Vanilla", "Peppermint", "Guava"] },
+  { label: "Accessories", items: ["Teak Soap Dish", "Sisal Soap Saver Bag"] },
 ];
 
 // Preorder ship dates, keyed by the same product slug used in SCENT_SLUGS.
