@@ -599,7 +599,10 @@ function maxShipDateIso(names) {
     addToBagBtn.addEventListener("click", () => {
       const picks = Array.from(picksEl.querySelectorAll(".mix-select")).map((s) => s.value);
       const slugs = picks.map((p) => SCENT_SLUGS[p]).filter(Boolean);
-      const name = "Curated Ritual: " + picks.join(", ");
+      // Lip balm picks are just a flavor ("Vanilla"), so name them in full
+      // for the bag, the Stripe checkout page, and the order record.
+      const lipBalms = (MIX_MATCH_GROUPS.find((g) => g.label === "Lip Balm") || { items: [] }).items;
+      const name = "Curated Ritual: " + picks.map((p) => (lipBalms.includes(p) ? p + " Lip Balm" : p)).join(", ");
       addItem("mixmatch-" + Date.now(), name, slugs.length ? slugs : undefined);
     });
 
