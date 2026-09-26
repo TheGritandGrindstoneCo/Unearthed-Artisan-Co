@@ -83,20 +83,23 @@
         policy</a> for details on how they handle your data.</p>
       <p><strong>Launch notifications:</strong> if you sign up to be notified when preorders open,
         we collect only the email address you provide.</p>
+      <p><strong>Email list:</strong> if you join our email list, we collect only the email address
+        you provide, and use it to send news about product launches, new scents and formulas, and
+        occasional updates from the studio.</p>
       <p><strong>Shopping bag:</strong> the contents of your shopping bag are stored locally in
         your browser (via local storage) so your bag persists between visits. This stays on your
         device and isn't sent to us until you check out.</p>
 
       <h3>How We Use Your Information</h3>
       <p>We use your information to fulfill and ship your order, to send a one-time email when
-        preorders open (if you signed up for that), and to respond to questions submitted through
+        preorders open (if you signed up for that), to send our email list updates (if you joined it), and to respond to questions submitted through
         our contact form. We don't use your information for targeted advertising, and we don't
         sell or rent your personal information to anyone.</p>
 
       <h3>Who We Share It With</h3>
       <p>We share information only with the services that help us run our business: Stripe
-        (payment processing), Netlify (our website host, which also handles our contact and
-        launch-notification form submissions), and USPS (shipping and delivery). We don't share
+        (payment processing), Netlify (our website host, which also handles our contact,
+        launch-notification and email-list form submissions), and USPS (shipping and delivery). We don't share
         your information with data brokers or advertisers.</p>
 
       <h3>Data Retention</h3>
@@ -109,6 +112,8 @@
         or use our <a href="https://forms.gle/fg3vWi77LpAgpj5m6" target="_blank" rel="noopener">contact form</a>.
         California residents may have additional rights under the California Consumer Privacy Act
         (CCPA); we'll honor requests to the extent they apply to us.</p>
+      <p>You can leave our email list at any time using the unsubscribe link in any of our emails
+        or on our <a href="unsubscribe.html">unsubscribe page</a>.</p>
 
       <h3>Cookies &amp; Local Storage</h3>
       <p>Our site doesn't use tracking or advertising cookies. We use your browser's local storage
@@ -135,6 +140,24 @@
 </section>
 
 <footer class="footer" id="contact">
+  <div class="wrap footer-join" id="join">
+    <div class="footer-join-copy">
+      <h4>Join our list</h4>
+      <p>New scents, launches and small-batch news. No spam, unsubscribe anytime.</p>
+    </div>
+    <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="join-form" data-ajax-form>
+      <input type="hidden" name="form-name" value="newsletter" />
+      <p class="join-hp"><label>Don't fill this out if you're human: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
+      <div class="join-fields" data-form-fields>
+        <label for="join-email" class="join-label join-label--hidden">Email address</label>
+        <input type="email" name="email" id="join-email" class="join-input" placeholder="you@email.com" autocomplete="email" required />
+        <button type="submit" class="btn btn--primary">Join</button>
+      </div>
+      <p class="join-msg" data-form-success hidden>You're on the list! 💜 Watch your inbox for new scents and launches.</p>
+      <p class="join-msg" data-form-error hidden>Something went wrong. Please try again, or email
+        <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a>.</p>
+    </form>
+  </div>
   <div class="wrap">
     <div>
       <p class="footer-mark">Unearthed Artisan Co.</p>

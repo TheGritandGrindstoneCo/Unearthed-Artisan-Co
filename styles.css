@@ -985,6 +985,51 @@ p { margin: 0; }
   gap: 10px;
 }
 
+/* ---------- email list sign-up (footer) + unsubscribe page ---------- */
+.footer .footer-join {
+  grid-template-columns: 1.2fr 2fr;
+  align-items: center;
+  gap: 20px 40px;
+  padding-bottom: 40px;
+  margin-bottom: 44px;
+  border-bottom: 1px solid rgba(246, 243, 233, 0.16);
+}
+.footer-join-copy p { margin: 0; }
+.join-form { margin: 0; }
+.join-fields {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.join-input {
+  flex: 1 1 240px;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 14px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--ivory-card);
+  color: var(--charcoal);
+}
+.join-input:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
+.footer .btn--primary:hover { background: var(--sage); color: var(--forest); }
+.join-hp { position: absolute; left: -9999px; }
+.join-label { display: block; width: 100%; font-weight: 600; font-size: 0.9rem; }
+.join-label--hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+.join-fields[hidden], .join-msg[hidden] { display: none; }
+.join-msg { margin: 12px 0 0; }
+.footer .join-msg a { text-decoration: underline; }
+.unsubscribe-form { max-width: 520px; margin-bottom: 28px; }
+
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
   .shelf { grid-template-columns: 1fr; }

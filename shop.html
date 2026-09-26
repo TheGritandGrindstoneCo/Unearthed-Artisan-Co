@@ -709,6 +709,24 @@
 </section>
 
 <footer class="footer" id="contact">
+  <div class="wrap footer-join" id="join">
+    <div class="footer-join-copy">
+      <h4>Join our list</h4>
+      <p>New scents, launches and small-batch news. No spam, unsubscribe anytime.</p>
+    </div>
+    <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="join-form" data-ajax-form>
+      <input type="hidden" name="form-name" value="newsletter" />
+      <p class="join-hp"><label>Don't fill this out if you're human: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
+      <div class="join-fields" data-form-fields>
+        <label for="join-email" class="join-label join-label--hidden">Email address</label>
+        <input type="email" name="email" id="join-email" class="join-input" placeholder="you@email.com" autocomplete="email" required />
+        <button type="submit" class="btn btn--primary">Join</button>
+      </div>
+      <p class="join-msg" data-form-success hidden>You're on the list! 💜 Watch your inbox for new scents and launches.</p>
+      <p class="join-msg" data-form-error hidden>Something went wrong. Please try again, or email
+        <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a>.</p>
+    </form>
+  </div>
   <div class="wrap">
     <div>
       <p class="footer-mark">Unearthed Artisan Co.</p>

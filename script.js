@@ -692,3 +692,38 @@ function maxShipDateIso(names) {
 
   render();
 })();
+
+// ============================================================
+// Email list forms — the "Join our list" sign-up in every footer and the
+// unsubscribe form on unsubscribe.html. Both are Netlify Forms (see the
+// "newsletter" and "unsubscribe" forms in the Netlify dashboard); this
+// submits them in place so the visitor stays on the page.
+// ============================================================
+(function () {
+  const forms = document.querySelectorAll("form[data-ajax-form]");
+  forms.forEach((form) => {
+    const fields = form.querySelector("[data-form-fields]");
+    const success = form.querySelector("[data-form-success]");
+    const error = form.querySelector("[data-form-error]");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (error) error.hidden = true;
+      const button = form.querySelector("button[type=submit]");
+      if (button) button.disabled = true;
+      try {
+        const res = await fetch("/", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams(new FormData(form)).toString(),
+        });
+        if (!res.ok) throw new Error("Submission failed");
+        if (fields) fields.hidden = true;
+        if (success) success.hidden = false;
+      } catch (err) {
+        if (button) button.disabled = false;
+        if (error) error.hidden = false;
+      }
+    });
+  });
+})();
