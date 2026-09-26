@@ -1029,6 +1029,26 @@ p { margin: 0; }
 .join-msg { margin: 12px 0 0; }
 .footer .join-msg a { text-decoration: underline; }
 .unsubscribe-form { max-width: 520px; margin-bottom: 28px; }
+.contact-form { max-width: 680px; margin-bottom: 28px; }
+.contact-fields { display: grid; gap: 18px; }
+.contact-fields[hidden] { display: none; }
+.contact-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.contact-field { display: grid; gap: 8px; }
+.contact-field .join-input { width: 100%; flex: none; }
+.contact-optional { font-weight: 400; opacity: 0.7; }
+.contact-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 42px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%2712%27 viewBox=%270 0 12 12%27%3E%3Cpath d=%27M2 4l4 4 4-4%27 fill=%27none%27 stroke=%27%235c7346%27 stroke-width=%271.6%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+}
+.contact-message { border-radius: 18px; resize: vertical; min-height: 150px; line-height: 1.6; }
+.contact-thanks { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--forest); }
+@media (max-width: 600px) {
+  .contact-row { grid-template-columns: 1fr; }
+}
 
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {

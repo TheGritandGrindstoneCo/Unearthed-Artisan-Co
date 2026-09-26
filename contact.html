@@ -3,20 +3,19 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="robots" content="noindex" />
-<title>Unsubscribe — Unearthed Artisan Co.</title>
-<meta name="description" content="Unsubscribe from the Unearthed Artisan Co. email list." />
+<title>Contact Us — Unearthed Artisan Co.</title>
+<meta name="description" content="Contact Unearthed Artisan Co. with questions about orders, products, local delivery in Simi Valley, or wholesale." />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://unearthedartisanco.com/unsubscribe.html" />
-<meta property="og:title" content="Unsubscribe — Unearthed Artisan Co." />
-<meta property="og:description" content="Unsubscribe from the Unearthed Artisan Co. email list." />
+<meta property="og:url" content="https://unearthedartisanco.com/contact.html" />
+<meta property="og:title" content="Contact Us — Unearthed Artisan Co." />
+<meta property="og:description" content="Contact Unearthed Artisan Co. with questions about orders, products, local delivery in Simi Valley, or wholesale." />
 <meta property="og:image" content="https://unearthedartisanco.com/assets/logo.png?v=2" />
 <meta property="og:image:width" content="600" />
 <meta property="og:image:height" content="600" />
 <meta property="og:image:type" content="image/png" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Unsubscribe — Unearthed Artisan Co." />
-<meta name="twitter:description" content="Unsubscribe from the Unearthed Artisan Co. email list." />
+<meta name="twitter:title" content="Contact Us — Unearthed Artisan Co." />
+<meta name="twitter:description" content="Contact Unearthed Artisan Co. with questions about orders, products, local delivery in Simi Valley, or wholesale." />
 <meta name="twitter:image" content="https://unearthedartisanco.com/assets/logo.png?v=2" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -61,34 +60,83 @@
 <section class="band">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">Email List</p>
-      <h2>Unsubscribe</h2>
-      <p>Sorry to see you go. Enter the email address you'd like removed from our list and we'll
-        take you off. No hard feelings, and you're always welcome back.</p>
+      <p class="eyebrow">Get in Touch</p>
+      <h2>Contact Us</h2>
+      <p>Questions about an order, a product, local delivery or wholesale? Send us a note below
+        and we'll personally get back to you as soon as we can.</p>
     </div>
 
     <div class="policy-content">
-      <form name="unsubscribe" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="join-form unsubscribe-form" data-ajax-form>
-        <input type="hidden" name="form-name" value="unsubscribe" />
+      <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="contact-form" data-ajax-form>
+        <input type="hidden" name="form-name" value="contact" />
         <p class="join-hp"><label>Don't fill this out if you're human: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
-        <div class="join-fields" data-form-fields>
-          <label for="unsubscribe-email" class="join-label">Email address</label>
-          <input type="email" name="email" id="unsubscribe-email" class="join-input" placeholder="you@email.com" autocomplete="email" required />
-          <button type="submit" class="btn btn--primary">Unsubscribe</button>
+        <div class="contact-fields" data-form-fields>
+          <div class="contact-row">
+            <label class="contact-field">
+              <span class="join-label">Name</span>
+              <input type="text" name="name" class="join-input" autocomplete="name" required />
+            </label>
+            <label class="contact-field">
+              <span class="join-label">Email</span>
+              <input type="email" name="email" class="join-input" placeholder="you@email.com" autocomplete="email" required />
+            </label>
+          </div>
+          <div class="contact-row">
+            <label class="contact-field">
+              <span class="join-label">Topic</span>
+              <select name="topic" class="join-input contact-select" required>
+                <option value="Order question">Order question</option>
+                <option value="Product question">Product question</option>
+                <option value="Local delivery">Local delivery</option>
+                <option value="Wholesale">Wholesale</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+            <label class="contact-field">
+              <span class="join-label">Order number <span class="contact-optional">(optional)</span></span>
+              <input type="text" name="order-number" class="join-input" />
+            </label>
+          </div>
+          <label class="contact-field">
+            <span class="join-label">Message</span>
+            <textarea name="message" class="join-input contact-message" rows="6" required></textarea>
+          </label>
+          <div>
+            <button type="submit" class="btn btn--primary">Send Message</button>
+          </div>
         </div>
-        <p class="join-msg" data-form-success hidden>You're unsubscribed. We'll remove your email from our list
-          within a few days, and you won't receive any more marketing emails from us.</p>
-        <p class="join-msg" data-form-error hidden>Something went wrong. Please try again, or email us at
-          <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a> and we'll remove you.</p>
+        <p class="join-msg contact-thanks" data-form-success hidden>Thanks for reaching out! Your message is on its
+          way, and we'll get back to you as soon as we can.</p>
+        <p class="join-msg" data-form-error hidden>Something went wrong. Please try again, or email us directly at
+          <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a>.</p>
       </form>
 
-      <p class="policy-note">Only unsubscribing from our email list? Order confirmations and shipping
-        updates for any order you've placed will still reach you.</p>
+      <p class="policy-note">Prefer email? Write to us at
+        <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a>, or send a message on
+        <a href="https://www.instagram.com/unearthedartisanco" target="_blank" rel="noopener">Instagram</a>.</p>
     </div>
   </div>
 </section>
 
 <footer class="footer" id="contact">
+  <div class="wrap footer-join" id="join">
+    <div class="footer-join-copy">
+      <h4>Join our list</h4>
+      <p>New scents, launches and small-batch news. No spam, unsubscribe anytime.</p>
+    </div>
+    <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="join-form" data-ajax-form>
+      <input type="hidden" name="form-name" value="newsletter" />
+      <p class="join-hp"><label>Don't fill this out if you're human: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
+      <div class="join-fields" data-form-fields>
+        <label for="join-email" class="join-label join-label--hidden">Email address</label>
+        <input type="email" name="email" id="join-email" class="join-input" placeholder="you@email.com" autocomplete="email" required />
+        <button type="submit" class="btn btn--primary">Join</button>
+      </div>
+      <p class="join-msg" data-form-success hidden>You're on the list! Watch your inbox for new scents and launches.</p>
+      <p class="join-msg" data-form-error hidden>Something went wrong. Please try again, or email
+        <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a>.</p>
+    </form>
+  </div>
   <div class="wrap">
     <div>
       <p class="footer-mark">Unearthed Artisan Co.</p>
