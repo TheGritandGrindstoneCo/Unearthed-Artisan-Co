@@ -599,10 +599,14 @@ function maxShipDateIso(names) {
     addToBagBtn.addEventListener("click", () => {
       const picks = Array.from(picksEl.querySelectorAll(".mix-select")).map((s) => s.value);
       const slugs = picks.map((p) => SCENT_SLUGS[p]).filter(Boolean);
-      // Lip balm picks are just a flavor ("Vanilla"), so name them in full
-      // for the bag, the Stripe checkout page, and the order record.
-      const lipBalms = (MIX_MATCH_GROUPS.find((g) => g.label === "Lip Balm") || { items: [] }).items;
-      const name = "Curated Ritual: " + picks.map((p) => (lipBalms.includes(p) ? p + " Lip Balm" : p)).join(", ");
+      // Soap and lip balm picks are just a scent or flavor ("Quiet Clay",
+      // "Vanilla"), so name them in full for the bag, the Stripe checkout
+      // page, and the order record. Creams and accessories already are.
+      const groupItems = (label) => (MIX_MATCH_GROUPS.find((g) => g.label === label) || { items: [] }).items;
+      const soaps = groupItems("Soap");
+      const lipBalms = groupItems("Lip Balm");
+      const fullName = (p) => (soaps.includes(p) ? p + " Soap" : lipBalms.includes(p) ? p + " Lip Balm" : p);
+      const name = "Curated Ritual: " + picks.map(fullName).join(", ");
       addItem("mixmatch-" + Date.now(), name, slugs.length ? slugs : undefined);
     });
 
