@@ -37,8 +37,11 @@ function buildHtml({ lineItems, totals, total }) {
   <div style="background:#f6f3e9;padding:32px 16px;font-family:Georgia,'Times New Roman',serif;">
     <div style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;">
       <div style="background:#f6f3e9;padding:32px 24px;text-align:center;">
-        <p style="margin:0 0 4px;letter-spacing:2px;text-transform:uppercase;font-size:12px;color:#5c7346;font-weight:600;">Handcrafted in the USA</p>
-        <h1 style="margin:0;font-size:22px;color:#000000;">Unearthed Artisan Co.</h1>
+        <a href="https://unearthedartisanco.com/" style="text-decoration:none;">
+          <img src="https://unearthedartisanco.com/assets/logo.png" width="120" height="120" alt="Unearthed Artisan Co." style="display:block;margin:0 auto 16px;width:120px;height:120px;border:0;border-radius:50%;" />
+        </a>
+        <p style="margin:0 0 6px;letter-spacing:2px;text-transform:uppercase;font-size:12px;color:#5c7346;font-weight:600;">Handcrafted in the USA</p>
+        <h1 style="margin:0;font-size:22px;letter-spacing:1px;color:#000000;">UNEARTHED ARTISAN CO.</h1>
       </div>
       <div style="padding:32px 24px;">
         <h2 style="margin:0 0 12px;font-size:20px;color:#000000;">Thank You For Your Order!</h2>
@@ -53,14 +56,18 @@ function buildHtml({ lineItems, totals, total }) {
           </tr>
         </table>
         <p style="margin:24px 0 0;color:#2b2820;font-size:14px;line-height:1.6;">
-          Your order is being lovingly prepared. We'll follow up separately with shipping and delivery details.
+          Your pieces are reserved and will be hand-wrapped in our studio, each one finished with care before it leaves our hands. We'll send your shipping details the moment your order is on its way.
         </p>
         <p style="margin:24px 0 0;color:#2b2820;font-size:14px;line-height:1.6;">
           Questions in the meantime? Just reply to this email &mdash; we're always happy to help.
         </p>
       </div>
       <div style="background:#f6f3e9;padding:20px 24px;text-align:center;">
-        <p style="margin:0;font-size:13px;color:#5c7346;">unearthedartisanco.com &middot; @unearthedartisanco</p>
+        <p style="margin:0;font-size:13px;color:#5c7346;">
+          <a href="https://unearthedartisanco.com/" style="color:#5c7346;text-decoration:none;">unearthedartisanco.com</a>
+          &middot;
+          <a href="https://www.instagram.com/unearthedartisanco" style="color:#5c7346;text-decoration:none;">@unearthedartisanco</a>
+        </p>
       </div>
     </div>
   </div>`;
