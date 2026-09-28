@@ -140,9 +140,10 @@
       spreadsheets. <strong>pirate-ship-labels</strong> has every Standard Shipping order — one row
       per package, with its estimated weight and box size — ready to upload at pirateship.com under
       "Import Spreadsheet" to buy and print labels. Weigh each package before buying its label, since
-      weights are estimates. <strong>local-delivery</strong> (only when there are any) lists Local
-      Delivery orders for your delivery run. Uses the admin password above. Only new orders — ones
-      not already in a previous export — are included by default.</p>
+      weights are estimates. <strong>local-delivery</strong> lists Local Delivery orders for your
+      delivery run, with the same columns. Each file downloads only when it has orders. Uses the
+      admin password above. Only new orders — ones not already in a previous export — are included
+      by default.</p>
     <div class="inv-export-row">
       <label for="inv-export-include"><input type="checkbox" id="inv-export-include" /> Re-include orders already exported</label>
     </div>
@@ -331,8 +332,8 @@
       })
       .then(function (data) {
         exportBtn.disabled = false;
-        // One file for Pirate Ship labels, plus a Local Delivery list when
-        // there are delivery orders. Spaced out slightly so the browser
+        // One file for Pirate Ship labels and one Local Delivery list, each
+        // only when it has orders. Spaced out slightly so the browser
         // doesn't drop the second download.
         (data.files || []).forEach(function (file, i) {
           setTimeout(function () {
@@ -346,10 +347,16 @@
             setTimeout(function () { URL.revokeObjectURL(objectUrl); }, 1000);
           }, i * 400);
         });
-        var parts = [data.shippingOrders + " to ship"];
+        if (!data.files || data.files.length === 0) {
+          exportStatusEl.textContent = "No new orders to export.";
+          exportStatusEl.className = "inv-status is-ok";
+          return;
+        }
+        var parts = [];
+        if (data.shippingOrders > 0) parts.push(data.shippingOrders + " to ship");
         if (data.deliveryOrders > 0) parts.push(data.deliveryOrders + " for local delivery");
         exportStatusEl.textContent =
-          "Downloaded " + (data.files || []).map(function (f) { return f.filename; }).join(" and ") +
+          "Downloaded " + data.files.map(function (f) { return f.filename; }).join(" and ") +
           " (" + parts.join(", ") + ").";
         exportStatusEl.className = "inv-status is-ok";
       })

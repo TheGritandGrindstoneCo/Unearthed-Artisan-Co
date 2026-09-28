@@ -7,7 +7,7 @@
 //   upload, Pirate Ship will ask you to map each column to a field (Name,
 //   Address Line 1, Weight, etc.) — it remembers that mapping for next time.
 // - Local Delivery orders, as a separate list for the delivery run (they
-//   don't need labels).
+//   don't need labels), with the same columns as the Pirate Ship file.
 //
 // Password-protected with the same INVENTORY_ADMIN_PASSWORD used by
 // inventory.html, since this is another internal-only tool.
@@ -95,11 +95,12 @@ exports.handler = async (event) => {
   // the order the orders came in.
   toExport.sort((a, b) => a.created - b.created);
 
-  // Standard Shipping orders go in the Pirate Ship CSV, one row per package
-  // (weight and box size filled in from catalog.js, so labels don't need
-  // them typed by hand). Local Delivery orders don't need labels, so they go
-  // in a separate list for the delivery run.
-  let shippingCsv = csvRow([
+  // Standard Shipping orders go in the Pirate Ship CSV and Local Delivery
+  // orders in a separate list for the delivery run. Both use the same
+  // columns, one row per package (weight and box size filled in from
+  // catalog.js, so labels don't need them typed by hand, and the delivery
+  // list shows which box to pack).
+  const header = csvRow([
     "Order ID",
     "Order Date",
     "Name",
@@ -119,19 +120,8 @@ exports.handler = async (event) => {
     "Items",
     "Order Total",
   ]);
-  let deliveryCsv = csvRow([
-    "Order ID",
-    "Order Date",
-    "Name",
-    "Phone",
-    "Email",
-    "Address Line 1",
-    "Address Line 2",
-    "City",
-    "ZIP",
-    "Items",
-    "Order Total",
-  ]);
+  let shippingCsv = header;
+  let deliveryCsv = header;
   let shippingOrders = 0;
   let deliveryOrders = 0;
 
@@ -166,32 +156,17 @@ exports.handler = async (event) => {
     const orderDate = new Date(session.created * 1000).toISOString().slice(0, 10);
     const total = "$" + formatMoney(session.amount_total);
 
-    if ((await deliveryMethodOf(stripe, session, lineDescriptions)) === "delivery") {
-      deliveryOrders++;
-      deliveryCsv += csvRow([
-        session.id,
-        orderDate,
-        shippingName,
-        phone,
-        email,
-        address.line1 || "",
-        address.line2 || "",
-        address.city || "",
-        address.postal_code || "",
-        itemsSummary,
-        total,
-      ]);
-      continue;
-    }
+    const isDelivery = (await deliveryMethodOf(stripe, session, lineDescriptions)) === "delivery";
+    if (isDelivery) deliveryOrders++;
+    else shippingOrders++;
 
-    shippingOrders++;
     // Blank package columns (weigh it yourself) only if the order's products
     // can't be read back — e.g. an order from before inventory tracking.
     const packages = packagesOf(session);
     const rows = packages.length > 0 ? packages : [null];
     rows.forEach((pkg, i) => {
       const label = !pkg ? "" : pkg.box + (rows.length > 1 ? " (" + (i + 1) + " of " + rows.length + ")" : "");
-      shippingCsv += csvRow([
+      const row = csvRow([
         session.id,
         orderDate,
         shippingName,
@@ -213,6 +188,8 @@ exports.handler = async (event) => {
         itemsSummary,
         total,
       ]);
+      if (isDelivery) deliveryCsv += row;
+      else shippingCsv += row;
     });
   }
 
@@ -226,7 +203,7 @@ exports.handler = async (event) => {
 
   const date = new Date().toISOString().slice(0, 10);
   const files = [];
-  if (shippingOrders > 0 || deliveryOrders === 0) {
+  if (shippingOrders > 0) {
     files.push({ filename: "pirate-ship-labels-" + date + ".csv", csv: shippingCsv, orders: shippingOrders });
   }
   if (deliveryOrders > 0) {
