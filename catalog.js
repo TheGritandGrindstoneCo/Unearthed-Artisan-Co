@@ -37,6 +37,35 @@
     "teak-soap-dish": { kind: "accessory", price: 9.95, oz: 1.9, space: 0.5 },
   };
 
+  // Preorder ship dates, by product slug — shown on the shop cards and in
+  // the bag (script.js), and on the packing slip email. Soap dates come from
+  // the Batch Tracking Log's cure-ready dates (42-day cure), floored at the
+  // October 10, 2026 launch date; lotion and lip balm don't need to cure, so
+  // they all ship that same launch date. Golden Harvest and Emerald Meadow
+  // were poured later (9/10) so their cure finishes later too. Update this
+  // table each time a new soap batch is poured — see Batch Tracking Log.xlsx.
+  const SHIP_DATES = {
+    "quiet-clay": "2026-10-10",
+    "jade-hollow": "2026-10-10",
+    "lavender-dawn": "2026-10-10",
+    "lilac-bloom": "2026-10-10",
+    "garnet-dusk": "2026-10-10",
+    "indigo-grove": "2026-10-10",
+    "onyx-ember": "2026-10-10",
+    "golden-harvest": "2026-10-22",
+    "emerald-meadow": "2026-10-22",
+    "lavender-tallow-lotion": "2026-10-10",
+    "frankincense-facial-lotion": "2026-10-10",
+    "unscented-body-cream": "2026-10-10",
+    "unscented-facial-cream": "2026-10-10",
+    "vanilla-lip-balm": "2026-10-10",
+    "peppermint-lip-balm": "2026-10-10",
+    "guava-lip-balm": "2026-10-10",
+    // Accessories are bought in, not made — ship with the launch.
+    "soap-saver-bag": "2026-10-10",
+    "teak-soap-dish": "2026-10-10",
+  };
+
   // Discount applied to every Ritual card's price (Starter, Daily, and
   // Curated) — same formula everywhere so an identical set of picks always
   // costs the same no matter which Ritual card it's built from.
@@ -221,6 +250,7 @@
   const api = {
     PRODUCTS: PRODUCTS,
     GIFT_CARD: GIFT_CARD,
+    SHIP_DATES: SHIP_DATES,
     priceOf: priceOf,
     ritualPrice: ritualPrice,
     ritualHasProduct: ritualHasProduct,

@@ -39,33 +39,9 @@ const MIX_MATCH_GROUPS = [
 ];
 
 // Preorder ship dates, keyed by the same product slug used in SCENT_SLUGS.
-// Soap dates come from the Batch Tracking Log's cure-ready dates (42-day
-// cure), floored at the October 10, 2026 launch date; lotion and lip balm
-// don't need to cure, so they all ship that same launch date. Golden
-// Harvest and Emerald Meadow were poured later (9/10) so their cure
-// finishes later too. Update this table each time a new soap batch is
-// poured — see Batch Tracking Log.xlsx.
-const SHIP_DATES = {
-  "quiet-clay": "2026-10-10",
-  "jade-hollow": "2026-10-10",
-  "lavender-dawn": "2026-10-10",
-  "lilac-bloom": "2026-10-10",
-  "garnet-dusk": "2026-10-10",
-  "indigo-grove": "2026-10-10",
-  "onyx-ember": "2026-10-10",
-  "golden-harvest": "2026-10-22",
-  "emerald-meadow": "2026-10-22",
-  "lavender-tallow-lotion": "2026-10-10",
-  "frankincense-facial-lotion": "2026-10-10",
-  "unscented-body-cream": "2026-10-10",
-  "unscented-facial-cream": "2026-10-10",
-  "vanilla-lip-balm": "2026-10-10",
-  "peppermint-lip-balm": "2026-10-10",
-  "guava-lip-balm": "2026-10-10",
-  // Accessories are bought in, not made — ship with the launch.
-  "soap-saver-bag": "2026-10-10",
-  "teak-soap-dish": "2026-10-10",
-};
+// They live in catalog.js now, so the packing slip email
+// (netlify/functions/lib/packing-slip-email.js) shows the same dates.
+const SHIP_DATES = UACCatalog.SHIP_DATES;
 
 function shipDateLabel(iso) {
   if (!iso) return "";

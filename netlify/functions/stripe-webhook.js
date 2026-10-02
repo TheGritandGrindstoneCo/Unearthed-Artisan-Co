@@ -19,8 +19,9 @@
 const Stripe = require("stripe");
 const { releaseStock } = require("./lib/inventory-store");
 const { sendOrderConfirmationEmail } = require("./lib/order-email");
-const { finalizeHold, releaseHold } = require("./lib/gift-card-store");
+const { finalizeHold, releaseHold, updateCard } = require("./lib/gift-card-store");
 const { issueGiftCard } = require("./lib/gift-card-issue");
+const { sendPackingSlipEmail, sendGiftCardSoldEmail } = require("./lib/packing-slip-email");
 
 // Order paid (or fully covered by the card): the held gift card amount is
 // spent, and the tax worked out at checkout goes on record in Stripe Tax.
@@ -89,11 +90,24 @@ exports.handler = async (event) => {
     // retries — the card has to reach someone. issueGiftCard picks up where
     // a failed attempt stopped.
     if (eventSession.payment_status === "paid") {
+      let card;
       try {
-        await issueGiftCard(eventSession);
+        card = await issueGiftCard(eventSession);
       } catch (e) {
         console.error("Gift card issue failed for " + eventSession.id + ":", e && e.message);
         return { statusCode: 500, body: "Gift card issue failed." };
+      }
+      // The shop's heads-up — marked on the card so a repeated event from
+      // Stripe doesn't send it twice. Best-effort: no retry if it fails.
+      if (card && !card.shopNotifiedAt) {
+        try {
+          await sendGiftCardSoldEmail(card);
+          await updateCard(card.code, (c) => {
+            c.shopNotifiedAt = new Date().toISOString();
+          });
+        } catch (e) {
+          console.error("Gift card sold email failed:", e && e.message);
+        }
       }
     }
     return { statusCode: 200, body: JSON.stringify({ received: true }) };
@@ -120,6 +134,14 @@ exports.handler = async (event) => {
       // Best-effort — this function already returns 200 below regardless,
       // so a failure here never causes Stripe to retry the whole event.
       console.error("Order confirmation email failed:", e && e.message);
+    }
+
+    // The shop's own new-order email, laid out as a printable packing slip.
+    // Best-effort, like the customer email above.
+    try {
+      await sendPackingSlipEmail(stripe, eventSession);
+    } catch (e) {
+      console.error("Packing slip email failed:", e && e.message);
     }
   } else if (
     stripeEvent.type === "checkout.session.expired" ||
