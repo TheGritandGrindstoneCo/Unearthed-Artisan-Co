@@ -287,6 +287,31 @@ function maxShipDateIso(names) {
 
   let cart = loadCart();
 
+  // Gift card applied in the bag: { code, balance (cents), zip }. Saved so it
+  // survives a trip back to the shop — and set by gift-card.html's "Shop with
+  // This Card" button. The balance is re-checked with the server each time
+  // the bag opens, and again at checkout.
+  const GIFT_KEY = "uac-gift";
+  let gift = loadGift();
+
+  function loadGift() {
+    try {
+      const g = JSON.parse(localStorage.getItem(GIFT_KEY) || "null");
+      return g && g.code ? g : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveGift() {
+    try {
+      if (gift) localStorage.setItem(GIFT_KEY, JSON.stringify(gift));
+      else localStorage.removeItem(GIFT_KEY);
+    } catch (e) {
+      /* storage blocked — the card just won't persist */
+    }
+  }
+
   // Re-prices every saved line from catalog.js, so a bag saved before a
   // price change shows what checkout will actually charge, and drops
   // anything that's no longer sold.
@@ -398,12 +423,17 @@ function maxShipDateIso(names) {
     const shipCost = UACCatalog.shippingCost(cart, method, sub);
     // Sales tax depends on the delivery address, which Stripe collects on its
     // checkout page, so it's added there (Stripe Tax) rather than here.
-    const total = sub + shipCost;
+    // A gift card comes off here up to the pre-tax total; whatever's left on
+    // it goes toward the tax at checkout.
+    const giftBalance = gift && typeof gift.balance === "number" ? gift.balance / 100 : 0;
+    const giftOff = qty === 0 ? 0 : Math.min(giftBalance, sub + shipCost);
+    const total = sub + shipCost - giftOff;
 
     subtotalEl.textContent = money(sub);
     shippingEl.textContent = qty === 0 ? "—" : money(shipCost);
     taxEl.textContent = qty === 0 ? "—" : "At checkout";
     totalEl.textContent = money(total);
+    renderGift(giftOff, giftBalance - giftOff);
 
     if (shipDateEl) {
       const label = shipDateLabel(cartShipDateIso());
@@ -420,6 +450,28 @@ function maxShipDateIso(names) {
       checkoutBtn.classList.remove("is-disabled");
     } else {
       checkoutBtn.classList.add("is-disabled");
+    }
+  }
+
+  // The Gift Card box in the bag's Order Summary — the code field, or the
+  // applied card with its ZIP field — and its line in the totals. giftOff
+  // and leftForTax are in dollars.
+  function renderGift(giftOff, leftForTax) {
+    const entry = document.getElementById("gift-entry");
+    if (!entry) return;
+    entry.hidden = !!gift;
+    document.getElementById("gift-applied").hidden = !gift;
+    document.getElementById("cart-gift-row").hidden = !gift || giftOff <= 0;
+    if (!gift) return;
+    document.getElementById("gift-applied-label").textContent =
+      "Card ending " + gift.code.slice(-4) + (typeof gift.balance === "number" ? " · " + money(gift.balance / 100) + " balance" : "");
+    document.getElementById("cart-gift-amount").textContent = "−" + money(giftOff);
+    const msg = document.getElementById("gift-msg");
+    if (!msg.classList.contains("is-error")) {
+      msg.textContent =
+        (leftForTax > 0.005 && totalQty() > 0
+          ? "The rest of your card goes toward sales tax at checkout, and anything left stays on it. "
+          : "") + "Promo codes can't be combined with a gift card.";
     }
   }
 
@@ -662,9 +714,96 @@ function maxShipDateIso(names) {
       });
     }
 
+    // ---------------- Gift card ----------------
+    const giftInput = document.getElementById("gift-code-input");
+    const giftApplyBtn = document.getElementById("gift-apply");
+    const giftZipInput = document.getElementById("gift-zip");
+    const giftMsg = document.getElementById("gift-msg");
+
+    function setGiftMsg(text, isError) {
+      giftMsg.textContent = text;
+      giftMsg.classList.toggle("is-error", !!isError);
+    }
+
+    // Looks the code up and applies it. quiet = refreshing a card saved from
+    // an earlier visit: it's dropped if it's no longer valid, but kept as is
+    // if the lookup just couldn't connect.
+    function applyGift(code, quiet) {
+      if (!quiet) setGiftMsg("Checking…", false);
+      return fetch("/.netlify/functions/gift-card-balance?code=" + encodeURIComponent(code))
+        .then((res) => res.json().then((data) => ({ ok: res.ok, data: data })))
+        .then((r) => {
+          if (!r.ok || r.data.balance <= 0) {
+            const err = new Error(
+              r.ok ? "That gift card has no balance left." : (r.data && r.data.error) || "Could not check that gift card."
+            );
+            err.invalid = true;
+            throw err;
+          }
+          const deliveryZip = (document.getElementById("delivery-zip") || {}).value || "";
+          let zip = gift && gift.code === r.data.code ? gift.zip || "" : "";
+          if (!zip && /^\d{5}$/.test(deliveryZip.trim())) zip = deliveryZip.trim();
+          gift = { code: r.data.code, balance: r.data.balance, zip: zip };
+          saveGift();
+          giftZipInput.value = zip;
+          giftInput.value = "";
+          setGiftMsg("", false);
+          render();
+        })
+        .catch((err) => {
+          if (quiet && !err.invalid) return;
+          if (quiet) {
+            gift = null;
+            saveGift();
+            render();
+          }
+          setGiftMsg(err.message || "Could not check that gift card. Please try again.", true);
+        });
+    }
+
+    giftApplyBtn.addEventListener("click", () => {
+      const code = giftInput.value.trim();
+      if (code) applyGift(code, false);
+      else setGiftMsg("Enter the code from your gift card email.", true);
+    });
+    giftInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        giftApplyBtn.click();
+      }
+    });
+    giftZipInput.addEventListener("input", () => {
+      if (!gift) return;
+      gift.zip = giftZipInput.value.trim();
+      saveGift();
+      if (giftMsg.classList.contains("is-error")) {
+        setGiftMsg("", false);
+        render();
+      }
+    });
+    document.getElementById("gift-remove").addEventListener("click", () => {
+      gift = null;
+      saveGift();
+      setGiftMsg("", false);
+      render();
+    });
+
+    if (gift) {
+      giftZipInput.value = gift.zip || "";
+      applyGift(gift.code, true);
+    }
+
     checkoutBtn.addEventListener("click", async (e) => {
       e.preventDefault();
       if (checkoutBtn.classList.contains("is-disabled")) return;
+
+      // Tax is worked out before Stripe's page when a gift card pays toward
+      // it, so the ZIP is needed up front.
+      if (gift && !/^\d{5}$/.test(gift.zip || "")) {
+        setGiftMsg("Please enter your 5-digit shipping ZIP code to use your gift card.", true);
+        giftZipInput.focus();
+        return;
+      }
 
       const method = selectedMethod();
 
@@ -679,6 +818,8 @@ function maxShipDateIso(names) {
           body: JSON.stringify({
             items: cart.map((item) => ({ id: item.id, name: item.name, price: item.price, qty: item.qty, scents: item.scents })),
             method: method,
+            giftCode: gift ? gift.code : undefined,
+            giftZip: gift ? gift.zip : undefined,
             siteUrl: window.location.origin,
           }),
         });

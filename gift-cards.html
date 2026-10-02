@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gift Cards — Unearthed Artisan Co.</title>
+<meta name="description" content="Give an Unearthed Artisan Co. gift card — emailed on the day you choose, for handcrafted soap, tallow cream and lip balm." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://unearthedartisanco.com/gift-cards.html" />
+<meta property="og:title" content="Gift Cards — Unearthed Artisan Co." />
+<meta property="og:description" content="Give an Unearthed Artisan Co. gift card — emailed on the day you choose, for handcrafted soap, tallow cream and lip balm." />
+<meta property="og:image" content="https://unearthedartisanco.com/assets/logo.png?v=2" />
+<meta property="og:image:width" content="600" />
+<meta property="og:image:height" content="600" />
+<meta property="og:image:type" content="image/png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Gift Cards — Unearthed Artisan Co." />
+<meta name="twitter:description" content="Give an Unearthed Artisan Co. gift card — emailed on the day you choose, for handcrafted soap, tallow cream and lip balm." />
+<meta name="twitter:image" content="https://unearthedartisanco.com/assets/logo.png?v=2" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="nav-mark" href="home.html">
+      <img src="assets/logo.png" alt="" />
+      Unearthed Artisan Co.
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="gift-cards.html">Gift Cards</a></li>
+      <li><a href="shipping.html">Shopping Bag</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <a class="cart-toggle" id="cart-toggle" href="shipping.html" aria-label="Your shopping bag">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 8h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span class="cart-count" id="cart-count">0</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<section class="band">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Gift Cards</p>
+      <h2>Give the gift of an everyday ritual.</h2>
+      <p class="brand-line brand-line--left">Emailed on the day you choose, to spend on handcrafted
+        soap, tallow cream and lip balm &mdash; shipping and tax included.</p>
+    </div>
+
+    <div class="gift-thanks" id="gift-thanks" hidden>
+      <h3>Thank you &mdash; your gift card is on its way!</h3>
+      <p>We've emailed you a copy with the gift card code and a link you can text or print. Your
+        recipient will get theirs by email on the date you chose.</p>
+    </div>
+
+    <div class="gift-layout">
+      <div>
+        <div class="gift-visual" aria-hidden="true">
+          <div class="gift-visual-top">
+            <img src="assets/logo.png" alt="" />
+            <span class="gift-visual-brand">Unearthed Artisan Co.</span>
+          </div>
+          <div>
+            <p class="gift-visual-label">Gift Card</p>
+            <p class="gift-visual-amount" id="gift-preview-amount">$50</p>
+          </div>
+          <p class="gift-visual-to" id="gift-preview-to">For someone special</p>
+        </div>
+        <ul class="gift-fine" style="margin-top:24px; padding-left:18px;">
+          <li>Emailed with its own code on the date you pick. You'll get a copy too, with a link you can text or print.</li>
+          <li>Spend it on anything in the shop, including shipping and sales tax. Any balance left stays on the card for next time.</li>
+          <li>Never expires, and has no fees.</li>
+          <li>Not redeemable for cash, except a balance under $10 on request, as California law provides.</li>
+        </ul>
+      </div>
+
+      <form class="gift-form" id="gift-form" novalidate>
+        <div>
+          <span class="gift-amounts-label">Amount</span>
+          <div class="gift-amounts" role="group" aria-label="Gift card amount">
+            <button type="button" class="gift-amount" data-amount="50" aria-pressed="true">$50</button>
+            <button type="button" class="gift-amount" data-amount="100" aria-pressed="false">$100</button>
+            <button type="button" class="gift-amount" data-amount="150" aria-pressed="false">$150</button>
+            <button type="button" class="gift-amount" data-amount="other" aria-pressed="false">Other amount</button>
+          </div>
+          <div class="gift-custom" id="gift-custom" hidden>
+            <span>$</span>
+            <input type="number" id="gift-custom-amount" class="join-input" min="10" max="500" step="1" inputmode="numeric" placeholder="75" aria-label="Other amount, in dollars" />
+            <span class="gift-fine" id="gift-custom-range">$10&ndash;$500, whole dollars</span>
+          </div>
+        </div>
+
+        <div class="contact-row">
+          <label class="contact-field">
+            <span>Recipient's name</span>
+            <input type="text" id="gift-recipient-name" class="join-input" maxlength="60" autocomplete="off" required />
+          </label>
+          <label class="contact-field">
+            <span>Recipient's email</span>
+            <input type="email" id="gift-recipient-email" class="join-input" maxlength="120" autocomplete="off" placeholder="them@email.com" required />
+          </label>
+        </div>
+        <div class="contact-row">
+          <label class="contact-field">
+            <span>Your name</span>
+            <input type="text" id="gift-sender-name" class="join-input" maxlength="60" autocomplete="name" required />
+          </label>
+          <label class="contact-field">
+            <span>Email it on</span>
+            <input type="date" id="gift-deliver-on" class="join-input" required />
+          </label>
+        </div>
+        <label class="contact-field">
+          <span>Message <span class="contact-optional">(optional)</span></span>
+          <textarea id="gift-message" class="join-input contact-message" rows="4" maxlength="300" placeholder="Happy holidays! Treat yourself to something lovely."></textarea>
+          <span class="gift-count" id="gift-message-count">0 / 300</span>
+        </label>
+
+        <p class="gift-error" id="gift-error" role="alert" hidden></p>
+        <button type="submit" class="btn btn--primary" id="gift-submit">Purchase Gift Card &mdash; $50</button>
+        <p class="gift-fine">Checkout is handled securely by Stripe. The gift card is emailed the
+          morning of the date you choose (Pacific time) from unearthedartisanco@gmail.com &mdash;
+          choose today and it goes out right away.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="footer" id="contact">
+  <div class="wrap footer-join" id="join">
+    <div class="footer-join-copy">
+      <h4>Join our list</h4>
+      <p>New scents, launches and small-batch news. No spam, unsubscribe anytime.</p>
+    </div>
+    <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="join-form" data-ajax-form>
+      <input type="hidden" name="form-name" value="newsletter" />
+      <p class="join-hp"><label>Don't fill this out if you're human: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
+      <div class="join-fields" data-form-fields>
+        <label for="join-email" class="join-label join-label--hidden">Email address</label>
+        <input type="email" name="email" id="join-email" class="join-input" placeholder="you@email.com" autocomplete="email" required />
+        <button type="submit" class="btn btn--primary">Join</button>
+      </div>
+      <p class="join-msg" data-form-success hidden>You're on the list! Watch your inbox for new scents and launches.</p>
+      <p class="join-msg" data-form-error hidden>Something went wrong. Please try again, or email
+        <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a>.</p>
+    </form>
+  </div>
+  <div class="wrap">
+    <div>
+      <p class="footer-mark">Unearthed Artisan Co.</p>
+      <p>Woman-owned.<br />Made with intention.<br />Handcrafted in the USA.</p>
+    </div>
+    <div>
+      <h4>Visit &amp; Contact</h4>
+      <address>
+        <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a><br />
+        <a href="contact.html">Contact Us</a><br />
+        <a href="https://www.instagram.com/unearthedartisanco" target="_blank" rel="noopener" class="footer-social">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/>
+            <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/>
+            <circle cx="17.3" cy="6.7" r="1" fill="currentColor"/>
+          </svg>
+          @unearthedartisanco
+        </a><br />
+        <a href="https://www.facebook.com/unearthedartisanco/" target="_blank" rel="noopener" class="footer-social">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M14 8.5h-1.5c-.8 0-1.5.7-1.5 1.5v2h3l-.4 2.5h-2.6V19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          @unearthedartisanco
+        </a>
+      </address>
+    </div>
+    <div>
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="shop.html">The Collection</a></li>
+        <li><a href="gift-cards.html">Gift Cards</a></li>
+        <li><a href="shipping.html">Shopping Bag</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="faq.html">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>&copy; 2026 Unearthed Artisan Co.</span>
+    <span>Prices shown are per item and do not include shipping.</span>
+    <span><a href="privacy-policy.html">Privacy Policy</a> &middot; <a href="refund-policy.html">Refund &amp; Return Policy</a></span>
+  </div>
+</footer>
+
+<script src="catalog.js"></script>
+<script src="script.js"></script>
+<script>
+(function () {
+  var cfg = UACCatalog.GIFT_CARD;
+  var form = document.getElementById("gift-form");
+  var amountBtns = form.querySelectorAll(".gift-amount");
+  var customWrap = document.getElementById("gift-custom");
+  var customInput = document.getElementById("gift-custom-amount");
+  var recipientName = document.getElementById("gift-recipient-name");
+  var recipientEmail = document.getElementById("gift-recipient-email");
+  var senderName = document.getElementById("gift-sender-name");
+  var deliverOn = document.getElementById("gift-deliver-on");
+  var message = document.getElementById("gift-message");
+  var count = document.getElementById("gift-message-count");
+  var errorEl = document.getElementById("gift-error");
+  var submit = document.getElementById("gift-submit");
+  var previewAmount = document.getElementById("gift-preview-amount");
+  var previewTo = document.getElementById("gift-preview-to");
+  var choice = String(cfg.presets[0]);
+
+  customInput.min = cfg.min;
+  customInput.max = cfg.max;
+  document.getElementById("gift-custom-range").textContent = "$" + cfg.min + "–$" + cfg.max + ", whole dollars";
+
+  // Delivery date: today (the visitor's own calendar) up to a year out.
+  function iso(d) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  var today = new Date();
+  var nextYear = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+  deliverOn.min = iso(today);
+  deliverOn.max = iso(nextYear);
+  deliverOn.value = iso(today);
+
+  // The chosen amount in whole dollars, or null if "Other" isn't valid yet.
+  function amount() {
+    if (choice !== "other") return Number(choice);
+    var n = Number(customInput.value);
+    return Number.isInteger(n) && n >= cfg.min && n <= cfg.max ? n : null;
+  }
+
+  function update() {
+    var a = amount();
+    previewAmount.textContent = a ? "$" + a : "$—";
+    submit.textContent = "Purchase Gift Card" + (a ? " — $" + a : "");
+    var name = recipientName.value.trim();
+    previewTo.textContent = name ? "For " + name : "For someone special";
+    count.textContent = message.value.length + " / 300";
+  }
+
+  amountBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      choice = btn.dataset.amount;
+      amountBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(b === btn)); });
+      customWrap.hidden = choice !== "other";
+      if (choice === "other") customInput.focus();
+      update();
+    });
+  });
+  [customInput, recipientName, message].forEach(function (el) { el.addEventListener("input", update); });
+
+  function showError(text, field) {
+    errorEl.textContent = text;
+    errorEl.hidden = false;
+    if (field) field.focus();
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    errorEl.hidden = true;
+    var a = amount();
+    if (!a) return showError("Please enter a whole-dollar amount from $" + cfg.min + " to $" + cfg.max + ".", customInput);
+    if (!recipientName.value.trim()) return showError("Please enter the recipient's name.", recipientName);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipientEmail.value.trim())) {
+      return showError("Please enter a valid email address for the recipient.", recipientEmail);
+    }
+    if (!senderName.value.trim()) return showError("Please enter your name so they know who it's from.", senderName);
+    if (!deliverOn.value) return showError("Please choose the date to email it.", deliverOn);
+
+    var originalText = submit.textContent;
+    submit.textContent = "Redirecting to checkout…";
+    submit.disabled = true;
+
+    fetch("/.netlify/functions/create-gift-card-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: a,
+        recipientName: recipientName.value,
+        recipientEmail: recipientEmail.value,
+        senderName: senderName.value,
+        message: message.value,
+        deliverOn: deliverOn.value,
+        siteUrl: window.location.origin,
+      }),
+    })
+      .then(function (res) {
+        return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+      })
+      .then(function (r) {
+        if (!r.ok || !r.data.url) throw new Error((r.data && r.data.error) || "");
+        window.location.href = r.data.url;
+      })
+      .catch(function (err) {
+        submit.textContent = originalText;
+        submit.disabled = false;
+        showError((err && err.message) || "Something went wrong starting checkout. Please try again, or email us at unearthedartisanco@gmail.com.");
+      });
+  });
+
+  if (new URLSearchParams(window.location.search).get("purchased")) {
+    var thanks = document.getElementById("gift-thanks");
+    thanks.hidden = false;
+    thanks.scrollIntoView({ block: "center" });
+  }
+
+  update();
+})();
+</script>
+</body>
+</html>

@@ -23,15 +23,33 @@ function row(label, amount) {
 // Products are listed at their pre-discount, pre-tax price; any promo code
 // discount, shipping, and sales tax (from Stripe Tax) follow as their own
 // rows from the session's totals, so the rows add up to the Total.
-function buildHtml({ lineItems, totals, total }) {
-  let rows = lineItems
+//
+// Orders paid with a gift card carry shipping and tax as line items instead
+// (see create-checkout-session.js), and the session's discount is the gift
+// card — so those are pulled back out of the item list and shown the same
+// way, with the card last.
+const GIFT_ORDER_EXTRA_LINES = ["Standard Shipping", "Local Delivery", "Sales Tax"];
+
+function buildHtml({ lineItems, totals, total, paidWithGiftCard }) {
+  const products = paidWithGiftCard
+    ? lineItems.filter((item) => !GIFT_ORDER_EXTRA_LINES.includes(item.description))
+    : lineItems;
+  let rows = products
     .map((item) =>
       row(item.description + (item.quantity > 1 ? " &times; " + item.quantity : ""), formatMoney(item.amount_subtotal))
     )
     .join("");
-  if (totals.amount_discount > 0) rows += row("Discount", "&minus;" + formatMoney(totals.amount_discount));
-  rows += row("Shipping", totals.amount_shipping > 0 ? formatMoney(totals.amount_shipping) : "Free");
-  if (totals.amount_tax > 0) rows += row("Sales Tax", formatMoney(totals.amount_tax));
+  if (paidWithGiftCard) {
+    const ship = lineItems.find((item) => item.description === "Standard Shipping" || item.description === "Local Delivery");
+    const tax = lineItems.find((item) => item.description === "Sales Tax");
+    rows += row("Shipping", ship ? formatMoney(ship.amount_subtotal) : "Free");
+    if (tax) rows += row("Sales Tax", formatMoney(tax.amount_subtotal));
+    rows += row("Gift Card", "&minus;" + formatMoney(totals.amount_discount || 0));
+  } else {
+    if (totals.amount_discount > 0) rows += row("Discount", "&minus;" + formatMoney(totals.amount_discount));
+    rows += row("Shipping", totals.amount_shipping > 0 ? formatMoney(totals.amount_shipping) : "Free");
+    if (totals.amount_tax > 0) rows += row("Sales Tax", formatMoney(totals.amount_tax));
+  }
 
   return `
   <div style="background:#f6f3e9;padding:32px 16px;font-family:Georgia,'Times New Roman',serif;">
@@ -102,6 +120,7 @@ async function sendOrderConfirmationEmail(stripe, session) {
       lineItems: lineItemsResponse.data,
       totals: session.total_details || {},
       total: session.amount_total,
+      paidWithGiftCard: !!(session.metadata && session.metadata.gift_code),
     }),
   });
 }

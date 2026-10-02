@@ -92,6 +92,10 @@
   const DELIVERY_PRICE = 5;
   const FREE_DELIVERY_MIN = 45;
 
+  // Gift cards (gift-cards.html, create-gift-card-session.js): the preset
+  // amounts, plus any other whole-dollar amount between min and max.
+  const GIFT_CARD = { presets: [50, 100, 150], min: 10, max: 500 };
+
   // Sales tax isn't calculated here — Stripe Tax works it out from the
   // address entered at checkout (see create-checkout-session.js).
 
@@ -216,6 +220,7 @@
 
   const api = {
     PRODUCTS: PRODUCTS,
+    GIFT_CARD: GIFT_CARD,
     priceOf: priceOf,
     ritualPrice: ritualPrice,
     ritualHasProduct: ritualHasProduct,

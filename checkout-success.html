@@ -58,6 +58,9 @@
   // someone backs out of payment without completing it.
   try {
     localStorage.removeItem("uac-cart");
+    // The gift card applied in the bag, if any — its balance changed, and
+    // it's applied fresh next time.
+    localStorage.removeItem("uac-gift");
   } catch (e) {
     /* private browsing / storage blocked — nothing to clear */
   }

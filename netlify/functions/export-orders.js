@@ -80,7 +80,8 @@ exports.handler = async (event) => {
         // skipped below.
         expand: ["data.payment_intent.latest_charge"],
       });
-      sessions = sessions.concat(result.data.filter((s) => !isFullyRefunded(s)));
+      // Gift card purchases are emailed, so there's nothing to ship.
+      sessions = sessions.concat(result.data.filter((s) => !isFullyRefunded(s) && !isGiftCardPurchase(s)));
       if (!result.has_more || result.data.length === 0) break;
       startingAfter = result.data[result.data.length - 1].id;
     }
@@ -217,7 +218,13 @@ exports.handler = async (event) => {
   };
 };
 
-const NON_PRODUCT_LINES = ["Standard Shipping", "Local Delivery", "CA Sales Tax"];
+// "Sales Tax" (with shipping) is a line item on orders paid with a gift card
+// — see create-checkout-session.js.
+const NON_PRODUCT_LINES = ["Standard Shipping", "Local Delivery", "CA Sales Tax", "Sales Tax"];
+
+function isGiftCardPurchase(session) {
+  return !!(session.metadata && session.metadata.order_type === "gift_card");
+}
 
 // Fully refunded orders have nothing to ship, so they're left out of both
 // lists. A partial refund (e.g. one item) still ships, so it stays in.

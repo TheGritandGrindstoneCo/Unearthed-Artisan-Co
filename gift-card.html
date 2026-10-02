@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Your Gift Card — Unearthed Artisan Co.</title>
+<meta name="description" content="An Unearthed Artisan Co. gift card for handcrafted soap, tallow cream and lip balm." />
+<!-- Each card's page is private to whoever has its link. -->
+<meta name="robots" content="noindex" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="A gift card for you — Unearthed Artisan Co." />
+<meta property="og:description" content="Handcrafted soap, tallow cream and lip balm. Open to see your gift card." />
+<meta property="og:image" content="https://unearthedartisanco.com/assets/logo.png?v=2" />
+<meta property="og:image:width" content="600" />
+<meta property="og:image:height" content="600" />
+<meta property="og:image:type" content="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="nav-mark" href="home.html">
+      <img src="assets/logo.png" alt="" />
+      Unearthed Artisan Co.
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="gift-cards.html">Gift Cards</a></li>
+      <li><a href="shipping.html">Shopping Bag</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <a class="cart-toggle" id="cart-toggle" href="shipping.html" aria-label="Your shopping bag">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 8h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span class="cart-count" id="cart-count">0</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<section class="band">
+  <div class="wrap">
+    <div class="gift-page">
+      <p class="eyebrow gift-noprint" style="text-align:center;">Gift Card</p>
+
+      <p id="gc-loading" style="text-align:center; margin-top:24px;" hidden>Loading your gift card&hellip;</p>
+
+      <div id="gc-card" hidden>
+        <div class="gift-visual" style="margin-top:18px;">
+          <div class="gift-visual-top">
+            <img src="assets/logo.png" alt="" />
+            <span class="gift-visual-brand">Unearthed Artisan Co.</span>
+          </div>
+          <div>
+            <p class="gift-visual-label">Gift Card</p>
+            <p class="gift-visual-amount" id="gc-amount"></p>
+          </div>
+          <p class="gift-visual-to" id="gc-to"></p>
+        </div>
+
+        <p class="gift-message" id="gc-message" hidden></p>
+        <p class="gift-from" id="gc-from" hidden></p>
+
+        <div class="gift-code-box">
+          <p class="gift-amounts-label">Gift card code</p>
+          <p class="gift-code" id="gc-code"></p>
+          <p class="gift-balance" id="gc-balance"></p>
+        </div>
+
+        <div class="gift-actions">
+          <button type="button" class="btn btn--primary" id="gc-shop">Shop with This Card</button>
+          <a class="btn btn--ghost" id="gc-text" href="#">Text It</a>
+          <button type="button" class="btn btn--ghost" id="gc-copy">Copy Link</button>
+          <button type="button" class="btn btn--ghost" id="gc-print">Print</button>
+        </div>
+
+        <p class="gift-how">To use it, add your favorites to your shopping bag and enter the code
+          under <b>Gift Card</b> in the Order Summary &mdash; or tap <b>Shop with This Card</b> and
+          it's added for you. It covers shipping and sales tax too, any balance left stays on the
+          card, and it never expires.</p>
+      </div>
+
+      <form id="gc-lookup" class="gift-code-box gift-noprint" style="margin-top:24px;" hidden>
+        <p class="gift-amounts-label"><label for="gc-lookup-code">Check a gift card balance</label></p>
+        <p class="gift-error" id="gc-lookup-error" role="alert" hidden></p>
+        <div class="cart-gift-row" style="margin-top:12px;">
+          <input type="text" id="gc-lookup-code" class="zip-input" placeholder="UAC-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false" />
+          <button type="submit" class="cart-gift-apply">Look Up</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="footer" id="contact">
+  <div class="wrap footer-join" id="join">
+    <div class="footer-join-copy">
+      <h4>Join our list</h4>
+      <p>New scents, launches and small-batch news. No spam, unsubscribe anytime.</p>
+    </div>
+    <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="join-form" data-ajax-form>
+      <input type="hidden" name="form-name" value="newsletter" />
+      <p class="join-hp"><label>Don't fill this out if you're human: <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
+      <div class="join-fields" data-form-fields>
+        <label for="join-email" class="join-label join-label--hidden">Email address</label>
+        <input type="email" name="email" id="join-email" class="join-input" placeholder="you@email.com" autocomplete="email" required />
+        <button type="submit" class="btn btn--primary">Join</button>
+      </div>
+      <p class="join-msg" data-form-success hidden>You're on the list! Watch your inbox for new scents and launches.</p>
+      <p class="join-msg" data-form-error hidden>Something went wrong. Please try again, or email
+        <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a>.</p>
+    </form>
+  </div>
+  <div class="wrap">
+    <div>
+      <p class="footer-mark">Unearthed Artisan Co.</p>
+      <p>Woman-owned.<br />Made with intention.<br />Handcrafted in the USA.</p>
+    </div>
+    <div>
+      <h4>Visit &amp; Contact</h4>
+      <address>
+        <a href="mailto:unearthedartisanco@gmail.com">unearthedartisanco@gmail.com</a><br />
+        <a href="contact.html">Contact Us</a><br />
+        <a href="https://www.instagram.com/unearthedartisanco" target="_blank" rel="noopener" class="footer-social">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/>
+            <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/>
+            <circle cx="17.3" cy="6.7" r="1" fill="currentColor"/>
+          </svg>
+          @unearthedartisanco
+        </a><br />
+        <a href="https://www.facebook.com/unearthedartisanco/" target="_blank" rel="noopener" class="footer-social">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M14 8.5h-1.5c-.8 0-1.5.7-1.5 1.5v2h3l-.4 2.5h-2.6V19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          @unearthedartisanco
+        </a>
+      </address>
+    </div>
+    <div>
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="shop.html">The Collection</a></li>
+        <li><a href="gift-cards.html">Gift Cards</a></li>
+        <li><a href="shipping.html">Shopping Bag</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="faq.html">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>&copy; 2026 Unearthed Artisan Co.</span>
+    <span>Prices shown are per item and do not include shipping.</span>
+    <span><a href="privacy-policy.html">Privacy Policy</a> &middot; <a href="refund-policy.html">Refund &amp; Return Policy</a></span>
+  </div>
+</footer>
+
+<script src="catalog.js"></script>
+<script src="script.js"></script>
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var loading = document.getElementById("gc-loading");
+  var cardEl = document.getElementById("gc-card");
+  var lookup = document.getElementById("gc-lookup");
+  var lookupInput = document.getElementById("gc-lookup-code");
+  var lookupError = document.getElementById("gc-lookup-error");
+
+  function money(cents) {
+    return "$" + (cents / 100).toFixed(cents % 100 === 0 ? 0 : 2);
+  }
+
+  function show(card) {
+    document.getElementById("gc-amount").textContent = money(card.amount);
+    document.getElementById("gc-to").textContent = card.recipientName ? "For " + card.recipientName : "";
+    var msg = document.getElementById("gc-message");
+    msg.textContent = card.message ? "“" + card.message + "”" : "";
+    msg.hidden = !card.message;
+    var from = document.getElementById("gc-from");
+    from.textContent = card.senderName ? "— " + card.senderName : "";
+    from.hidden = !card.senderName;
+    document.getElementById("gc-code").textContent = card.code;
+    document.getElementById("gc-balance").textContent =
+      card.balance === card.amount ? "Full balance: " + money(card.balance) : "Balance left: " + money(card.balance);
+
+    // The page's own link, always with the code, so it can be shared as is.
+    var url = window.location.origin + "/gift-card.html?code=" + encodeURIComponent(card.code);
+    var text = (card.senderName ? card.senderName + " sent" : "Here's") + " you an Unearthed Artisan Co. gift card! " + url;
+    // "sms:?&body=" opens Messages with the text filled in on both iPhone and Android.
+    document.getElementById("gc-text").href = "sms:?&body=" + encodeURIComponent(text);
+
+    document.getElementById("gc-copy").onclick = function () {
+      var btn = this;
+      var done = function () {
+        btn.textContent = "Copied!";
+        setTimeout(function () { btn.textContent = "Copy Link"; }, 2000);
+      };
+      if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, function () { window.prompt("Copy this link:", url); });
+      else window.prompt("Copy this link:", url);
+    };
+    document.getElementById("gc-print").onclick = function () { window.print(); };
+    document.getElementById("gc-shop").onclick = function () {
+      // Picked up by the Gift Card field in the shopping bag.
+      try {
+        localStorage.setItem("uac-gift", JSON.stringify({ code: card.code, balance: card.balance }));
+      } catch (e) {
+        /* storage blocked — they can still type the code in the bag */
+      }
+      window.location.href = "shop.html";
+    };
+
+    loading.hidden = true;
+    lookup.hidden = true;
+    cardEl.hidden = false;
+  }
+
+  function load(code) {
+    loading.hidden = false;
+    cardEl.hidden = true;
+    return fetch("/.netlify/functions/gift-card-balance?code=" + encodeURIComponent(code))
+      .then(function (res) {
+        return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+      })
+      .then(function (r) {
+        if (!r.ok) throw new Error((r.data && r.data.error) || "");
+        show(r.data);
+        if (params.get("code") !== r.data.code) {
+          history.replaceState(null, "", "gift-card.html?code=" + encodeURIComponent(r.data.code));
+        }
+      })
+      .catch(function (err) {
+        loading.hidden = true;
+        lookup.hidden = false;
+        lookupError.textContent = (err && err.message) || "Could not look up that gift card. Please try again.";
+        lookupError.hidden = false;
+      });
+  }
+
+  lookup.addEventListener("submit", function (e) {
+    e.preventDefault();
+    lookupError.hidden = true;
+    if (lookupInput.value.trim()) load(lookupInput.value.trim());
+  });
+
+  if (params.get("code")) {
+    lookupInput.value = params.get("code");
+    load(params.get("code"));
+  } else {
+    lookup.hidden = false;
+  }
+})();
+</script>
+</body>
+</html>

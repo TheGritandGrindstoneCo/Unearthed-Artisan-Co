@@ -1,2 +1,7 @@
 [functions]
   directory = "netlify/functions"
+
+# Every morning at 15:00 UTC (8am Pacific in summer, 7am in winter), email
+# the gift cards scheduled for that day.
+[functions."deliver-gift-cards"]
+  schedule = "0 15 * * *"

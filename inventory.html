@@ -109,6 +109,31 @@
   }
   .inv-export-row input[type="checkbox"] { width: auto; }
   .inv-export-row label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+
+  .inv-gift-list { margin-top: 16px; display: grid; gap: 12px; }
+  .inv-gift {
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--ivory-card);
+    font-size: 0.88rem;
+  }
+  .inv-gift-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .inv-gift-code { font-family: "Courier New", monospace; font-weight: 700; color: var(--forest); }
+  .inv-gift-bal { font-weight: 600; color: var(--sage-deep); }
+  .inv-gift-meta { margin-top: 6px; color: var(--charcoal); line-height: 1.5; }
+  .inv-gift-actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .inv-gift-actions button {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--sage-deep);
+    background: transparent;
+    color: var(--sage-deep);
+    cursor: pointer;
+  }
+  .inv-gift-actions button:disabled { opacity: 0.5; cursor: default; }
 </style>
 </head>
 <body>
@@ -149,6 +174,37 @@
     </div>
     <button type="button" class="btn btn--primary" id="inv-export-btn" style="margin-top:20px;">Download Orders CSV</button>
     <p class="inv-status" id="inv-export-status"></p>
+  </div>
+
+  <div class="inv-section">
+    <p class="eyebrow">Internal Tool</p>
+    <h2>Gift Cards</h2>
+    <p>Every gift card sold, newest first. <strong>Send now</strong> emails a card to its recipient
+      right away (or again, if they can't find it); <strong>Resend receipt</strong> sends the buyer
+      their copy again. Outstanding balances are money already collected for products not yet
+      sold &mdash; keep it in mind at tax and bookkeeping time.</p>
+    <p class="inv-status" id="gc-summary"></p>
+    <div class="inv-gift-list" id="gc-list"></div>
+
+    <h2 style="margin-top:32px; font-size:1.1rem;">Adjust a Balance</h2>
+    <p>Use this to put money back on a card after refunding an order it paid for (a positive
+      amount, like 25.00), or to take some off (a negative amount, like -10).</p>
+    <div class="inv-field" style="margin-top:16px;">
+      <label for="gc-adjust-code">Gift card code</label>
+      <input type="text" id="gc-adjust-code" placeholder="UAC-XXXX-XXXX-XXXX" autocomplete="off" />
+    </div>
+    <div class="inv-export-row" style="align-items:flex-end;">
+      <div class="inv-field" style="flex:0 0 140px;">
+        <label for="gc-adjust-amount">Amount ($)</label>
+        <input type="number" id="gc-adjust-amount" step="0.01" />
+      </div>
+      <div class="inv-field" style="flex:1;">
+        <label for="gc-adjust-note">Note</label>
+        <input type="text" id="gc-adjust-note" placeholder="e.g. Refunded order of 11/30" maxlength="200" />
+      </div>
+    </div>
+    <button type="button" class="btn btn--primary" id="gc-adjust-btn" style="margin-top:16px;">Save Adjustment</button>
+    <p class="inv-status" id="gc-adjust-status"></p>
   </div>
   </div>
 </div>
@@ -250,6 +306,7 @@
         unlockBtn.hidden = true;
         passwordEl.readOnly = true;
         unlockStatusEl.textContent = "";
+        loadGiftCards();
       })
       .catch(function (err) {
         unlockBtn.disabled = false;
@@ -364,6 +421,117 @@
         exportBtn.disabled = false;
         exportStatusEl.textContent = err.message || "Could not reach the server.";
         exportStatusEl.className = "inv-status is-error";
+      });
+  });
+
+
+  // ---------------- Gift cards ----------------
+  var gcListEl = document.getElementById("gc-list");
+  var gcSummaryEl = document.getElementById("gc-summary");
+
+  function giftAdmin(body) {
+    body.password = passwordEl.value.trim();
+    return fetch("/.netlify/functions/gift-cards-admin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then(function (res) {
+      return res.json().then(function (data) {
+        if (!res.ok) throw new Error((data && data.error) || "Something went wrong.");
+        return data;
+      });
+    });
+  }
+
+  function dollars(cents) {
+    return "$" + (cents / 100).toFixed(2);
+  }
+
+  // "Dec 25, 2026" from an ISO date or timestamp.
+  function shortDate(s) {
+    var d = s.length === 10 ? new Date(s + "T12:00:00") : new Date(s);
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  }
+
+  function giftRow(card) {
+    var row = document.createElement("div");
+    row.className = "inv-gift";
+    var status = card.deliveredAt
+      ? "Emailed " + shortDate(card.deliveredAt)
+      : "Emails the morning of " + shortDate(card.deliverOn);
+    row.innerHTML =
+      '<div class="inv-gift-head"><span class="inv-gift-code"></span><span class="inv-gift-bal"></span></div>' +
+      '<div class="inv-gift-meta"></div>' +
+      '<div class="inv-gift-actions"><button type="button" data-to="recipient"></button>' +
+      '<button type="button" data-to="buyer">Resend receipt</button></div>';
+    row.querySelector(".inv-gift-code").textContent = card.code;
+    row.querySelector(".inv-gift-bal").textContent = dollars(card.balance) + " left of " + dollars(card.amount);
+    row.querySelector(".inv-gift-meta").textContent =
+      "To " + card.recipient.name + " (" + card.recipient.email + ") · From " + card.buyer.name +
+      " (" + card.buyer.email + ") · Bought " + shortDate(card.createdAt) + " · " + status;
+    row.querySelector('[data-to="recipient"]').textContent = card.deliveredAt ? "Resend to recipient" : "Send now";
+    row.querySelectorAll("button").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var label = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "Sending…";
+        giftAdmin({ action: "send", code: card.code, to: btn.dataset.to })
+          .then(function () {
+            btn.textContent = "Sent!";
+            setTimeout(loadGiftCards, 1500);
+          })
+          .catch(function (err) {
+            btn.disabled = false;
+            btn.textContent = label;
+            gcSummaryEl.textContent = err.message;
+            gcSummaryEl.className = "inv-status is-error";
+          });
+      });
+    });
+    return row;
+  }
+
+  function loadGiftCards() {
+    giftAdmin({ action: "list" })
+      .then(function (data) {
+        var cards = data.cards || [];
+        gcListEl.innerHTML = "";
+        cards.forEach(function (card) { gcListEl.appendChild(giftRow(card)); });
+        var sold = cards.reduce(function (t, c) { return t + c.amount; }, 0);
+        var owed = cards.reduce(function (t, c) { return t + c.balance; }, 0);
+        gcSummaryEl.textContent = cards.length
+          ? cards.length + " sold for " + dollars(sold) + " · " + dollars(owed) + " still to be spent"
+          : "No gift cards sold yet.";
+        gcSummaryEl.className = "inv-status";
+      })
+      .catch(function (err) {
+        gcSummaryEl.textContent = "Could not load gift cards: " + err.message;
+        gcSummaryEl.className = "inv-status is-error";
+      });
+  }
+
+  var gcAdjustBtn = document.getElementById("gc-adjust-btn");
+  var gcAdjustStatus = document.getElementById("gc-adjust-status");
+  gcAdjustBtn.addEventListener("click", function () {
+    gcAdjustStatus.textContent = "Saving…";
+    gcAdjustStatus.className = "inv-status";
+    gcAdjustBtn.disabled = true;
+    giftAdmin({
+      action: "adjust",
+      code: document.getElementById("gc-adjust-code").value,
+      amount: document.getElementById("gc-adjust-amount").value,
+      note: document.getElementById("gc-adjust-note").value,
+    })
+      .then(function (data) {
+        gcAdjustBtn.disabled = false;
+        gcAdjustStatus.textContent = "Saved — " + data.card.code + " now has " + dollars(data.card.balance) + ".";
+        gcAdjustStatus.className = "inv-status is-ok";
+        loadGiftCards();
+      })
+      .catch(function (err) {
+        gcAdjustBtn.disabled = false;
+        gcAdjustStatus.textContent = err.message;
+        gcAdjustStatus.className = "inv-status is-error";
       });
   });
 </script>

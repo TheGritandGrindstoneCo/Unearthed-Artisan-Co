@@ -35,6 +35,7 @@
     </a>
     <ul class="nav-links" id="nav-links">
       <li><a href="shop.html">Shop</a></li>
+      <li><a href="gift-cards.html">Gift Cards</a></li>
       <li><a href="shipping.html">Shopping Bag</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="faq.html">FAQ</a></li>
@@ -136,10 +137,30 @@
           </div>
         </div>
 
+        <div class="cart-gift">
+          <label for="gift-code-input">Gift card</label>
+          <div class="cart-gift-row" id="gift-entry">
+            <input type="text" id="gift-code-input" class="zip-input" placeholder="UAC-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false" />
+            <button type="button" class="cart-gift-apply" id="gift-apply">Apply</button>
+          </div>
+          <div id="gift-applied" hidden>
+            <div class="cart-gift-applied">
+              <span id="gift-applied-label"></span>
+              <button type="button" class="cart-remove" id="gift-remove">Remove</button>
+            </div>
+            <div class="cart-gift-zip">
+              <label for="gift-zip">Shipping ZIP code (for sales tax)</label>
+              <input type="text" id="gift-zip" class="zip-input" inputmode="numeric" maxlength="5" placeholder="ZIP code" />
+            </div>
+          </div>
+          <p class="cart-gift-msg" id="gift-msg"></p>
+        </div>
+
         <div class="cart-totals">
           <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
           <div class="cart-total-row"><span>Shipping</span><span id="cart-shipping">&mdash;</span></div>
           <div class="cart-total-row"><span>Sales Tax</span><span id="cart-tax">&mdash;</span></div>
+          <div class="cart-total-row cart-total-row--gift" id="cart-gift-row" hidden><span>Gift card</span><span id="cart-gift-amount"></span></div>
           <div class="cart-total-row cart-total-row--grand"><span>Total before tax</span><span id="cart-total">$0.00</span></div>
         </div>
         <p class="cart-ship-summary" id="cart-ship-date" hidden></p>
@@ -204,6 +225,7 @@
       <h4>Shop</h4>
       <ul>
         <li><a href="shop.html">The Collection</a></li>
+        <li><a href="gift-cards.html">Gift Cards</a></li>
         <li><a href="shipping.html">Shopping Bag</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="faq.html">FAQ</a></li>
