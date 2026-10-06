@@ -7,7 +7,8 @@
 //   upload, Pirate Ship will ask you to map each column to a field (Name,
 //   Address Line 1, Weight, etc.) — it remembers that mapping for next time.
 // - Local Delivery orders, as a separate list for the delivery run (they
-//   don't need labels), with the same columns as the Pirate Ship file.
+//   don't need labels), with the same columns as the Pirate Ship file plus
+//   a Ship Date column (when the order's preorder items are ready).
 //
 // Password-protected with the same INVENTORY_ADMIN_PASSWORD used by
 // inventory.html, since this is another internal-only tool.
@@ -100,10 +101,13 @@ exports.handler = async (event) => {
   // orders in a separate list for the delivery run. Both use the same
   // columns, one row per package (weight and box size filled in from
   // catalog.js, so labels don't need them typed by hand, and the delivery
-  // list shows which box to pack).
-  const header = csvRow([
+  // list shows which box to pack). The delivery list also gets a Ship Date
+  // column after Order Date, for planning preorder delivery runs — it's kept
+  // out of the Pirate Ship file so its saved column mapping doesn't shift.
+  const columns = (withShipDate) => [
     "Order ID",
     "Order Date",
+    ...(withShipDate ? ["Ship Date"] : []),
     "Name",
     "Email",
     "Phone",
@@ -120,9 +124,9 @@ exports.handler = async (event) => {
     "Height (in)",
     "Items",
     "Order Total",
-  ]);
-  let shippingCsv = header;
-  let deliveryCsv = header;
+  ];
+  let shippingCsv = csvRow(columns(false));
+  let deliveryCsv = csvRow(columns(true));
   let shippingOrders = 0;
   let deliveryOrders = 0;
 
@@ -163,13 +167,15 @@ exports.handler = async (event) => {
 
     // Blank package columns (weigh it yourself) only if the order's products
     // can't be read back — e.g. an order from before inventory tracking.
-    const packages = packagesOf(session);
+    const counts = productCountsOf(session);
+    const packages = UACCatalog.packages(counts);
     const rows = packages.length > 0 ? packages : [null];
     rows.forEach((pkg, i) => {
       const label = !pkg ? "" : pkg.box + (rows.length > 1 ? " (" + (i + 1) + " of " + rows.length + ")" : "");
       const row = csvRow([
         session.id,
         orderDate,
+        ...(isDelivery ? [shipDateOf(counts)] : []),
         shippingName,
         email,
         phone,
@@ -252,18 +258,28 @@ async function deliveryMethodOf(stripe, session, lineDescriptions) {
   return "shipping";
 }
 
-// The packages an order ships in, rebuilt from the per-product counts
-// saved on the session at checkout (stock_deductions — Rituals are already
-// expanded into their picks there).
-function packagesOf(session) {
+// The products in an order, rebuilt from the per-product counts saved on
+// the session at checkout (stock_deductions — Rituals are already expanded
+// into their picks there).
+function productCountsOf(session) {
   let counts = {};
   try {
     counts = JSON.parse((session.metadata && session.metadata.stock_deductions) || "{}");
   } catch (e) {
     return [];
   }
-  const items = Object.keys(counts)
+  return Object.keys(counts)
     .map((id) => ({ id: id, qty: parseInt(counts[id], 10) }))
     .filter((item) => item.qty > 0);
-  return UACCatalog.packages(items);
+}
+
+// The whole order goes out together, on its latest item's preorder ship
+// date (same rule as the packing slip). Blank if no item has a date.
+function shipDateOf(counts) {
+  let latest = "";
+  counts.forEach((item) => {
+    const iso = UACCatalog.SHIP_DATES[item.id];
+    if (iso && iso > latest) latest = iso;
+  });
+  return latest;
 }

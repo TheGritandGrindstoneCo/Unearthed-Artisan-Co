@@ -27,6 +27,15 @@ function esc(s) {
     .replace(/"/g, "&quot;");
 }
 
+// Gmail's print view sets its own font on paragraphs and table cells, so a
+// font on the outer wrapper alone shows in the inbox but prints as Arial.
+// This repeats the serif font on every styled text element that doesn't
+// already pick its own (the Arial cut line and Stripe ID keep theirs).
+const SERIF = "font-family:Georgia,'Times New Roman',serif;";
+function withSerif(html) {
+  return html.replace(/<(p|td|div|span|b)\b([^>]*?)style="(?![^"]*font-family)/g, `<$1$2style="${SERIF}`);
+}
+
 function money(cents) {
   return "$" + ((cents || 0) / 100).toFixed(2);
 }
@@ -208,7 +217,7 @@ async function sendPackingSlipEmail(stripe, session) {
     to: to,
     replyTo: (session.customer_details && session.customer_details.email) || undefined,
     subject: "New order: " + name + " · " + method + " · " + units + (units === 1 ? " item" : " items") + " · " + money(session.amount_total),
-    html: buildHtml(session, lineItems),
+    html: withSerif(buildHtml(session, lineItems)),
   });
 }
 
@@ -221,7 +230,7 @@ async function sendGiftCardSoldEmail(card) {
     to: to,
     replyTo: card.buyer.email || undefined,
     subject: "Gift card sold: " + money(card.amount) + " for " + String(card.recipient.name).replace(/[\r\n]+/g, " ") + " (" + when + ")",
-    html: `
+    html: withSerif(`
   <div style="font-family:Georgia,'Times New Roman',serif;color:${INK};max-width:620px;margin:0 auto;padding:8px;">
     ${label("Gift card sold")}
     <p style="margin:0 0 14px;font-size:22px;font-weight:bold;">${money(card.amount)} for ${esc(card.recipient.name)}</p>
@@ -232,7 +241,7 @@ async function sendGiftCardSoldEmail(card) {
       ${infoRow("Code", esc(card.code))}
     </table>
     <p style="margin:16px 0 0;font-size:13px;color:${MUTED};">Nothing to pack or ship. Every card and its balance is on your inventory page under Gift Cards.</p>
-  </div>`,
+  </div>`),
   });
 }
 
