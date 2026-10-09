@@ -177,7 +177,7 @@ function buildHtml(session, lineItems) {
     </table>
     <p style="margin:22px 0 12px;font-style:italic;font-size:14px;line-height:1.6;">Thank you for letting us be part of your everyday ritual. Every piece was mixed, poured, and packed by hand, just for you.</p>
     <p style="margin:0 0 2px;font-size:12px;color:${MUTED};">Questions? We're always happy to help.</p>
-    <p style="margin:0;font-size:12px;"><b style="color:${SAGE};">unearthedartisanco.com</b> <span style="color:${MUTED};">&middot;</span> <b style="color:${SAGE};">@unearthedartisanco</b></p>
+    <p style="margin:0;font-size:12px;"><a href="${SITE}/" style="color:${SAGE};text-decoration:none;"><b style="color:${SAGE};">unearthedartisanco.com</b></a> <span style="color:${MUTED};">&middot;</span> <b style="color:${SAGE};">@unearthedartisanco</b></p>
 
     <p style="margin:28px 0 18px;padding-top:8px;border-top:2px dashed #b9b4a5;text-align:center;font-family:Arial,sans-serif;font-size:11px;color:${MUTED};letter-spacing:1px;">&#9986; CUT HERE &mdash; SHOP COPY BELOW, NOT FOR THE BOX</p>
 
