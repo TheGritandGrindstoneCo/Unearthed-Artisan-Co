@@ -43,8 +43,14 @@ const MIX_MATCH_GROUPS = [
 // (netlify/functions/lib/packing-slip-email.js) shows the same dates.
 const SHIP_DATES = UACCatalog.SHIP_DATES;
 
+// Today in the shopper's local time, as YYYY-MM-DD (same format as SHIP_DATES).
+const TODAY_ISO = new Date().toLocaleDateString("en-CA");
+
+// "Ships October 22" while a date is still ahead; blank once it has arrived,
+// since the item is ready and there's no wait to announce. Every ship-date
+// spot (shop cards, Ritual cards, the bag) already hides an empty label.
 function shipDateLabel(iso) {
-  if (!iso) return "";
+  if (!iso || iso <= TODAY_ISO) return "";
   const d = new Date(iso + "T00:00:00");
   return "Ships " + d.toLocaleDateString("en-US", { month: "long", day: "numeric" });
 }
@@ -64,6 +70,14 @@ function maxShipDateIsoFromSlugs(slugs) {
 // Same, but takes the product display names shown in a bundle's dropdowns.
 function maxShipDateIso(names) {
   return maxShipDateIsoFromSlugs(names.map((name) => SCENT_SLUGS[name]));
+}
+
+// A Ritual card's button: "Preorder Ritual" while any pick is still ahead
+// of its ship date, "Add Ritual to Bag" once every pick is ready. Leaves a
+// sold-out button alone.
+function setRitualButtonLabel(btn, names) {
+  if (btn.classList.contains("is-sold-out")) return;
+  btn.textContent = shipDateLabel(maxShipDateIso(names)) ? "Preorder Ritual" : "Add Ritual to Bag";
 }
 
 // ============================================================
@@ -138,14 +152,22 @@ function maxShipDateIso(names) {
 // Preorder ship-date badges — shows each product card's "Ships [date]"
 // line from SHIP_DATES. Static data, so this runs immediately rather than
 // waiting on the inventory fetch above.
+//
+// Once a product's ship date arrives it's ready on the shelf, so its button
+// drops "Preorder" for "Add to Bag" (and shipDateLabel has already gone
+// blank). Sold-out marking above still wins, since its fetch resolves after
+// this runs.
 // ============================================================
 (function () {
   document.querySelectorAll(".add-to-cart[data-id]").forEach((btn) => {
+    const iso = SHIP_DATES[btn.dataset.id];
+    if (iso && iso <= TODAY_ISO && !btn.disabled) {
+      btn.textContent = "Add to Bag";
+    }
     const card = btn.closest(".card-body");
     const shipEl = card ? card.querySelector(".ship-date") : null;
-    if (!shipEl) return;
-    const label = shipDateLabel(SHIP_DATES[btn.dataset.id]);
-    if (label) shipEl.textContent = label;
+    const label = shipDateLabel(iso);
+    if (shipEl && label) shipEl.textContent = label;
   });
 })();
 
@@ -411,9 +433,17 @@ function maxShipDateIso(names) {
     totalEl.textContent = money(total);
     renderGift(giftOff, giftBalance - giftOff);
 
+    // Only shows while something in the bag is still on preorder (its date is
+    // ahead). With more than one item, spell out that the in-stock items wait
+    // and ship together with it.
     if (shipDateEl) {
       const label = shipDateLabel(cartShipDateIso());
-      shipDateEl.textContent = label || "";
+      const date = label.replace(/^Ships /, "");
+      shipDateEl.textContent = !label
+        ? ""
+        : qty > 1
+          ? "Your bag includes a preorder item, so everything ships together on " + date + ", once it's ready."
+          : label;
       shipDateEl.hidden = qty === 0 || !label;
     }
 
@@ -498,7 +528,9 @@ function maxShipDateIso(names) {
     function recalcGiftset() {
       const slugs = Array.from(selects).map((s) => SCENT_SLUGS[s.value]);
       if (totalEl) totalEl.textContent = money(UACCatalog.ritualPrice(slugs) || 0);
-      if (shipEl) shipEl.textContent = shipDateLabel(maxShipDateIso(Array.from(selects).map((s) => s.value)));
+      const names = Array.from(selects).map((s) => s.value);
+      if (shipEl) shipEl.textContent = shipDateLabel(maxShipDateIso(names));
+      setRitualButtonLabel(btn, names);
     }
 
     selects.forEach((s) => s.addEventListener("change", recalcGiftset));
@@ -597,7 +629,9 @@ function maxShipDateIso(names) {
       const valid = UACCatalog.ritualHasProduct(slugs);
       countEl2.textContent = selects.length + (selects.length === 1 ? " item" : " items");
       totalEl2.textContent = valid ? money(UACCatalog.ritualPrice(slugs) || 0) : "—";
-      if (shipEl2) shipEl2.textContent = shipDateLabel(maxShipDateIso(Array.from(selects).map((s) => s.value)));
+      const names = Array.from(selects).map((s) => s.value);
+      if (shipEl2) shipEl2.textContent = shipDateLabel(maxShipDateIso(names));
+      setRitualButtonLabel(addToBagBtn, names);
       hintEl.hidden = valid;
       if (!addToBagBtn.classList.contains("is-sold-out")) addToBagBtn.disabled = !valid;
     }
