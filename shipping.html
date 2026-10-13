@@ -156,6 +156,19 @@
           <p class="cart-gift-msg" id="gift-msg"></p>
         </div>
 
+        <div class="cart-gift">
+          <label for="ship-code-input">Shipping code</label>
+          <div class="cart-gift-row" id="ship-code-entry">
+            <input type="text" id="ship-code-input" class="zip-input" placeholder="Code" autocomplete="off" spellcheck="false" />
+            <button type="button" class="cart-gift-apply" id="ship-code-apply">Apply</button>
+          </div>
+          <div class="cart-gift-applied" id="ship-code-applied" hidden>
+            <span>Free shipping &amp; delivery applied</span>
+            <button type="button" class="cart-remove" id="ship-code-remove">Remove</button>
+          </div>
+          <p class="cart-gift-msg" id="ship-code-msg"></p>
+        </div>
+
         <div class="cart-totals">
           <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
           <div class="cart-total-row"><span>Shipping</span><span id="cart-shipping">&mdash;</span></div>

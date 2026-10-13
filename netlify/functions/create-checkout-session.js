@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const Stripe = require("stripe");
 const { SCENT_IDS, SCENT_NAMES, readInventory, reserveStock, releaseStock } = require("./lib/inventory-store");
 const { normalizeCode, getCard, holdBalance, releaseHold } = require("./lib/gift-card-store");
+const { isFreeShippingCode } = require("./lib/shipping-code");
 const UACCatalog = require("../../catalog.js");
 
 function badRequest(message) {
@@ -44,9 +45,15 @@ exports.handler = async (event) => {
     };
   }
   const method = payload.method === "delivery" ? "delivery" : "shipping";
+  // A family shipping code (bag's Shipping Code field) makes either method
+  // free. It's checked here, not trusted from the browser.
+  if (payload.shippingCode && !isFreeShippingCode(payload.shippingCode)) {
+    return badRequest("That shipping code isn't valid. Please remove it and try again.");
+  }
+  const freeShipping = !!payload.shippingCode;
   const shippingLabel = method === "delivery" ? "Local Delivery" : "Standard Shipping";
   const subtotal = UACCatalog.subtotalOf(items);
-  const shippingCost = UACCatalog.shippingCost(items, method, subtotal);
+  const shippingCost = freeShipping ? 0 : UACCatalog.shippingCost(items, method, subtotal);
   const siteUrl = (payload.siteUrl || "").replace(/\/$/, "");
 
   if (items.length === 0 || !siteUrl) {
@@ -258,6 +265,8 @@ exports.handler = async (event) => {
     // Local Delivery list.
     delivery_method: method,
   };
+  // So the order list shows which orders used the family code.
+  if (freeShipping) metadata.free_shipping_code = "family";
 
   const params = {
     mode: "payment",

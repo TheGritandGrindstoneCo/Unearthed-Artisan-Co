@@ -1525,4 +1525,4 @@ body.lightbox-open { overflow: hidden; }
 .cart-gift-msg { margin-top: 8px; font-size: 0.82rem; }
 .cart-gift-msg.is-error { color: var(--accent); font-weight: 600; }
 .cart-total-row--gift { color: var(--sage-deep); font-weight: 600; }
-.cart-gift-row[hidden], .cart-total-row[hidden] { display: none; }
+.cart-gift-row[hidden], .cart-gift-applied[hidden], .cart-total-row[hidden] { display: none; }

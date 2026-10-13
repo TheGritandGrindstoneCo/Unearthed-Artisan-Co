@@ -310,6 +310,34 @@ function setRitualButtonLabel(btn, names) {
     }
   }
 
+  // Family free-shipping code from the bag's Shipping Code field. Saved like
+  // the gift card, re-checked with the server when the bag opens, and checked
+  // again at checkout (create-checkout-session.js) — the code itself is never
+  // in this file.
+  const SHIP_CODE_KEY = "uac-ship-code";
+  let shipCode = loadShipCode();
+
+  function loadShipCode() {
+    try {
+      return localStorage.getItem(SHIP_CODE_KEY) || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveShipCode() {
+    try {
+      if (shipCode) localStorage.setItem(SHIP_CODE_KEY, shipCode);
+      else localStorage.removeItem(SHIP_CODE_KEY);
+    } catch (e) {
+      /* storage blocked — the code just won't persist */
+    }
+  }
+
+  function shippingFor(method, sub) {
+    return shipCode ? 0 : UACCatalog.shippingCost(cart, method, sub);
+  }
+
   // Re-prices every saved line from catalog.js, so a bag saved before a
   // price change shows what checkout will actually charge, and drops
   // anything that's no longer sold.
@@ -418,7 +446,7 @@ function setRitualButtonLabel(btn, names) {
 
     const sub = subtotal();
     const method = selectedMethod();
-    const shipCost = UACCatalog.shippingCost(cart, method, sub);
+    const shipCost = shippingFor(method, sub);
     // Sales tax depends on the delivery address, which Stripe collects on its
     // checkout page, so it's added there (Stripe Tax) rather than here.
     // A gift card comes off here up to the pre-tax total; whatever's left on
@@ -449,8 +477,14 @@ function setRitualButtonLabel(btn, names) {
 
     methodRadios.forEach((r) => {
       const amtEl = r.closest(".radio-option").querySelector(".ramt");
-      amtEl.textContent = qty === 0 ? "—" : money(UACCatalog.shippingCost(cart, r.value, sub));
+      amtEl.textContent = qty === 0 ? "—" : money(shippingFor(r.value, sub));
     });
+
+    const shipCodeEntry = document.getElementById("ship-code-entry");
+    if (shipCodeEntry) {
+      shipCodeEntry.hidden = !!shipCode;
+      document.getElementById("ship-code-applied").hidden = !shipCode;
+    }
 
     if (qty > 0) {
       checkoutBtn.classList.remove("is-disabled");
@@ -803,6 +837,65 @@ function setRitualButtonLabel(btn, names) {
       applyGift(gift.code, true);
     }
 
+    // ---------------- Shipping code ----------------
+    const shipCodeInput = document.getElementById("ship-code-input");
+    const shipCodeApplyBtn = document.getElementById("ship-code-apply");
+    const shipCodeMsg = document.getElementById("ship-code-msg");
+
+    function setShipCodeMsg(text, isError) {
+      shipCodeMsg.textContent = text;
+      shipCodeMsg.classList.toggle("is-error", !!isError);
+    }
+
+    // Same idea as applyGift: quiet = re-checking a code saved from an
+    // earlier visit, dropped only if the server says it's no longer valid.
+    function applyShipCode(code, quiet) {
+      if (!quiet) setShipCodeMsg("Checking…", false);
+      return fetch("/.netlify/functions/check-shipping-code?code=" + encodeURIComponent(code))
+        .then((res) => res.json().then((data) => ({ ok: res.ok, status: res.status, data: data })))
+        .then((r) => {
+          if (!r.ok) {
+            const err = new Error((r.data && r.data.error) || "Could not check that code.");
+            err.invalid = r.status === 404;
+            throw err;
+          }
+          shipCode = r.data.code;
+          saveShipCode();
+          shipCodeInput.value = "";
+          setShipCodeMsg("", false);
+          render();
+        })
+        .catch((err) => {
+          if (quiet && !err.invalid) return;
+          if (quiet) {
+            shipCode = null;
+            saveShipCode();
+            render();
+          }
+          setShipCodeMsg(err.message || "Could not check that code. Please try again.", true);
+        });
+    }
+
+    shipCodeApplyBtn.addEventListener("click", () => {
+      const code = shipCodeInput.value.trim();
+      if (code) applyShipCode(code, false);
+      else setShipCodeMsg("Enter your shipping code.", true);
+    });
+    shipCodeInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        shipCodeApplyBtn.click();
+      }
+    });
+    document.getElementById("ship-code-remove").addEventListener("click", () => {
+      shipCode = null;
+      saveShipCode();
+      setShipCodeMsg("", false);
+      render();
+    });
+
+    if (shipCode) applyShipCode(shipCode, true);
+
     checkoutBtn.addEventListener("click", async (e) => {
       e.preventDefault();
       if (checkoutBtn.classList.contains("is-disabled")) return;
@@ -830,6 +923,7 @@ function setRitualButtonLabel(btn, names) {
             method: method,
             giftCode: gift ? gift.code : undefined,
             giftZip: gift ? gift.zip : undefined,
+            shippingCode: shipCode || undefined,
             siteUrl: window.location.origin,
           }),
         });
