@@ -44,11 +44,14 @@
   // they all ship that same launch date. Golden Harvest and Emerald Meadow
   // were poured later (9/10) so their cure finishes later too. Update this
   // table each time a new soap batch is poured — see Batch Tracking Log.xlsx.
+  // Lavender Dawn and Lavender Bloom sold out their first batches, so they're
+  // back on preorder from batch #2 (Lavender Bloom poured 9/27, Lavender Dawn
+  // 10/4).
   const SHIP_DATES = {
     "quiet-clay": "2026-10-10",
     "jade-hollow": "2026-10-10",
-    "lavender-dawn": "2026-10-10",
-    "lilac-bloom": "2026-10-10",
+    "lavender-dawn": "2026-11-15",
+    "lilac-bloom": "2026-11-08",
     "garnet-dusk": "2026-10-10",
     "indigo-grove": "2026-10-10",
     "onyx-ember": "2026-10-10",
