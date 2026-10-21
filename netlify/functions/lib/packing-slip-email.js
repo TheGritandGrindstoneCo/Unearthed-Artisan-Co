@@ -175,7 +175,7 @@ function buildHtml(session, lineItems) {
       </tr>
       ${itemRows(lineItems)}
     </table>
-    <p style="margin:22px 0 12px;font-style:italic;font-size:14px;line-height:1.6;">Thank you for letting us be part of your everyday ritual. Every piece was mixed, poured, and packed by hand, just for you.</p>
+    <p style="margin:22px 0 12px;font-style:italic;font-size:14px;line-height:1.6;">Thank you for letting us be part of your everyday ritual. Every piece was handcrafted and packed with care, just for you.</p>
     <p style="margin:0 0 2px;font-size:12px;color:${MUTED};">Questions? We're always happy to help.</p>
     <p style="margin:0;font-size:12px;"><a href="${SITE}/" style="color:${SAGE};text-decoration:none;"><b style="color:${SAGE};">unearthedartisanco.com</b></a> <span style="color:${MUTED};">&middot;</span> <b style="color:${SAGE};">@unearthedartisanco</b></p>
 
