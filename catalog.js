@@ -11,8 +11,8 @@
 (function (root) {
   // price: retail price. oz: the product alone, as it goes loose into a
   // white box (from Shipping/Product Weights & Measurements.xlsx). space:
-  // room it takes in a box — the Large box holds 10 (10 soaps, or 6 soaps +
-  // 3 creams + 2 lip balms).
+  // room it takes in a box — the Large box holds 12 (12 soaps, or 7 soaps +
+  // 3 creams + 4 lip balms), but no more than 10 creams.
   const PRODUCTS = {
     "quiet-clay": { kind: "soap", price: 9.95, oz: 4.5, space: 1 },
     "jade-hollow": { kind: "soap", price: 9.95, oz: 4.5, space: 1 },
@@ -113,7 +113,7 @@
   const FILL_OZ = 1.0;
   const BOXES = [
     { name: "Medium box", oz: 4.1, space: 3, maxCreams: 3, price: 10.95, dims: [6, 4, 4] },
-    { name: "Large box", oz: 7.8, space: 10, maxCreams: 10, price: 12.5, dims: [8, 6, 4] },
+    { name: "Large box", oz: 7.8, space: 12, maxCreams: 10, price: 12.5, dims: [8, 6, 4] },
   ];
   const LARGE = BOXES[BOXES.length - 1];
 
@@ -228,9 +228,12 @@
     while (!fits(LARGE, remaining)) {
       const load = [];
       let space = 0;
+      let creams = 0;
       remaining = remaining.filter((u) => {
         if (space + u.space > LARGE.space) return true;
+        if (u.kind === "cream" && creams >= LARGE.maxCreams) return true;
         space += u.space;
+        if (u.kind === "cream") creams++;
         load.push(u);
         return false;
       });
