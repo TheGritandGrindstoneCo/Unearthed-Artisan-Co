@@ -84,13 +84,13 @@ function shipByIso(counts) {
   return latest;
 }
 
-// Rituals list their picks after a colon ("Starter Ritual: Soap - Onyx
-// Ember, Cream - ..."), so they're split out to pack one by one.
+// Rituals and Holiday Sets list their picks after a colon ("Starter Ritual:
+// Soap - Onyx Ember, Cream - ..."), so they're split out to pack one by one.
 function itemRows(lineItems) {
   return lineItems
     .filter((li) => !EXTRA_LINES.includes(li.description))
     .map((li) => {
-      const match = /^(.*?Ritual[^:]*):\s*(.+)$/.exec(li.description || "");
+      const match = /^(.*?(?:Ritual|Holiday Gift Set|Stocking Stuffer)[^:]*):\s*(.+)$/.exec(li.description || "");
       const title = match ? match[1] : li.description;
       const picks = match ? match[2].split(/,\s*/).map((p) => p.replace(/\s+-\s+/, ": ")) : [];
       const pickHtml = picks

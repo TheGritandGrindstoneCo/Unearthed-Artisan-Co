@@ -21,6 +21,9 @@ const SCENT_SLUGS = {
   "Guava": "guava-lip-balm",
   "Teak Soap Dish": "teak-soap-dish",
   "Sisal Soap Saver Bag": "soap-saver-bag",
+  "Peppermint Frost": "peppermint-frost",
+  "Alpine Snow": "alpine-snow",
+  "Mini Unscented Tallow Body Cream": "mini-body-cream",
 };
 
 // Populated by the stock-marking block below once /get-inventory resolves.
@@ -130,11 +133,14 @@ function setRitualButtonLabel(btn, names) {
       // If every scent in one of a bundle/gift set's dropdowns is sold out,
       // there's no valid pick left for that slot — disable the whole "Add to
       // Bag" button for that card rather than leave a broken selection.
-      document.querySelectorAll(".add-giftset, .add-mixmatch").forEach((btn) => {
+      // A Holiday Set is also blocked when the set itself (its boxes or
+      // muslin bags) or anything that always comes in it is sold out.
+      document.querySelectorAll(".add-giftset, .add-mixmatch, .add-holiday").forEach((btn) => {
         const cardSelects = btn.closest(".card-body").querySelectorAll(".bundle-select");
-        const blocked = Array.from(cardSelects).some((select) =>
-          Array.from(select.options).every((o) => o.disabled)
-        );
+        const fixed = btn.dataset.set ? [btn.dataset.set].concat((btn.dataset.includes || "").split(",")) : [];
+        const blocked =
+          Array.from(cardSelects).some((select) => Array.from(select.options).every((o) => o.disabled)) ||
+          fixed.some((slug) => typeof stock[slug] === "number" && stock[slug] <= 0);
         if (blocked) {
           btn.disabled = true;
           btn.textContent = "Sold Out";
@@ -384,9 +390,10 @@ function setRitualButtonLabel(btn, names) {
 
   // A single item's own ship date — a bundle ships on whichever of its
   // picks (item.scents) cures slowest, a plain item ships on its own slug.
+  // A Holiday Set's own date (item.set) counts too.
   function itemShipDateIso(item) {
     if (Array.isArray(item.scents) && item.scents.length > 0) {
-      return maxShipDateIsoFromSlugs(item.scents);
+      return maxShipDateIsoFromSlugs(item.scents.concat(item.set || []));
     }
     return SHIP_DATES[item.id] || null;
   }
@@ -515,9 +522,9 @@ function setRitualButtonLabel(btn, names) {
     }
   }
 
-  // The price always comes from catalog.js — a plain item's slug, or a
-  // Ritual's picks (scents) — never from the page.
-  function addItem(id, name, scents) {
+  // The price always comes from catalog.js — a plain item's slug, a
+  // Ritual's picks (scents), or a Holiday Set (set) — never from the page.
+  function addItem(id, name, scents, set) {
     // Items carrying a scents list (the Rituals) always get a fresh cart
     // line, since re-picking a different scent shouldn't merge with a
     // previous pick under the same id.
@@ -527,6 +534,7 @@ function setRitualButtonLabel(btn, names) {
     } else {
       const entry = { id: id, name: name, qty: 1 };
       if (scents) entry.scents = scents;
+      if (set) entry.set = set;
       entry.price = UACCatalog.linePrice(entry);
       if (entry.price === null) return;
       cart.push(entry);
@@ -584,6 +592,43 @@ function setRitualButtonLabel(btn, names) {
       // Deduct one of each picked item's own stock from its respective pool.
       const pickSlugs = picks.map((p) => SCENT_SLUGS[p]).filter(Boolean);
       addItem("giftset-" + Date.now(), name, pickSlugs.length ? pickSlugs : undefined);
+    });
+  });
+
+  // Holiday Gift Set and Stocking Stuffer — fixed prices from catalog.js
+  // SETS (UACCatalog.setPrice), not the Ritual discount. The card's
+  // dropdowns are the picks; data-includes lists the slugs that always come
+  // in the set, and data-contents names them for the line item.
+  document.querySelectorAll(".add-holiday").forEach((btn) => {
+    const body = btn.closest(".card-body");
+    const selects = body.querySelectorAll(".bundle-select");
+    const totalEl = body.querySelector(".holiday-total");
+    const shipEl = body.querySelector(".ship-date");
+    const includes = btn.dataset.includes ? btn.dataset.includes.split(",") : [];
+
+    function slugsOf() {
+      return Array.from(selects).map((s) => SCENT_SLUGS[s.value]).concat(includes);
+    }
+
+    function recalcHoliday() {
+      if (totalEl) totalEl.textContent = money(UACCatalog.setPrice(btn.dataset.set, slugsOf()) || 0);
+      const label = shipDateLabel(maxShipDateIsoFromSlugs(slugsOf().concat(btn.dataset.set)));
+      if (shipEl) shipEl.textContent = label;
+      if (!btn.classList.contains("is-sold-out")) btn.textContent = label ? "Preorder" : "Add to Bag";
+    }
+
+    selects.forEach((s) => s.addEventListener("change", recalcHoliday));
+    recalcHoliday();
+
+    btn.addEventListener("click", () => {
+      const picks = Array.from(selects).map((s) => {
+        const clone = s.closest("label").cloneNode(true);
+        clone.querySelector("select").remove();
+        return clone.textContent.trim() + " - " + s.value;
+      });
+      const contents = btn.dataset.contents ? [btn.dataset.contents] : [];
+      const name = btn.dataset.setName + ": " + picks.concat(contents).join(", ");
+      addItem("holiday-" + Date.now(), name, slugsOf(), btn.dataset.set);
     });
   });
 
@@ -919,7 +964,7 @@ function setRitualButtonLabel(btn, names) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            items: cart.map((item) => ({ id: item.id, name: item.name, price: item.price, qty: item.qty, scents: item.scents })),
+            items: cart.map((item) => ({ id: item.id, name: item.name, price: item.price, qty: item.qty, scents: item.scents, set: item.set })),
             method: method,
             giftCode: gift ? gift.code : undefined,
             giftZip: gift ? gift.zip : undefined,

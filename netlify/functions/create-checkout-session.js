@@ -94,6 +94,10 @@ exports.handler = async (event) => {
     const qty = Math.max(1, parseInt(item.qty, 10) || 1);
     if (Array.isArray(item.scents) && item.scents.length > 0) {
       item.scents.forEach((scentId) => addDeduction(scentId, qty));
+      // A Holiday Set also counts against its own stock (the boxes and
+      // muslin bags on hand), which carries its ship date to the packing
+      // slip and order export too.
+      if (item.set) addDeduction(item.set, qty);
     } else if (typeof item.id === "string") {
       addDeduction(item.id, qty);
     }

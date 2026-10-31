@@ -1,8 +1,9 @@
 const { getStore } = require("@netlify/blobs");
 
 // The products with tracked inventory — 9 soap scents, 4 tallow creams,
-// 3 lip balms, and 2 accessories. Matches the data-id values used on the
-// "Add to Bag" buttons in shop.html.
+// 3 lip balms, 2 accessories, and the holiday products and Holiday Sets.
+// Matches the data-id values used on the "Add to Bag" buttons in shop.html
+// (and the set ids in catalog.js SETS).
 const SCENT_IDS = [
   "quiet-clay",
   "jade-hollow",
@@ -22,6 +23,11 @@ const SCENT_IDS = [
   "guava-lip-balm",
   "soap-saver-bag",
   "teak-soap-dish",
+  "peppermint-frost",
+  "alpine-snow",
+  "mini-body-cream",
+  "holiday-gift-set",
+  "stocking-stuffer",
 ];
 
 // Display names for building customer-facing messages (e.g. stock shortages).
@@ -44,6 +50,11 @@ const SCENT_NAMES = {
   "guava-lip-balm": "Guava Tallow Lip Balm",
   "soap-saver-bag": "Sisal Soap Saver Bag",
   "teak-soap-dish": "Teak Soap Dish",
+  "peppermint-frost": "Peppermint Frost",
+  "alpine-snow": "Alpine Snow",
+  "mini-body-cream": "Mini Unscented Tallow Body Cream",
+  "holiday-gift-set": "Holiday Gift Set",
+  "stocking-stuffer": "Stocking Stuffer",
 };
 
 // New products default to "in stock" (not sold out) until a real count is

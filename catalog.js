@@ -35,6 +35,32 @@
     // takes about half a bar's.
     "soap-saver-bag": { kind: "accessory", price: 5.99, oz: 0.5, space: 0 },
     "teak-soap-dish": { kind: "accessory", price: 9.95, oz: 1.9, space: 0.5 },
+    // Holiday — only sold inside the Holiday Sets below for now, so these
+    // prices aren't shown anywhere. The mini cream's oz is an estimate until
+    // it's weighed for Product Weights & Measurements.xlsx.
+    "peppermint-frost": { kind: "soap", price: 10.95, oz: 4.5, space: 1 },
+    "alpine-snow": { kind: "soap", price: 10.95, oz: 4.5, space: 1 },
+    "mini-body-cream": { kind: "cream", price: 12.99, oz: 3.5, space: 0.5 },
+  };
+
+  // Holiday Sets — fixed prices, not the Ritual discount. slots lists, for
+  // each item in the set, the products allowed there (one = always
+  // included, more = the customer picks; picks come first, in the order of
+  // the card's dropdowns, then the card's data-includes). upcharge adds to the price when a
+  // pick is chosen — a Stocking Stuffer with the mini cream instead of a
+  // soap is $2 more ($18.50 vs $20.50).
+  const BALMS = ["vanilla-lip-balm", "peppermint-lip-balm", "guava-lip-balm"];
+  const SOAPS = Object.keys(PRODUCTS).filter((slug) => PRODUCTS[slug].kind === "soap");
+  const SETS = {
+    "holiday-gift-set": {
+      price: 54,
+      slots: [BALMS, ["alpine-snow"], ["peppermint-frost"], ["mini-body-cream"], ["teak-soap-dish"]],
+    },
+    "stocking-stuffer": {
+      price: 18.5,
+      slots: [BALMS, SOAPS.concat("mini-body-cream")],
+      upcharge: { "mini-body-cream": 2 },
+    },
   };
 
   // Preorder ship dates, by product slug — shown on the shop cards and in
@@ -67,6 +93,14 @@
     // Accessories are bought in, not made — ship with the launch.
     "soap-saver-bag": "2026-10-10",
     "teak-soap-dish": "2026-10-10",
+    // Holiday — Peppermint Frost's cure finishes 11/14 and Alpine Snow's
+    // 11/16, so every Holiday Set ships the week of November 16 (the set
+    // dates cover a Stocking Stuffer built from a soap that's ready now).
+    "peppermint-frost": "2026-11-16",
+    "alpine-snow": "2026-11-16",
+    "mini-body-cream": "2026-11-16",
+    "holiday-gift-set": "2026-11-16",
+    "stocking-stuffer": "2026-11-16",
   };
 
   // Discount applied to every Ritual card's price (Starter, Daily, and
@@ -164,10 +198,22 @@
     return roundCents(sum * (1 - RITUAL_DISCOUNT));
   }
 
-  // Each-price of one cart line — a plain product (item.id is its slug) or a
-  // Ritual (item.scents lists its picks). null if anything in it isn't in
-  // the catalog.
+  // Holiday Set price for a set slug and its items (in slot order). null if
+  // the set doesn't exist or any item isn't allowed in its slot.
+  function setPrice(setId, slugs) {
+    const set = SETS[setId];
+    if (!set || slugs.length !== set.slots.length) return null;
+    if (slugs.some((slug, i) => !set.slots[i].includes(slug))) return null;
+    const extra = slugs.reduce((total, slug) => total + ((set.upcharge && set.upcharge[slug]) || 0), 0);
+    return roundCents(set.price + extra);
+  }
+
+  // Each-price of one cart line — a plain product (item.id is its slug), a
+  // Holiday Set (item.set is its slug, item.scents its items), or a Ritual
+  // (item.scents lists its picks). null if anything in it isn't in the
+  // catalog.
   function linePrice(item) {
+    if (item.set) return isBundle(item) ? setPrice(item.set, item.scents) : null;
     return isBundle(item) ? ritualPrice(item.scents) : priceOf(item.id);
   }
 
@@ -257,7 +303,9 @@
     PRODUCTS: PRODUCTS,
     GIFT_CARD: GIFT_CARD,
     SHIP_DATES: SHIP_DATES,
+    SETS: SETS,
     priceOf: priceOf,
+    setPrice: setPrice,
     ritualPrice: ritualPrice,
     ritualHasProduct: ritualHasProduct,
     linePrice: linePrice,
