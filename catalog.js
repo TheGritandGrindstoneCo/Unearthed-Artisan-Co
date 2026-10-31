@@ -35,8 +35,9 @@
     // takes about half a bar's.
     "soap-saver-bag": { kind: "accessory", price: 5.99, oz: 0.5, space: 0 },
     "teak-soap-dish": { kind: "accessory", price: 9.95, oz: 1.9, space: 0.5 },
-    // Holiday — only sold inside the Holiday Sets below for now, so these
-    // prices aren't shown anywhere. The mini cream's oz is an estimate until
+    // Holiday — the two limited bars are sold by the bar on the Holiday
+    // shelf and in the Holiday Sets below. The mini cream is only sold in the
+    // sets, so its price isn't shown anywhere; its oz is an estimate until
     // it's weighed for Product Weights & Measurements.xlsx.
     "peppermint-frost": { kind: "soap", price: 10.95, oz: 4.5, space: 1 },
     "alpine-snow": { kind: "soap", price: 10.95, oz: 4.5, space: 1 },
