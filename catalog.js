@@ -49,7 +49,8 @@
   // included, more = the customer picks; picks come first, in the order of
   // the card's dropdowns, then the card's data-includes). upcharge adds to the price when a
   // pick is chosen — a Stocking Stuffer with the mini cream instead of a
-  // soap is $2 more ($18.50 vs $20.50).
+  // soap is $2 more ($18.50 vs $20.50). A negative upcharge is a discount —
+  // Quiet Clay, Jade Hollow, and Lavender Dawn make it $17.50.
   const BALMS = ["vanilla-lip-balm", "peppermint-lip-balm", "guava-lip-balm"];
   const SOAPS = Object.keys(PRODUCTS).filter((slug) => PRODUCTS[slug].kind === "soap");
   const SETS = {
@@ -60,7 +61,7 @@
     "stocking-stuffer": {
       price: 18.5,
       slots: [BALMS, SOAPS.concat("mini-body-cream")],
-      upcharge: { "mini-body-cream": 2 },
+      upcharge: { "mini-body-cream": 2, "quiet-clay": -1, "jade-hollow": -1, "lavender-dawn": -1 },
     },
   };
 
