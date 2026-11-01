@@ -153,8 +153,9 @@
   const LARGE = BOXES[BOXES.length - 1];
 
   const UNDER_1LB_PRICE = 8.95;
-  // Compared against the product subtotal before tax and before any Stripe
-  // promo code (e.g. THANKYOU10) — see the note on shipping.html.
+  // Compared against the product subtotal before tax and before any promo
+  // code (THANKYOU10 on Stripe's page, or a bag code from PROMOS below) —
+  // see the note on shipping.html.
   const FREE_SHIPPING_MIN = 100;
   const DELIVERY_PRICE = 5;
   const FREE_DELIVERY_MIN = 45;
@@ -162,6 +163,18 @@
   // Gift cards (gift-cards.html, create-gift-card-session.js): the preset
   // amounts, plus any other whole-dollar amount between min and max.
   const GIFT_CARD = { presets: [50, 100, 150], min: 10, max: 500 };
+
+  // Promo codes for the bag's Promo Code field (shipping.html). Each takes
+  // `percent` off regular items only — never a Holiday Set or anything in
+  // HOLIDAY_ONLY — from `starts` to `ends` (California dates, inclusive).
+  // They're posted publicly, so unlike the family shipping code they're kept
+  // here in plain text. A code typed on Stripe's own page (THANKYOU10) can't
+  // be limited to some items, so Stripe's box is off while one of these is
+  // applied (create-checkout-session.js).
+  const PROMOS = {
+    BLACKFRIDAY10: { percent: 10, starts: "2026-11-27", ends: "2026-11-30", name: "Black Friday 10% off" },
+  };
+  const HOLIDAY_ONLY = ["peppermint-frost", "alpine-snow", "mini-body-cream"];
 
   // Sales tax isn't calculated here — Stripe Tax works it out from the
   // address entered at checkout (see create-checkout-session.js).
@@ -220,6 +233,34 @@
 
   function subtotalOf(items) {
     return roundCents(items.reduce((total, item) => total + qtyOf(item) * (linePrice(item) || 0), 0));
+  }
+
+  // A promo code checked against a day (YYYY-MM-DD): { code, promo } when it
+  // can be used that day, or { error } saying why not.
+  function checkPromo(code, todayIso) {
+    const key = String(code || "").trim().toUpperCase();
+    const promo = PROMOS[key];
+    if (!promo) return { error: "That promo code isn't valid." };
+    if (todayIso < promo.starts) {
+      const starts = new Date(promo.starts + "T00:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric" });
+      return { error: "That code starts " + starts + "." };
+    }
+    if (todayIso > promo.ends) return { error: "That code has ended." };
+    return { code: key, promo: promo };
+  }
+
+  // Whether a cart line takes promo codes: not a Holiday Set, and nothing
+  // in it (a Ritual's picks too) is a holiday-only product.
+  function promoEligible(item) {
+    if (item.set) return false;
+    const slugs = isBundle(item) ? item.scents : [item.id];
+    return !slugs.some((slug) => HOLIDAY_ONLY.includes(slug));
+  }
+
+  // Dollars a promo takes off the cart: its percent of the eligible lines.
+  function promoDiscount(items, promo) {
+    const eligible = subtotalOf(items.filter(promoEligible));
+    return roundCents((eligible * promo.percent) / 100);
   }
 
   // Every physical product in the cart, one entry per unit — a Ritual
@@ -311,6 +352,9 @@
     ritualHasProduct: ritualHasProduct,
     linePrice: linePrice,
     subtotalOf: subtotalOf,
+    checkPromo: checkPromo,
+    promoEligible: promoEligible,
+    promoDiscount: promoDiscount,
     packages: packages,
     shippingCost: shippingCost,
   };

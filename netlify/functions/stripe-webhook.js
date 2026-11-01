@@ -161,6 +161,9 @@ exports.handler = async (event) => {
         return { statusCode: 500, body: "Gift card release failed." };
       }
     }
+    // A bag promo code's one-time coupon (create-checkout-session.js) was
+    // never used, so it goes too.
+    if (meta.promo_coupon) await stripe.coupons.del(meta.promo_coupon).catch(() => {});
 
     let deductions = {};
     try {

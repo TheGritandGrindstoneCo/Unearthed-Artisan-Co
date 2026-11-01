@@ -51,6 +51,16 @@ exports.handler = async (event) => {
     return badRequest("That shipping code isn't valid. Please remove it and try again.");
   }
   const freeShipping = !!payload.shippingCode;
+  // A promo code from the bag's Promo Code field (catalog.js PROMOS), checked
+  // against today's date in California. It only discounts regular items, so
+  // it goes on as a one-time coupon for that amount (see below).
+  let promo = null;
+  if (payload.promoCode) {
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+    promo = UACCatalog.checkPromo(payload.promoCode, today);
+    if (promo.error) return badRequest(promo.error + " Please remove it and try again.");
+    if (payload.giftCode) return badRequest("Promo codes can't be combined with a gift card. Please remove one and try again.");
+  }
   const shippingLabel = method === "delivery" ? "Local Delivery" : "Standard Shipping";
   const subtotal = UACCatalog.subtotalOf(items);
   const shippingCost = freeShipping ? 0 : UACCatalog.shippingCost(items, method, subtotal);
@@ -272,6 +282,11 @@ exports.handler = async (event) => {
   // So the order list shows which orders used the family code.
   if (freeShipping) metadata.free_shipping_code = "family";
 
+  // A bag promo code's discount, in cents — nothing if every line in the bag
+  // is a holiday item.
+  const promoCents = promo ? Math.round(UACCatalog.promoDiscount(items, promo.promo) * 100) : 0;
+  let promoCoupon = null;
+
   const params = {
     mode: "payment",
     success_url: siteUrl + "/checkout-success.html",
@@ -306,7 +321,10 @@ exports.handler = async (event) => {
     });
   } else {
     params.shipping_options = shipping_options;
-    params.allow_promotion_codes = true;
+    // Stripe's own promo code box (THANKYOU10) would discount holiday items
+    // too, and only one discount fits a session, so it's off while a bag
+    // promo code is taking something off.
+    if (!promoCents) params.allow_promotion_codes = true;
     // Stripe Tax calculates sales tax from the shipping address the
     // customer enters on Stripe's page — California addresses are taxed at
     // their local rate; other states aren't until a registration is added
@@ -325,6 +343,19 @@ exports.handler = async (event) => {
       });
       params.discounts = [{ coupon: gift.coupon.id }];
       metadata.gift_coupon = gift.coupon.id;
+    } else if (promoCents > 0) {
+      // A fixed amount rather than a percent, because a Stripe coupon can't
+      // be limited to some of a session's made-up line items.
+      promoCoupon = await stripe.coupons.create({
+        amount_off: promoCents,
+        currency: "usd",
+        duration: "once",
+        max_redemptions: 1,
+        name: promo.promo.name + " (" + promo.code + ")",
+      });
+      params.discounts = [{ coupon: promoCoupon.id }];
+      metadata.promo_code = promo.code;
+      metadata.promo_coupon = promoCoupon.id;
     }
 
     const session = await stripe.checkout.sessions.create(params);
@@ -339,6 +370,7 @@ exports.handler = async (event) => {
       await releaseHold(gift.code, gift.holdId).catch(() => {});
       if (gift.coupon) await stripe.coupons.del(gift.coupon.id).catch(() => {});
     }
+    if (promoCoupon) await stripe.coupons.del(promoCoupon.id).catch(() => {});
     return { statusCode: 500, body: JSON.stringify({ error: (e && e.message) || "Stripe error." }) };
   }
 };

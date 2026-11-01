@@ -340,6 +340,30 @@ function setRitualButtonLabel(btn, names) {
     }
   }
 
+  // Promo code from the bag's Promo Code field (catalog.js PROMOS). Saved
+  // like the shipping code; checked again at checkout.
+  const PROMO_KEY = "uac-promo-code";
+  let promoCode = loadPromoCode();
+
+  function loadPromoCode() {
+    try {
+      const code = localStorage.getItem(PROMO_KEY);
+      // A code saved before it ended is dropped when the bag opens.
+      return code && !UACCatalog.checkPromo(code, TODAY_ISO).error ? code : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function savePromoCode() {
+    try {
+      if (promoCode) localStorage.setItem(PROMO_KEY, promoCode);
+      else localStorage.removeItem(PROMO_KEY);
+    } catch (e) {
+      /* storage blocked — the code just won't persist */
+    }
+  }
+
   function shippingFor(method, sub) {
     return shipCode ? 0 : UACCatalog.shippingCost(cart, method, sub);
   }
@@ -458,15 +482,20 @@ function setRitualButtonLabel(btn, names) {
     // checkout page, so it's added there (Stripe Tax) rather than here.
     // A gift card comes off here up to the pre-tax total; whatever's left on
     // it goes toward the tax at checkout.
+    // A promo code only comes off regular items, and shipping is still
+    // figured on the full subtotal (see FREE_SHIPPING_MIN in catalog.js).
+    const promo = promoCode ? UACCatalog.checkPromo(promoCode, TODAY_ISO).promo : null;
+    const promoOff = promo && qty > 0 ? UACCatalog.promoDiscount(cart, promo) : 0;
     const giftBalance = gift && typeof gift.balance === "number" ? gift.balance / 100 : 0;
-    const giftOff = qty === 0 ? 0 : Math.min(giftBalance, sub + shipCost);
-    const total = sub + shipCost - giftOff;
+    const giftOff = qty === 0 ? 0 : Math.min(giftBalance, sub - promoOff + shipCost);
+    const total = sub - promoOff + shipCost - giftOff;
 
     subtotalEl.textContent = money(sub);
     shippingEl.textContent = qty === 0 ? "—" : money(shipCost);
     taxEl.textContent = qty === 0 ? "—" : "At checkout";
     totalEl.textContent = money(total);
     renderGift(giftOff, giftBalance - giftOff);
+    renderPromo(promo, promoOff);
 
     // Only shows while something in the bag is still on preorder (its date is
     // ahead). With more than one item, spell out that the in-stock items wait
@@ -519,6 +548,27 @@ function setRitualButtonLabel(btn, names) {
         (leftForTax > 0.005 && totalQty() > 0
           ? "The rest of your card goes toward sales tax at checkout, and anything left stays on it. "
           : "") + "Promo codes can't be combined with a gift card.";
+    }
+  }
+
+  // The Promo Code box in the bag's Order Summary and its line in the
+  // totals. promoOff is in dollars.
+  function renderPromo(promo, promoOff) {
+    const entry = document.getElementById("promo-code-entry");
+    if (!entry) return;
+    entry.hidden = !!promo;
+    document.getElementById("promo-code-applied").hidden = !promo;
+    document.getElementById("cart-promo-row").hidden = !promo || promoOff <= 0;
+    if (!promo) return;
+    document.getElementById("promo-code-label").textContent = promoCode + " · " + promo.percent + "% off";
+    document.getElementById("cart-promo-name").textContent = promo.name;
+    document.getElementById("cart-promo-amount").textContent = "−" + money(promoOff);
+    const msg = document.getElementById("promo-code-msg");
+    if (!msg.classList.contains("is-error")) {
+      msg.textContent =
+        promoOff <= 0 && totalQty() > 0
+          ? "This code doesn't apply to holiday items, so nothing in your bag is discounted yet."
+          : "Holiday items aren't included.";
     }
   }
 
@@ -852,7 +902,8 @@ function setRitualButtonLabel(btn, names) {
 
     giftApplyBtn.addEventListener("click", () => {
       const code = giftInput.value.trim();
-      if (code) applyGift(code, false);
+      if (code && promoCode) setGiftMsg("Promo codes can't be combined with a gift card. Remove the promo code to use your card.", true);
+      else if (code) applyGift(code, false);
       else setGiftMsg("Enter the code from your gift card email.", true);
     });
     giftInput.addEventListener("keydown", (e) => {
@@ -941,6 +992,41 @@ function setRitualButtonLabel(btn, names) {
 
     if (shipCode) applyShipCode(shipCode, true);
 
+    // ---------------- Promo code ----------------
+    const promoInput = document.getElementById("promo-code-input");
+    const promoApplyBtn = document.getElementById("promo-code-apply");
+    const promoMsg = document.getElementById("promo-code-msg");
+
+    function setPromoMsg(text, isError) {
+      promoMsg.textContent = text;
+      promoMsg.classList.toggle("is-error", !!isError);
+    }
+
+    promoApplyBtn.addEventListener("click", () => {
+      const code = promoInput.value.trim();
+      if (!code) return setPromoMsg("Enter your promo code.", true);
+      if (gift) return setPromoMsg("Promo codes can't be combined with a gift card.", true);
+      const checked = UACCatalog.checkPromo(code, TODAY_ISO);
+      if (checked.error) return setPromoMsg(checked.error, true);
+      promoCode = checked.code;
+      savePromoCode();
+      promoInput.value = "";
+      setPromoMsg("", false);
+      render();
+    });
+    promoInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        promoApplyBtn.click();
+      }
+    });
+    document.getElementById("promo-code-remove").addEventListener("click", () => {
+      promoCode = null;
+      savePromoCode();
+      setPromoMsg("", false);
+      render();
+    });
+
     checkoutBtn.addEventListener("click", async (e) => {
       e.preventDefault();
       if (checkoutBtn.classList.contains("is-disabled")) return;
@@ -969,6 +1055,7 @@ function setRitualButtonLabel(btn, names) {
             giftCode: gift ? gift.code : undefined,
             giftZip: gift ? gift.zip : undefined,
             shippingCode: shipCode || undefined,
+            promoCode: promoCode || undefined,
             siteUrl: window.location.origin,
           }),
         });

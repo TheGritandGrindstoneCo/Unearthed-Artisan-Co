@@ -169,8 +169,22 @@
           <p class="cart-gift-msg" id="ship-code-msg"></p>
         </div>
 
+        <div class="cart-gift">
+          <label for="promo-code-input">Promo code</label>
+          <div class="cart-gift-row" id="promo-code-entry">
+            <input type="text" id="promo-code-input" class="zip-input" placeholder="Code" autocomplete="off" spellcheck="false" />
+            <button type="button" class="cart-gift-apply" id="promo-code-apply">Apply</button>
+          </div>
+          <div class="cart-gift-applied" id="promo-code-applied" hidden>
+            <span id="promo-code-label"></span>
+            <button type="button" class="cart-remove" id="promo-code-remove">Remove</button>
+          </div>
+          <p class="cart-gift-msg" id="promo-code-msg"></p>
+        </div>
+
         <div class="cart-totals">
           <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
+          <div class="cart-total-row cart-total-row--gift" id="cart-promo-row" hidden><span id="cart-promo-name">Promo code</span><span id="cart-promo-amount"></span></div>
           <div class="cart-total-row"><span>Shipping</span><span id="cart-shipping">&mdash;</span></div>
           <div class="cart-total-row"><span>Sales Tax</span><span id="cart-tax">&mdash;</span></div>
           <div class="cart-total-row cart-total-row--gift" id="cart-gift-row" hidden><span>Gift card</span><span id="cart-gift-amount"></span></div>

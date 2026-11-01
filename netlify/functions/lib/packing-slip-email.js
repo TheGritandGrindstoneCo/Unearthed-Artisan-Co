@@ -151,7 +151,7 @@ function buildHtml(session, lineItems) {
   let paid = "Items " + money(products) + " &middot; " + (isDelivery ? "Delivery " : "Shipping ") + (shipping ? money(shipping) : "free");
   if (tax) paid += " &middot; Tax " + money(tax);
   if (totals.amount_discount) {
-    paid += " &middot; " + (m.gift_code ? "Gift card ending " + esc(m.gift_code.slice(-4)) : "Promo code") + " &minus;" + money(totals.amount_discount);
+    paid += " &middot; " + (m.gift_code ? "Gift card ending " + esc(m.gift_code.slice(-4)) : "Promo code" + (m.promo_code ? " " + esc(m.promo_code) : "")) + " &minus;" + money(totals.amount_discount);
   }
   paid += "<br /><b>Total charged " + money(session.amount_total) + "</b>";
 
