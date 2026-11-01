@@ -133,8 +133,8 @@ function setRitualButtonLabel(btn, names) {
       // If every scent in one of a bundle/gift set's dropdowns is sold out,
       // there's no valid pick left for that slot — disable the whole "Add to
       // Bag" button for that card rather than leave a broken selection.
-      // A Holiday Set is also blocked when the set itself (its boxes or
-      // muslin bags) or anything that always comes in it is sold out.
+      // A Holiday Set is also blocked when the set itself (the Gift Set's
+      // boxes) or anything that always comes in it is sold out.
       document.querySelectorAll(".add-giftset, .add-mixmatch, .add-holiday").forEach((btn) => {
         const cardSelects = btn.closest(".card-body").querySelectorAll(".bundle-select");
         const fixed = btn.dataset.set ? [btn.dataset.set].concat((btn.dataset.includes || "").split(",")) : [];

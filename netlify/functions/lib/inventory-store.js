@@ -1,9 +1,11 @@
 const { getStore } = require("@netlify/blobs");
 
 // The products with tracked inventory — 9 soap scents, 4 tallow creams,
-// 3 lip balms, 2 accessories, and the holiday products and Holiday Sets.
-// Matches the data-id values used on the "Add to Bag" buttons in shop.html
-// (and the set ids in catalog.js SETS).
+// 3 lip balms, 2 accessories, the holiday products, and the Holiday Gift
+// Set's boxes. Matches the data-id values used on the "Add to Bag" buttons
+// in shop.html (and the set ids in catalog.js SETS). The Stocking Stuffer
+// isn't here — there are plenty of muslin bags, so it's limited only by
+// the lip balm and soap or cream picked for it.
 const SCENT_IDS = [
   "quiet-clay",
   "jade-hollow",
@@ -27,7 +29,6 @@ const SCENT_IDS = [
   "alpine-snow",
   "mini-body-cream",
   "holiday-gift-set",
-  "stocking-stuffer",
 ];
 
 // Display names for building customer-facing messages (e.g. stock shortages).
@@ -109,6 +110,7 @@ async function reserveStock(deductions) {
   for (const id of Object.keys(deductions)) {
     const qty = parseInt(deductions[id], 10);
     if (!Number.isFinite(qty) || qty <= 0) continue;
+    if (!SCENT_IDS.includes(id)) continue; // not tracked (e.g. the Stocking Stuffer)
 
     let done = false;
     for (let attempt = 0; attempt < 5 && !done; attempt++) {
@@ -152,6 +154,7 @@ async function releaseStock(reserved) {
   for (const item of reserved) {
     const qty = parseInt(item.qty, 10);
     if (!Number.isFinite(qty) || qty <= 0) continue;
+    if (!SCENT_IDS.includes(item.id)) continue; // not tracked — nothing to release
 
     for (let attempt = 0; attempt < 5; attempt++) {
       const result = await store.getWithMetadata(item.id, { type: "text" });

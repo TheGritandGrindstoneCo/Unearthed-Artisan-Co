@@ -97,16 +97,17 @@ exports.handler = async (event) => {
   const scentIdSet = new Set(SCENT_IDS);
   const deductions = {};
   const addDeduction = (id, qty) => {
-    if (!scentIdSet.has(id)) return;
+    if (!scentIdSet.has(id) && !UACCatalog.SETS[id]) return;
     deductions[id] = (deductions[id] || 0) + qty;
   };
   items.forEach((item) => {
     const qty = Math.max(1, parseInt(item.qty, 10) || 1);
     if (Array.isArray(item.scents) && item.scents.length > 0) {
       item.scents.forEach((scentId) => addDeduction(scentId, qty));
-      // A Holiday Set also counts against its own stock (the boxes and
-      // muslin bags on hand), which carries its ship date to the packing
-      // slip and order export too.
+      // A Holiday Set is counted too, which carries its ship date to the
+      // packing slip and order export. The Gift Set's boxes are tracked
+      // stock; the Stocking Stuffer's muslin bags aren't, so reserveStock()
+      // and the shortage check below skip it.
       if (item.set) addDeduction(item.set, qty);
     } else if (typeof item.id === "string") {
       addDeduction(item.id, qty);
@@ -116,7 +117,9 @@ exports.handler = async (event) => {
   if (Object.keys(deductions).length > 0) {
     try {
       const currentStock = await readInventory();
-      const shortages = Object.keys(deductions).filter((id) => deductions[id] > (currentStock[id] || 0));
+      const shortages = Object.keys(deductions).filter(
+        (id) => scentIdSet.has(id) && deductions[id] > (currentStock[id] || 0)
+      );
       if (shortages.length > 0) {
         const details = shortages
           .map((id) => {
