@@ -37,11 +37,11 @@
     "teak-soap-dish": { kind: "accessory", price: 9.95, oz: 1.9, space: 0.5 },
     // Holiday — the two limited bars are sold by the bar on the Holiday
     // shelf and in the Holiday Sets below. The mini cream is only sold in the
-    // sets, so its price isn't shown anywhere; its oz is an estimate until
-    // it's weighed for Product Weights & Measurements.xlsx.
+    // sets, so its price isn't shown anywhere. It's a 2oz jar, so its oz
+    // matches the 2oz facial creams until it's weighed on its own.
     "peppermint-frost": { kind: "soap", price: 10.95, oz: 4.5, space: 1 },
     "alpine-snow": { kind: "soap", price: 10.95, oz: 4.5, space: 1 },
-    "mini-body-cream": { kind: "cream", price: 12.99, oz: 3.5, space: 0.5 },
+    "mini-body-cream": { kind: "cream", price: 12.99, oz: 5.54, space: 0.5 },
   };
 
   // Holiday Sets — fixed prices, not the Ritual discount. slots lists, for
