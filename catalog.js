@@ -153,7 +153,9 @@
   ];
   const LARGE = BOXES[BOXES.length - 1];
 
-  const UNDER_1LB_PRICE = 8.95;
+  // Lowered to $7.00 on 2026-11-16 by choice (below the worst-case $8.95
+  // cost): one item shouldn't cost almost as much to ship as it does to buy.
+  const UNDER_1LB_PRICE = 7;
   // Compared against the product subtotal before tax and before any promo
   // code (THANKYOU10 on Stripe's page, or a bag code from PROMOS below) —
   // see the note on shipping.html.
