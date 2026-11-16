@@ -95,7 +95,7 @@
     // Accessories are bought in, not made — ship with the launch.
     "soap-saver-bag": "2026-10-10",
     "teak-soap-dish": "2026-10-10",
-    // Holiday — Peppermint Frost's cure finishes 11/14 and Alpine Snow's
+    // Holiday — Peppermint Frost's cure finishes 11/13 and Alpine Snow's
     // 11/16, so every Holiday Set ships the week of November 16 (the set
     // dates cover a Stocking Stuffer built from a soap that's ready now).
     "peppermint-frost": "2026-11-16",
