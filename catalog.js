@@ -74,14 +74,15 @@
   // table each time a new soap batch is poured — see Batch Tracking Log.xlsx.
   // Lavender Dawn and Lavender Bloom sold out their first batches, so they're
   // back on preorder from batch #2 (Lavender Bloom poured 9/27, Lavender Dawn
-  // 10/4).
+  // 10/4). Indigo Grove sold out its first batch too; batch #2 (poured
+  // 10/13, new base, organic eucalyptus & patchouli) is ready 11/24.
   const SHIP_DATES = {
     "quiet-clay": "2026-10-10",
     "jade-hollow": "2026-10-10",
     "lavender-dawn": "2026-11-15",
     "lilac-bloom": "2026-11-08",
     "garnet-dusk": "2026-10-10",
-    "indigo-grove": "2026-10-10",
+    "indigo-grove": "2026-11-24",
     "onyx-ember": "2026-10-10",
     "golden-harvest": "2026-10-22",
     "emerald-meadow": "2026-10-22",
