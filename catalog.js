@@ -96,13 +96,15 @@
     // Accessories are bought in, not made — ship with the launch.
     "soap-saver-bag": "2026-10-10",
     "teak-soap-dish": "2026-10-10",
-    // Holiday — Peppermint Frost's cure finishes 11/13 and Alpine Snow's
-    // 11/16, so every Holiday Set ships the week of November 16 (the set
-    // dates cover a Stocking Stuffer built from a soap that's ready now).
-    "peppermint-frost": "2026-11-16",
-    "alpine-snow": "2026-11-16",
+    // Holiday — batch #1 is nearly sold through, so online orders come from
+    // batch #2 (Alpine Snow ready 12/2, Peppermint Frost 12/3) and ship
+    // December 3. The Holiday Gift Set holds both soaps, so it ships 12/3
+    // too. Mini creams are in stock now; a Stocking Stuffer ships on its
+    // picks' dates (12/3 only if it holds a holiday soap).
+    "peppermint-frost": "2026-12-03",
+    "alpine-snow": "2026-12-03",
     "mini-body-cream": "2026-11-16",
-    "holiday-gift-set": "2026-11-16",
+    "holiday-gift-set": "2026-12-03",
     "stocking-stuffer": "2026-11-16",
   };
 
