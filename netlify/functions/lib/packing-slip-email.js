@@ -74,16 +74,6 @@ function countsOf(session) {
   }
 }
 
-// The whole order ships together, on its latest item's date.
-function shipByIso(counts) {
-  let latest = null;
-  counts.forEach((item) => {
-    const iso = UACCatalog.SHIP_DATES[item.id];
-    if (iso && (!latest || iso > latest)) latest = iso;
-  });
-  return latest;
-}
-
 // Rituals and Holiday Sets list their picks after a colon ("Starter Ritual:
 // Soap - Onyx Ember, Cream - ..."), so they're split out to pack one by one.
 function itemRows(lineItems) {
@@ -132,7 +122,7 @@ function buildHtml(session, lineItems) {
     .join("<br />");
 
   const counts = countsOf(session);
-  const shipBy = shipByIso(counts);
+  const shipBy = UACCatalog.orderShipDate(counts.map((item) => item.id), session.created, isDelivery);
   const packages = UACCatalog.packages(counts);
   const boxText = packages
     .map((p) => esc(p.box) + " &middot; about " + (Math.ceil(p.oz * 10) / 10).toFixed(1) + " oz &middot; " + p.dims.join(" &times; ") + " in")
@@ -184,7 +174,7 @@ function buildHtml(session, lineItems) {
     ${label(isDelivery ? "Deliver to" : "Ship to")}
     <p style="margin:0 0 14px;font-size:15px;line-height:1.5;"><b>${esc(name)}</b><br />${addressHtml}</p>
     <table style="border-collapse:collapse;">
-      ${shipBy ? infoRow(isDelivery ? "Deliver by" : "Ship by", "<b>" + longDate(shipBy) + "</b>") : ""}
+      ${shipBy ? infoRow(isDelivery ? "Deliver by" : "Ship by", "<b>" + longDate(shipBy) + "</b>") : counts.length ? infoRow("Ship by", "<b>In stock &mdash; ready to ship</b>") : ""}
       ${boxText ? infoRow("Pack in", boxText) : ""}
       ${infoRow("Phone", esc(customer.phone || "—"))}
       ${infoRow("Email", esc(customer.email || "—"))}

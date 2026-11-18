@@ -175,7 +175,7 @@ exports.handler = async (event) => {
       const row = csvRow([
         session.id,
         orderDate,
-        ...(isDelivery ? [shipDateOf(counts)] : []),
+        ...(isDelivery ? [UACCatalog.orderShipDate(counts.map((item) => item.id), session.created, true) || ""] : []),
         shippingName,
         email,
         phone,
@@ -271,15 +271,4 @@ function productCountsOf(session) {
   return Object.keys(counts)
     .map((id) => ({ id: id, qty: parseInt(counts[id], 10) }))
     .filter((item) => item.qty > 0);
-}
-
-// The whole order goes out together, on its latest item's preorder ship
-// date (same rule as the packing slip). Blank if no item has a date.
-function shipDateOf(counts) {
-  let latest = "";
-  counts.forEach((item) => {
-    const iso = UACCatalog.SHIP_DATES[item.id];
-    if (iso && iso > latest) latest = iso;
-  });
-  return latest;
 }

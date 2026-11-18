@@ -345,8 +345,48 @@
     return roundCents(packages(items).reduce((total, p) => total + p.price, 0));
   }
 
+  // When an order goes out: the whole order ships together on its latest
+  // preorder date while that date is still ahead of the order. Once every
+  // date has passed (the products are in stock), a local delivery goes on
+  // the next delivery day — orders by Monday 5pm PT go Wednesday, by
+  // Thursday 5pm PT go Saturday — and a shipped order returns null (ready
+  // to ship now). Returns YYYY-MM-DD or null.
+  function orderShipDate(ids, placedUnix, isDelivery) {
+    let latest = null;
+    ids.forEach((id) => {
+      const iso = SHIP_DATES[id];
+      if (iso && (!latest || iso > latest)) latest = iso;
+    });
+    const parts = {};
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Los_Angeles",
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      weekday: "short",
+      hour: "numeric",
+      hourCycle: "h23",
+    })
+      .formatToParts(new Date(placedUnix * 1000))
+      .forEach((p) => (parts[p.type] = p.value));
+    const y = +parts.year;
+    const m = +parts.month;
+    const d = +parts.day;
+    const placedIso = y + "-" + String(m).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+    if (latest && latest > placedIso) return latest;
+    if (!isDelivery) return null;
+    const w = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(parts.weekday);
+    const h = +parts.hour;
+    let add;
+    if (w === 1 && h < 17) add = 2; // Monday before 5pm -> Wednesday
+    else if (w === 1 || w === 2 || w === 3 || (w === 4 && h < 17)) add = 6 - w; // -> Saturday
+    else add = (3 - w + 7) % 7 || 7; // Thursday 5pm on -> next Wednesday
+    return new Date(Date.UTC(y, m - 1, d + add)).toISOString().slice(0, 10);
+  }
+
   const api = {
     PRODUCTS: PRODUCTS,
+    orderShipDate: orderShipDate,
     GIFT_CARD: GIFT_CARD,
     SHIP_DATES: SHIP_DATES,
     SETS: SETS,
